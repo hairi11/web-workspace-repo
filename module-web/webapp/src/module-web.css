@@ -69,26 +69,6 @@ th, td {
     padding: 5px 8px;
 }
 
-.dt-container .bottom {
-    margin-top: 16px;
-}
-
-.dt-container .dt-length,
-.dt-container .dt-info,
-.dt-container .dt-paging {
-    display: flex;
-    align-items: center;
-}
-
-.dt-container .dt-paging {
-    margin-left: auto;
-}
-
-.dt-container .dt-length label,
-.dt-container .dt-info {
-    margin-bottom: 0;
-}
-
 .form-group { margin-bottom: 14px; }
 
 label {
