@@ -1,6 +1,6 @@
 import $ from 'jquery';
-import 'datatables.net';
-import 'datatables.net-select';
+import 'datatables.net-bs5';
+import 'datatables.net-select-bs5';
 import Common from '@company/common-js-web';
 import UserFormAction from './UserFormAction.js';
 import UserService from './UserService.js';
