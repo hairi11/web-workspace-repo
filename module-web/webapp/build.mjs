@@ -1,5 +1,8 @@
 import { build } from 'esbuild';
+import path from 'node:path';
 import { copyStaticFiles, bundleDefinitions } from './build-common.mjs';
+
+const nodeModules = path.join(process.cwd(), 'node_modules');
 
 await copyStaticFiles();
 
@@ -11,7 +14,8 @@ for (const item of bundleDefinitions()) {
         format: 'iife',
         outfile: item.outfile,
         sourcemap: true,
-        logLevel: 'info'
+        logLevel: 'info',
+        nodePaths: [nodeModules]
     });
 }
 
