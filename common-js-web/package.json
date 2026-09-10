@@ -8,6 +8,12 @@
     "test": "node --test",
     "check": "find src examples test -name '*.js' -print0 | xargs -0 -n1 node --check"
   },
+  "dependencies": {
+    "eventemitter3": "^5.0.1",
+    "loglevel": "^1.9.2",
+    "lru-cache": "^11.1.0",
+    "unistore": "^3.5.2"
+  },
   "license": "MIT",
   "type": "commonjs"
 }
