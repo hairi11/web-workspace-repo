@@ -1,0 +1,21 @@
+main {
+    max-width: 1100px;
+    margin: 32px auto;
+    padding: 24px;
+    background: #fff;
+    border-radius: 8px;
+}
+
+nav, .toolbar, .actions, .form-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+nav { margin-bottom: 24px; }
+
+.toolbar {
+    margin: 16px 0;
+}
+
+.toolbar input { flex: 1; min-width: 220px; }
