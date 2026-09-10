@@ -8,7 +8,7 @@ import {
 
 const nodeModules = path.join(process.cwd(), 'node_modules');
 
-await copyStaticFiles();
+await copyStaticFiles({ minifyCss: true });
 
 for (const item of bundleDefinitions()) {
     await build({
