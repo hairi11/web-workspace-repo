@@ -1,13 +1,6 @@
-import $ from 'jquery';
-import 'datatables.net-bs5';
-import 'datatables.net-select-bs5';
-import select2 from 'select2';
 import Common from '@company/common-js-web';
 import TodoFormAction from './TodoFormAction.js';
 import TodoService from './TodoService.js';
-
-window.jQuery = window.$ = $;
-select2(window, $);
 
 const { Actions, DataTableBuilder, Toast } = Common;
 
@@ -35,7 +28,7 @@ function asText(value) {
 }
 
 function initStatusSelect() {
-    const status = $('#completed');
+    const status = window.jQuery('#completed');
     if (!status.length) return;
 
     status.select2({
