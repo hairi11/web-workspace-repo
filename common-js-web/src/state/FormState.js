@@ -1,9 +1,12 @@
+const createStore = require('unistore');
 const FormSerializer = require('../form/FormSerializer');
 
 class FormState {
     constructor(form) {
         this.form = form;
-        this.initial = FormSerializer.serialize(form);
+        this.store = createStore({
+            initial: FormSerializer.serialize(form)
+        });
     }
 
     snapshot() {
@@ -11,11 +14,13 @@ class FormState {
     }
 
     isDirty() {
-        return JSON.stringify(this.snapshot()) !== JSON.stringify(this.initial);
+        return JSON.stringify(this.snapshot()) !== JSON.stringify(this.store.getState().initial);
     }
 
     resetBaseline() {
-        this.initial = this.snapshot();
+        this.store.setState({
+            initial: this.snapshot()
+        });
         return this;
     }
 }
