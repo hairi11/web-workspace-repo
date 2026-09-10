@@ -7,8 +7,6 @@ import {
     copyStaticFiles,
     bundleDefinitions,
     sharedVendorPlugin,
-    renderModulePage,
-    renderModulePages,
     distRoot
 } from './build-common.mjs';
 
@@ -54,12 +52,10 @@ async function refreshStatic(filePath) {
         await copyStaticFiles();
     } else if (filePath.endsWith('index.html')) {
         await cp(filePath, path.join(distRoot, 'index.html'));
-    } else if (filePath.includes(path.join('src', 'templates'))) {
-        await renderModulePages();
     } else if (filePath.includes(path.join('user', 'src', 'pages'))) {
-        await renderModulePage('user', path.basename(filePath, '.html'));
+        await cp(filePath, path.join(distRoot, 'user', path.basename(filePath)));
     } else if (filePath.includes(path.join('todos', 'src', 'pages'))) {
-        await renderModulePage('todos', path.basename(filePath, '.html'));
+        await cp(filePath, path.join(distRoot, 'todos', path.basename(filePath)));
     } else {
         return;
     }
