@@ -19,6 +19,7 @@ module.exports = {
     Renderers: require('./datatable/Renderers'),
     SafeDom: require('./util/SafeDom'),
     SecurityUtil: require('./util/SecurityUtil'),
+    Select2: require('./select/Select2'),
     Repository: require('./repository/Repository'),
     Toast: require('./toast/Toast'),
     UrlUtil: require('./util/UrlUtil'),
