@@ -1,8 +1,12 @@
+import $ from 'jquery';
+import 'datatables.net';
 import Common from '@company/common-js-web';
 import UserFormAction from './UserFormAction.js';
 import UserService from './UserService.js';
 
-const { Toast } = Common;
+window.jQuery = window.$ = $;
+
+const { Actions, DataTableBuilder, Toast } = Common;
 
 function pageName() {
     return document.body.dataset.page;
@@ -51,73 +55,61 @@ async function init() {
 }
 
 async function initEnquiry() {
-    const tbody = document.querySelector('#userTableBody');
-    const search = document.querySelector('#searchInput');
     const reload = document.querySelector('#reloadButton');
     let records = [];
 
-    async function load() {
-        showMessage(tbody, 'Loading...');
-
-        try {
-            const response = await UserService.search();
-            records = Array.isArray(response.data) ? response.data : [];
-            render();
-        } catch (error) {
-            showMessage(tbody, 'Failed to load users.');
-            Toast.error('Failed to load users.');
-            console.error(error);
-        }
+    try {
+        const response = await UserService.search();
+        records = Array.isArray(response.data) ? response.data : [];
+    } catch (error) {
+        Toast.error('Failed to load users.');
+        console.error(error);
     }
 
-    function render() {
-        const keyword = (search.value || '').trim().toLowerCase();
-
-        const filtered = keyword
-            ? records.filter((user) =>
-                [user.id, user.name, user.username, user.email, user.phone]
-                    .some((v) => asText(v).toLowerCase().includes(keyword))
-            )
-            : records;
-
-        renderRows(tbody, filtered);
-    }
-
-    search.addEventListener('input', render);
-    reload.addEventListener('click', load);
-
-    tbody.addEventListener('click', async function (event) {
-        const button = event.target.closest('[data-action]');
-        if (!button) return;
-
-        const id = button.dataset.id;
-
-        if (button.dataset.action === 'view') {
-            window.location.href = './view.html?id=' + encodeURIComponent(id);
-            return;
-        }
-
-        if (button.dataset.action === 'update') {
-            window.location.href = './update.html?id=' + encodeURIComponent(id);
-            return;
-        }
-
-        if (button.dataset.action === 'delete') {
-            if (!window.confirm('Delete user #' + id + '?')) return;
+    const table = new DataTableBuilder('#userTable')
+        .data(records)
+        .column('id', 'ID')
+        .column('name', 'Name')
+        .column('username', 'Username')
+        .column('email', 'Email')
+        .column('phone', 'Phone')
+        .searchInput('#searchInput')
+        .menuAction({ title: 'Actions', mode: 'inline' })
+        .addAction(Actions.view((user) => {
+            window.location.href = './view.html?id=' + encodeURIComponent(user.id);
+        }))
+        .addAction(Actions.edit((user) => {
+            window.location.href = './update.html?id=' + encodeURIComponent(user.id);
+        }, { text: 'Update' }))
+        .addAction(Actions.delete(async (user, row) => {
+            if (!window.confirm('Delete user #' + user.id + '?')) return;
 
             try {
-                await UserService.delete(id);
-                records = records.filter((row) => String(row.id) !== String(id));
-                render();
+                await UserService.delete(user.id);
+                row.remove().draw(false);
                 Toast.success('Delete action posted successfully.');
             } catch (error) {
                 Toast.error('Delete action failed.');
                 console.error(error);
             }
+        }))
+        .build();
+
+    reload.addEventListener('click', async () => {
+        reload.disabled = true;
+
+        try {
+            const response = await UserService.search();
+            records = Array.isArray(response.data) ? response.data : [];
+            table.replaceData(records);
+            Toast.success('Users reloaded.');
+        } catch (error) {
+            Toast.error('Failed to reload users.');
+            console.error(error);
+        } finally {
+            reload.disabled = false;
         }
     });
-
-    await load();
 }
 
 async function initUpdate() {
@@ -165,54 +157,6 @@ async function initView() {
 
     document.querySelector('#updateLink').href =
         './update.html?id=' + encodeURIComponent(user.id);
-}
-
-function showMessage(tbody, message) {
-    tbody.textContent = '';
-    const row = document.createElement('tr');
-    const cell = document.createElement('td');
-    cell.colSpan = 6;
-    cell.textContent = message;
-    row.appendChild(cell);
-    tbody.appendChild(row);
-}
-
-function renderRows(tbody, users) {
-    tbody.textContent = '';
-
-    if (!users.length) {
-        showMessage(tbody, 'No users found.');
-        return;
-    }
-
-    users.forEach((user) => {
-        const row = document.createElement('tr');
-
-        [user.id, user.name, user.username, user.email, user.phone].forEach((value) => {
-            const cell = document.createElement('td');
-            cell.textContent = asText(value);
-            row.appendChild(cell);
-        });
-
-        const actions = document.createElement('td');
-        actions.className = 'actions';
-
-        [
-            ['View', 'view'],
-            ['Update', 'update'],
-            ['Delete', 'delete']
-        ].forEach(([label, action]) => {
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.textContent = label;
-            button.dataset.action = action;
-            button.dataset.id = user.id;
-            actions.appendChild(button);
-        });
-
-        row.appendChild(actions);
-        tbody.appendChild(row);
-    });
 }
 
 document.addEventListener('DOMContentLoaded', init);
