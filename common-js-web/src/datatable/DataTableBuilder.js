@@ -19,7 +19,7 @@ const DEFAULT_OPTIONS = {
             last: "<i class='fa fa-angle-double-right' aria-hidden='true'></i>"
         }
     },
-    dom: 't<"bottom d-flex align-items-center justify-content-between flex-wrap gap-2"<"dt-length"l><"dt-info"i><"dt-paging"p>>'
+    dom: 't<"row align-items-center mt-3"<"col-12 col-md-4"l><"col-12 col-md-4 text-md-center mt-2 mt-md-0"i><"col-12 col-md-4 d-flex justify-content-md-end mt-2 mt-md-0"p>>'
 };
 
 class DataTableBuilder {
