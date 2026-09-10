@@ -1,0 +1,13 @@
+{
+  "name": "@company/common-js-web",
+  "version": "7.1.0",
+  "description": "Framework-agnostic CommonJS utility library for Ajax, forms, DataTables and reusable UI helpers.",
+  "main": "src/index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "test": "node --test",
+    "check": "find src examples test -name '*.js' -print0 | xargs -0 -n1 node --check"
+  },
+  "license": "MIT",
+  "type": "commonjs"
+}

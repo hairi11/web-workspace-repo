@@ -1,0 +1,43 @@
+    <!doctype html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Update Todo</title>
+        <link rel="stylesheet" href="../assets/module-web.css">
+    </head>
+    <body data-page="update">
+    <main>
+        <nav>
+    <a class="button" href="../index.html">Modules</a>
+    <a class="button" href="./enquiry.html">Todo Enquiry</a>
+    <a class="button" href="./create.html">Create Todo</a>
+    <a class="button" href="../user/enquiry.html">Users</a>
+</nav>
+
+        <h1>Update Todo</h1>
+<form id="todoForm" novalidate>
+    <div class="form-group">
+        <label for="userId">User ID</label>
+        <input id="userId" name="userId" type="number" min="1">
+    </div>
+    <div class="form-group">
+        <label for="title">Title</label>
+        <input id="title" name="title" type="text">
+    </div>
+    <div class="form-group checkbox-row">
+        <input id="completed" name="completed" type="checkbox" value="true">
+        <label for="completed">Completed</label>
+    </div>
+    <div class="form-actions">
+        <button type="submit">Update</button>
+        <a class="button" href="./enquiry.html">Cancel</a>
+    </div>
+</form>
+<h2>Response</h2>
+<pre id="resultOutput">-</pre>
+
+    </main>
+    <script src="./todos.js"></script>
+    </body>
+    </html>

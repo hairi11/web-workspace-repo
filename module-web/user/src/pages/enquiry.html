@@ -1,0 +1,38 @@
+    <!doctype html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>User Enquiry</title>
+        <link rel="stylesheet" href="../assets/module-web.css">
+    </head>
+    <body data-page="enquiry">
+    <main>
+        <nav>
+    <a class="button" href="../index.html">Modules</a>
+    <a class="button" href="./enquiry.html">User Enquiry</a>
+    <a class="button" href="./create.html">Create User</a>
+    <a class="button" href="../todos/enquiry.html">Todos</a>
+</nav>
+
+        <h1>User Enquiry</h1>
+<div class="note">
+    JSONPlaceholder is a fake API. POST create/update/delete actions are not persisted.
+</div>
+<div class="toolbar">
+    <input id="searchInput" type="search" placeholder="Search user">
+    <button id="reloadButton" type="button">Reload</button>
+</div>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th><th>Name</th><th>Username</th><th>Email</th><th>Phone</th><th>Actions</th>
+        </tr>
+    </thead>
+    <tbody id="userTableBody"></tbody>
+</table>
+
+    </main>
+    <script src="./user.js"></script>
+    </body>
+    </html>

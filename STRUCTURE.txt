@@ -1,0 +1,47 @@
+web-workspace/
+├── pom.xml
+├── README.md
+├── STRUCTURE.txt
+├── common-js-web/
+│   ├── pom.xml
+│   ├── package.json
+│   ├── index.d.ts
+│   ├── src/
+│   ├── test/
+│   ├── docs/
+│   └── examples/
+└── module-web/
+    ├── pom.xml
+    ├── user/
+    │   ├── pom.xml
+    │   └── src/
+    │       ├── UserApi.js
+    │       ├── UserService.js
+    │       ├── UserFormAction.js
+    │       ├── UserPage.js
+    │       └── pages/
+    │           ├── enquiry.html
+    │           ├── create.html
+    │           ├── update.html
+    │           └── view.html
+    ├── todos/
+    │   ├── pom.xml
+    │   └── src/
+    │       ├── TodoApi.js
+    │       ├── TodoService.js
+    │       ├── TodoFormAction.js
+    │       ├── TodoPage.js
+    │       └── pages/
+    │           ├── enquiry.html
+    │           ├── create.html
+    │           ├── update.html
+    │           └── view.html
+    └── webapp/
+        ├── pom.xml
+        ├── package.json
+        ├── build.mjs
+        ├── build-common.mjs
+        ├── dev.mjs
+        └── src/
+            ├── index.html
+            └── module-web.css

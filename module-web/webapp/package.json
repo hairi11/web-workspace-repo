@@ -1,0 +1,25 @@
+{
+  "name": "module-web-webapp",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "npm run clean && node build.mjs",
+    "serve": "browser-sync start --server dist --startPath /module-web/ --no-open",
+    "dev": "node dev.mjs"
+  },
+  "dependencies": {
+    "@company/common-js-web": "file:../../common-js-web"
+  },
+  "devDependencies": {
+    "browser-sync": "^3.0.0",
+    "chokidar": "^4.0.0",
+    "esbuild": "^0.25.0",
+    "rimraf": "^6.0.0"
+  },
+  "engines": {
+    "node": "24.x",
+    "npm": ">=11"
+  }
+}

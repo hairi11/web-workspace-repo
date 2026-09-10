@@ -1,0 +1,28 @@
+\
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.company.web</groupId>
+    <artifactId>web-workspace</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>common-js-web</module>
+        <module>module-web</module>
+    </modules>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Compatible with Maven 3.5.4 -->
+        <maven.antrun.version>3.1.0</maven.antrun.version>
+        <maven.war.version>3.3.2</maven.war.version>
+
+        <!-- Change/override if Node is installed elsewhere -->
+        <node.home>C:\Program Files\nodejs</node.home>
+        <npm.executable>${node.home}\npm.cmd</npm.executable>
+    </properties>
+</project>
