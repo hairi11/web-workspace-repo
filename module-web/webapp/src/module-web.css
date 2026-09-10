@@ -1,9 +1,4 @@
-@import url('./bootstrap.min.css');
-@import url('./dataTables.bootstrap5.min.css');
-@import url('./select.bootstrap5.min.css');
-@import url('./fontawesome.min.css');
-@import url('./select2.min.css');
-
+@import url('./styles/vendor.css');
 @import url('./styles/base.css');
 @import url('./styles/layout.css');
 @import url('./styles/components.css');
