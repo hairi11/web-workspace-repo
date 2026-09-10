@@ -1,0 +1,7 @@
+.view-row {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: 12px;
+    border-bottom: 1px solid #eee;
+    padding: 10px 0;
+}
