@@ -1,8 +1,9 @@
-import { mkdir, cp } from 'node:fs/promises';
+import { mkdir, cp, readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const root = process.cwd();
 const distRoot = path.join(root, 'dist', 'module-web');
+const vendorEntry = path.join(root, 'src', 'js', 'vendor.js');
 
 export async function copyStaticFiles() {
     await mkdir(path.join(distRoot, 'assets'), { recursive: true });
@@ -84,6 +85,25 @@ export function bundleDefinitions() {
             outfile: path.join(distRoot, 'todos', 'todos.js')
         }
     ];
+}
+
+export function sharedVendorPlugin(entryFile) {
+    const normalizedEntry = path.resolve(entryFile);
+
+    return {
+        name: 'shared-vendor-bootstrap',
+        setup(buildContext) {
+            buildContext.onLoad({ filter: /\.js$/ }, async (args) => {
+                if (path.resolve(args.path) !== normalizedEntry) return null;
+
+                const source = await readFile(args.path, 'utf8');
+                return {
+                    contents: `import ${JSON.stringify(vendorEntry)};\n${source}`,
+                    loader: 'js'
+                };
+            });
+        }
+    };
 }
 
 export { distRoot };
