@@ -1,0 +1,10 @@
+.common-toast {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    background: #222;
+    color: #fff;
+    padding: 12px 16px;
+    border-radius: 6px;
+    z-index: 9999;
+}
