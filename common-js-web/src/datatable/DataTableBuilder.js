@@ -10,6 +10,8 @@ const DEFAULT_OPTIONS = {
     },
     lengthMenu: [10, 20, 50, 100],
     language: {
+        lengthMenu: 'Show _MENU_ entries',
+        info: 'Showing _START_ to _END_ of _TOTAL_ entries',
         paginate: {
             first: "<i class='fa fa-angle-double-left' aria-hidden='true'></i>",
             previous: "<i class='fa fa-angle-left' aria-hidden='true'></i>",
@@ -17,7 +19,7 @@ const DEFAULT_OPTIONS = {
             last: "<i class='fa fa-angle-double-right' aria-hidden='true'></i>"
         }
     },
-    dom: 't<"bottom"<"row"<"col-12 col-sm-12 col-md-12 col-lg-4 mt-2"l><"col-12 col-sm-12 col-md-4 col-lg-3 text-md-left text-center mt-2"i><"col-12 col-sm-12 col-md-8 col-lg-5 mt-2"p>>>'
+    dom: 't<"bottom d-flex align-items-center justify-content-between flex-wrap gap-2"<"dt-length"l><"dt-info"i><"dt-paging"p>>'
 };
 
 class DataTableBuilder {
@@ -26,6 +28,8 @@ class DataTableBuilder {
         this.options = Object.assign({}, DEFAULT_OPTIONS, {
             select: Object.assign({}, DEFAULT_OPTIONS.select),
             language: {
+                lengthMenu: DEFAULT_OPTIONS.language.lengthMenu,
+                info: DEFAULT_OPTIONS.language.info,
                 paginate: Object.assign({}, DEFAULT_OPTIONS.language.paginate)
             },
             lengthMenu: DEFAULT_OPTIONS.lengthMenu.slice(),
