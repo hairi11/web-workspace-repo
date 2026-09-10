@@ -1,9 +1,13 @@
+const DEFAULT_OPTIONS = {
+    allowInput: true,
+    dateFormat: 'd-M-Y',
+    position: 'auto'
+};
+
 class DatePicker {
     constructor(selector, options) {
         this.selector = selector;
-        this.options = Object.assign({
-            dateFormat: 'Y-m-d'
-        }, options || {});
+        this.options = Object.assign({}, DEFAULT_OPTIONS, options || {});
         this.instance = null;
     }
 
@@ -66,5 +70,7 @@ class DatePicker {
         return this.instance;
     }
 }
+
+DatePicker.DEFAULT_OPTIONS = DEFAULT_OPTIONS;
 
 module.exports = DatePicker;
