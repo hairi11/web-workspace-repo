@@ -5,6 +5,7 @@ module.exports = {
     AjaxError: require('./ajax/AjaxError'),
     AjaxResponse: require('./ajax/AjaxResponse'),
     ConfirmDialog: require('./form/dialog/ConfirmDialog'),
+    DataPicker: require('./datepicker/DatePicker'),
     DataTableBuilder: require('./datatable/DataTableBuilder'),
     EventBus: require('./event/EventBus'),
     FieldErrorRenderer: require('./form/FieldErrorRenderer'),
