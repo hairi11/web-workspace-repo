@@ -1,25 +1,25 @@
-import EnquiryAction from './action/EnquiryAction.js';
-import CreateAction from './action/CreateAction.js';
-import UpdateAction from './action/UpdateAction.js';
-import ViewAction from './action/ViewAction.js';
+import { initEnquiry } from './action/EnquiryAction.js';
+import { initCreate } from './action/CreateAction.js';
+import { initUpdate } from './action/UpdateAction.js';
+import { initView } from './action/ViewAction.js';
 
 const actions = {
-    enquiry: EnquiryAction,
-    create: CreateAction,
-    update: UpdateAction,
-    view: ViewAction
+    enquiry: initEnquiry,
+    create: initCreate,
+    update: initUpdate,
+    view: initView
 };
 
 async function init() {
     try {
         const page = document.body.dataset.page;
-        const Action = actions[page];
+        const action = actions[page];
 
-        if (!Action) {
+        if (!action) {
             throw new Error('Unsupported user page: ' + page);
         }
 
-        await new Action().init();
+        await action();
     } catch (error) {
         console.error(error);
     }
