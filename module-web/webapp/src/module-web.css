@@ -53,6 +53,16 @@ th, td {
     vertical-align: top;
 }
 
+.dt-common-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.dt-common-actions button {
+    padding: 5px 8px;
+}
+
 .form-group { margin-bottom: 14px; }
 
 label {
