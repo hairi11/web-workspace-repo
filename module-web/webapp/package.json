@@ -12,8 +12,9 @@
   "dependencies": {
     "@company/common-js-web": "file:../../common-js-web",
     "datatables.net": "2.3.4",
+    "datatables.net-select": "3.0.1",
     "jquery": "3.7.1",
-    "select2": "4.0.13"
+    "select2": "4.1.0-rc.0"
   },
   "devDependencies": {
     "browser-sync": "^3.0.0",
