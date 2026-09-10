@@ -10,6 +10,7 @@ import {
 } from './build-common.mjs';
 
 const browserSync = browserSyncFactory.create();
+const nodeModules = path.join(process.cwd(), 'node_modules');
 
 await copyStaticFiles();
 
@@ -24,6 +25,7 @@ for (const item of bundleDefinitions()) {
         outfile: item.outfile,
         sourcemap: true,
         logLevel: 'info',
+        nodePaths: [nodeModules],
         plugins: [{
             name: 'browser-reload',
             setup(build) {
