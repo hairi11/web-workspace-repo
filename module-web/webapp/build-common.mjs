@@ -6,6 +6,7 @@ const distRoot = path.join(root, 'dist', 'module-web');
 
 export async function copyStaticFiles() {
     await mkdir(path.join(distRoot, 'assets'), { recursive: true });
+    await mkdir(path.join(distRoot, 'assets', 'styles'), { recursive: true });
     await mkdir(path.join(distRoot, 'webfonts'), { recursive: true });
     await mkdir(path.join(distRoot, 'user'), { recursive: true });
     await mkdir(path.join(distRoot, 'todos'), { recursive: true });
@@ -18,6 +19,12 @@ export async function copyStaticFiles() {
     await cp(
         path.join(root, 'src', 'module-web.css'),
         path.join(distRoot, 'assets', 'module-web.css')
+    );
+
+    await cp(
+        path.join(root, 'src', 'styles'),
+        path.join(distRoot, 'assets', 'styles'),
+        { recursive: true }
     );
 
     await cp(
