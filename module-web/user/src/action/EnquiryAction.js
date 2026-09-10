@@ -11,20 +11,22 @@ class EnquiryAction extends UserActionBase {
     }
 
     async init() {
-        const records = await this.loadUsers();
+        let records = [];
+
+        try {
+            records = await this.loadUsers();
+        } catch (error) {
+            Toast.error('Failed to load users.');
+            console.error(error);
+        }
+
         this.table = this.buildTable(records);
         this.bindReloadButton();
     }
 
     async loadUsers() {
-        try {
-            const response = await UserService.search();
-            return Array.isArray(response.data) ? response.data : [];
-        } catch (error) {
-            Toast.error('Failed to load users.');
-            console.error(error);
-            return [];
-        }
+        const response = await UserService.search();
+        return Array.isArray(response.data) ? response.data : [];
     }
 
     buildTable(records) {
@@ -68,6 +70,9 @@ class EnquiryAction extends UserActionBase {
                 const records = await this.loadUsers();
                 this.table.replaceData(records);
                 Toast.success('Users reloaded.');
+            } catch (error) {
+                Toast.error('Failed to reload users.');
+                console.error(error);
             } finally {
                 reload.disabled = false;
             }
