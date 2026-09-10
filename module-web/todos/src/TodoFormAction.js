@@ -12,7 +12,8 @@ class TodoFormAction extends FormAction {
     getValidationRules() {
         return {
             userId: Validator.required('User ID is required.'),
-            title: Validator.required('Title is required.')
+            title: Validator.required('Title is required.'),
+            completed: Validator.required('Status is required.')
         };
     }
 
@@ -50,7 +51,11 @@ class TodoFormAction extends FormAction {
         }
 
         if (this.form.elements.completed) {
-            this.form.elements.completed.checked = Boolean(values.completed);
+            this.form.elements.completed.value = values.completed ? 'true' : 'false';
+
+            if (window.jQuery) {
+                window.jQuery(this.form.elements.completed).trigger('change.select2');
+            }
         }
 
         if (this.formState) {
