@@ -1,12 +1,29 @@
 import Common from '@company/common-js-web';
 import TodoService from './TodoService.js';
 
-const { FormAction, Validator, Toast } = Common;
+const { FormAction, Select2, Validator, Toast } = Common;
 
 class TodoFormAction extends FormAction {
     constructor(selector, options) {
         super(selector);
         this.options = options || {};
+        this.statusSelect = null;
+    }
+
+    onBuild(form) {
+        if (!form.elements.completed) return;
+
+        this.statusSelect = new Select2(form.elements.completed, {
+            width: '100%',
+            minimumResultsForSearch: Infinity
+        }).build();
+    }
+
+    onDestroy() {
+        if (this.statusSelect) {
+            this.statusSelect.destroy();
+            this.statusSelect = null;
+        }
     }
 
     getValidationRules() {
@@ -51,10 +68,12 @@ class TodoFormAction extends FormAction {
         }
 
         if (this.form.elements.completed) {
-            this.form.elements.completed.value = values.completed ? 'true' : 'false';
+            const value = values.completed ? 'true' : 'false';
 
-            if (window.jQuery) {
-                window.jQuery(this.form.elements.completed).trigger('change.select2');
+            if (this.statusSelect) {
+                this.statusSelect.setValue(value);
+            } else {
+                this.form.elements.completed.value = value;
             }
         }
 
