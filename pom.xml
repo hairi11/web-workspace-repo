@@ -20,8 +20,8 @@
         <maven.antrun.version>3.1.0</maven.antrun.version>
         <maven.war.version>3.3.2</maven.war.version>
 
-        <!-- Change/override if Node is installed elsewhere -->
-        <node.home>C:\Program Files\nodejs</node.home>
+        <!-- Node installation -->
+        <node.home>D:\node-v22.19.0-win-x64</node.home>
         <npm.executable>${node.home}\npm.cmd</npm.executable>
     </properties>
 </project>
