@@ -81,6 +81,7 @@
                 <configuration>
                     <webApp>
                         <contextPath>/module-web</contextPath>
+                        <resourceBase>${project.basedir}/dist/module-web</resourceBase>
                     </webApp>
                 </configuration>
             </plugin>
