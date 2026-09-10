@@ -20,6 +20,11 @@ export async function copyStaticFiles() {
     );
 
     await cp(
+        path.join(root, 'node_modules', 'select2', 'dist', 'css', 'select2.min.css'),
+        path.join(distRoot, 'assets', 'select2.min.css')
+    );
+
+    await cp(
         path.join(root, '..', 'user', 'src', 'pages'),
         path.join(distRoot, 'user'),
         { recursive: true }
