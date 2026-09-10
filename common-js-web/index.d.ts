@@ -20,7 +20,6 @@ export interface AjaxSecurityOptions {
     maxBodyLength?: number;
 }
 
-
 export interface FormValidationResult {
     valid: boolean;
     errors: Record<string, string>;
@@ -94,6 +93,19 @@ export class DataTableBuilder {
     refresh(resetPaging?: boolean): this;
     search(value: string): this;
     destroy(): this;
+}
+
+export class DatePicker {
+    constructor(selector: string | HTMLElement, options?: any);
+    option(name: string, value: any): this;
+    optionsConfig(config?: any): this;
+    build(): this;
+    setDate(value: any, triggerChange?: boolean): this;
+    clear(): this;
+    open(): this;
+    close(): this;
+    destroy(): this;
+    getInstance(): any;
 }
 
 export const Validator: any;
