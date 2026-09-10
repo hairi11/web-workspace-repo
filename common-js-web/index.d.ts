@@ -108,6 +108,20 @@ export class DatePicker {
     getInstance(): any;
 }
 
+export class Select2 {
+    constructor(selector: string | HTMLElement, options?: any);
+    option(name: string, value: any): this;
+    optionsConfig(config?: any): this;
+    build(): this;
+    value(): any;
+    setValue(value: any, triggerChange?: boolean): this;
+    clear(triggerChange?: boolean): this;
+    enable(): this;
+    disable(): this;
+    destroy(): this;
+    getInstance(): any;
+}
+
 export const Validator: any;
 export const Actions: any;
 export const Renderers: any;
