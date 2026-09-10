@@ -1,11 +1,12 @@
 import browserSyncFactory from 'browser-sync';
 import chokidar from 'chokidar';
 import { context } from 'esbuild';
-import { cp } from 'node:fs/promises';
+import { cp, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import {
     copyStaticFiles,
     bundleDefinitions,
+    sharedVendorPlugin,
     distRoot
 } from './build-common.mjs';
 
@@ -26,16 +27,19 @@ for (const item of bundleDefinitions()) {
         sourcemap: true,
         logLevel: 'info',
         nodePaths: [nodeModules],
-        plugins: [{
-            name: 'browser-reload',
-            setup(build) {
-                build.onEnd((result) => {
-                    if (result.errors.length === 0 && browserSync.active) {
-                        browserSync.reload();
-                    }
-                });
+        plugins: [
+            sharedVendorPlugin(item.entry),
+            {
+                name: 'browser-reload',
+                setup(build) {
+                    build.onEnd((result) => {
+                        if (result.errors.length === 0 && browserSync.active) {
+                            browserSync.reload();
+                        }
+                    });
+                }
             }
-        }]
+        ]
     });
 
     await ctx.watch();
@@ -62,13 +66,19 @@ const copyWatch = chokidar.watch([
 });
 
 async function refreshStatic(filePath) {
-    const relative = path.relative(process.cwd(), filePath);
-
     if (filePath.endsWith('module-web.css')) {
         await cp(
             filePath,
             path.join(distRoot, 'assets', 'module-web.css')
         );
+    } else if (filePath.includes(path.join('src', 'styles'))) {
+        const relativeStyle = path.relative(
+            path.join(process.cwd(), 'src', 'styles'),
+            filePath
+        );
+        const target = path.join(distRoot, 'assets', 'styles', relativeStyle);
+        await mkdir(path.dirname(target), { recursive: true });
+        await cp(filePath, target);
     } else if (filePath.endsWith('index.html')) {
         await cp(
             filePath,
