@@ -1,0 +1,24 @@
+a.button, button {
+    border: 1px solid #bbb;
+    background: #fff;
+    color: #222;
+    border-radius: 5px;
+    padding: 8px 12px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+a.button:hover, button:hover { background: #f0f0f0; }
+
+.note {
+    padding: 12px;
+    border: 1px solid #ddd;
+    background: #fafafa;
+    margin: 14px 0;
+}
+
+pre {
+    background: #f3f3f3;
+    padding: 12px;
+    overflow: auto;
+}
