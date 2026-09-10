@@ -70,7 +70,7 @@ async function initEnquiry() {
         .column('email', 'Email')
         .column('phone', 'Phone')
         .searchInput('#searchInput')
-        .menuAction({ title: 'Actions', mode: 'inline' })
+        .menuAction({ mode: 'context' })
         .addAction(Actions.view((user) => {
             window.location.href = './view.html?id=' + encodeURIComponent(user.id);
         }))
