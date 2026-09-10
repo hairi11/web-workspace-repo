@@ -1,31 +1,7 @@
-    <!doctype html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Update Todo</title>
-        <link rel="stylesheet" href="../assets/module-web.css">
-        <link rel="stylesheet" href="../assets/select2.min.css">
-    </head>
-    <body data-page="update">
-    <main>
-        <nav>
-    <a class="button" href="../index.html">Modules</a>
-    <a class="button" href="./enquiry.html">Todo Enquiry</a>
-    <a class="button" href="./create.html">Create Todo</a>
-    <a class="button" href="../user/enquiry.html">Users</a>
-</nav>
-
-        <h1>Update Todo</h1>
+<h1>Update Todo</h1>
 <form id="todoForm" novalidate>
-    <div class="form-group">
-        <label for="userId">User ID</label>
-        <input id="userId" name="userId" type="number" min="1">
-    </div>
-    <div class="form-group">
-        <label for="title">Title</label>
-        <input id="title" name="title" type="text">
-    </div>
+    <div class="form-group"><label for="userId">User ID</label><input id="userId" name="userId" type="number" min="1"></div>
+    <div class="form-group"><label for="title">Title</label><input id="title" name="title" type="text"></div>
     <div class="form-group">
         <label for="completed">Status</label>
         <select id="completed" name="completed" class="js-select2">
@@ -40,8 +16,3 @@
 </form>
 <h2>Response</h2>
 <pre id="resultOutput">-</pre>
-
-    </main>
-    <script src="./todos.js"></script>
-    </body>
-    </html>
