@@ -10,7 +10,9 @@
     "dev": "node dev.mjs"
   },
   "dependencies": {
-    "@company/common-js-web": "file:../../common-js-web"
+    "@company/common-js-web": "file:../../common-js-web",
+    "datatables.net": "2.3.4",
+    "jquery": "3.7.1"
   },
   "devDependencies": {
     "browser-sync": "^3.0.0",
@@ -19,7 +21,7 @@
     "rimraf": "^6.0.0"
   },
   "engines": {
-    "node": "24.x",
-    "npm": ">=11"
+    "node": "22.x",
+    "npm": ">=10"
   }
 }
