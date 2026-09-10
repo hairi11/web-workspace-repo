@@ -223,6 +223,10 @@ class FormAction {
     }
 
     sendRequest(context) {
+        if (!context.url) {
+            throw new Error('getUrl() must return a URL when using FormAction.sendRequest().');
+        }
+
         if (context.method === 'GET') {
             return Ajax.get(
                 context.url,
@@ -275,7 +279,7 @@ class FormAction {
     }
 
     getUrl() {
-        throw new Error('getUrl() must be implemented.');
+        return null;
     }
 
     getValidationRules() {
