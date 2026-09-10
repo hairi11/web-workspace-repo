@@ -1,9 +1,36 @@
 const SecurityUtil = require('../util/SecurityUtil');
 
+const DEFAULT_OPTIONS = {
+    searching: false,
+    pagingType: 'full_numbers',
+    select: {
+        style: 'multi+shift',
+        selector: 'td:not(:first-child)',
+        info: false
+    },
+    lengthMenu: [10, 20, 50, 100],
+    language: {
+        paginate: {
+            first: "<i class='fa fa-angle-double-left' aria-hidden='true'></i>",
+            previous: "<i class='fa fa-angle-left' aria-hidden='true'></i>",
+            next: "<i class='fa fa-angle-right' aria-hidden='true'></i>",
+            last: "<i class='fa fa-angle-double-right' aria-hidden='true'></i>"
+        }
+    },
+    dom: 't<"bottom"<"row"<"col-12 col-sm-12 col-md-12 col-lg-4 mt-2"l><"col-12 col-sm-12 col-md-4 col-lg-3 text-md-left text-center mt-2"i><"col-12 col-sm-12 col-md-8 col-lg-5 mt-2"p>>>'
+};
+
 class DataTableBuilder {
     constructor(selector) {
         this.selector = selector;
-        this.options = {columns: []};
+        this.options = Object.assign({}, DEFAULT_OPTIONS, {
+            select: Object.assign({}, DEFAULT_OPTIONS.select),
+            language: {
+                paginate: Object.assign({}, DEFAULT_OPTIONS.language.paginate)
+            },
+            lengthMenu: DEFAULT_OPTIONS.lengthMenu.slice(),
+            columns: []
+        });
         this.actions = [];
         this.bulkActions = [];
         this.actionConfig = null;
@@ -23,7 +50,7 @@ class DataTableBuilder {
     searchInput(selector) { this.searchSelector = selector; return this; }
     filter(selector, columnIndex) { this.filterBindings.push({selector: selector, columnIndex: columnIndex}); return this; }
     selectable(config) {
-        var cfg = Object.assign({style: 'multi', selector: 'td:first-child'}, config || {});
+        var cfg = Object.assign({}, DEFAULT_OPTIONS.select, config || {});
         this.options.select = cfg;
         return this;
     }
@@ -133,5 +160,7 @@ class DataTableBuilder {
         });
     }
 }
+
+DataTableBuilder.DEFAULT_OPTIONS = DEFAULT_OPTIONS;
 
 module.exports = DataTableBuilder;
