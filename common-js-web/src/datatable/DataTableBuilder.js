@@ -91,7 +91,7 @@ class DataTableBuilder {
         this._hideContextMenu();
         this.table.clear();
         this.table.rows.add(Array.isArray(rows) ? rows : []);
-        this.table.draw(resetPaging === true);
+        this.table.draw(resetPaging !== false);
         return this;
     }
     search(value) { if (this.table) this.table.search(value || '').draw(); return this; }
