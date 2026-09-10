@@ -5,79 +5,6 @@ import { transform } from 'esbuild';
 const root = process.cwd();
 const distRoot = path.join(root, 'dist', 'module-web');
 const vendorEntry = path.join(root, 'src', 'js', 'vendor.js');
-const templateFile = path.join(root, 'src', 'templates', 'base.html');
-
-const pageConfig = {
-    user: {
-        script: 'user.js',
-        source: path.join(root, '..', 'user', 'src', 'pages'),
-        nav: [
-            ['../index.html', 'Modules'],
-            ['./enquiry.html', 'User Enquiry'],
-            ['./create.html', 'Create User'],
-            ['../todos/enquiry.html', 'Todos']
-        ],
-        pages: {
-            enquiry: { title: 'User Enquiry' },
-            create: { title: 'Create User' },
-            update: { title: 'Update User' },
-            view: { title: 'View User' }
-        }
-    },
-    todos: {
-        script: 'todos.js',
-        source: path.join(root, '..', 'todos', 'src', 'pages'),
-        nav: [
-            ['../index.html', 'Modules'],
-            ['./enquiry.html', 'Todo Enquiry'],
-            ['./create.html', 'Create Todo'],
-            ['../user/enquiry.html', 'Users']
-        ],
-        pages: {
-            enquiry: { title: 'Todo Enquiry' },
-            create: { title: 'Create Todo' },
-            update: { title: 'Update Todo' },
-            view: { title: 'View Todo' }
-        }
-    }
-};
-
-function renderTemplate(template, values) {
-    return template.replace(/\{\{(\w+)\}\}/g, (_, key) => values[key] || '');
-}
-
-function renderNav(items) {
-    return items.map(([href, text]) => `        <a class="button" href="${href}">${text}</a>`).join('\n') + '\n';
-}
-
-export async function renderModulePage(moduleName, pageName) {
-    const module = pageConfig[moduleName];
-    const page = module && module.pages[pageName];
-    if (!module || !page) return;
-
-    const [template, content] = await Promise.all([
-        readFile(templateFile, 'utf8'),
-        readFile(path.join(module.source, pageName + '.html'), 'utf8')
-    ]);
-
-    await mkdir(path.join(distRoot, moduleName), { recursive: true });
-    await writeFile(path.join(distRoot, moduleName, pageName + '.html'), renderTemplate(template, {
-        title: page.title,
-        page: pageName,
-        nav: renderNav(module.nav),
-        content: content.trim(),
-        script: module.script,
-        extraStyles: ''
-    }));
-}
-
-export async function renderModulePages() {
-    for (const [moduleName, module] of Object.entries(pageConfig)) {
-        for (const pageName of Object.keys(module.pages)) {
-            await renderModulePage(moduleName, pageName);
-        }
-    }
-}
 
 async function inlineCssImports(filePath, seen) {
     const absolutePath = path.resolve(filePath);
@@ -124,6 +51,8 @@ export async function copyStaticFiles(options) {
     await cp(path.join(root, 'src', 'index.html'), path.join(distRoot, 'index.html'));
     await cp(path.join(root, 'src', 'module-web.css'), path.join(distRoot, 'assets', 'module-web.css'));
     await cp(path.join(root, 'src', 'styles'), path.join(distRoot, 'assets', 'styles'), { recursive: true });
+    await cp(path.join(root, '..', 'user', 'src', 'pages'), path.join(distRoot, 'user'), { recursive: true });
+    await cp(path.join(root, '..', 'todos', 'src', 'pages'), path.join(distRoot, 'todos'), { recursive: true });
     await cp(path.join(root, 'node_modules', 'bootstrap', 'dist', 'css', 'bootstrap.min.css'), path.join(distRoot, 'assets', 'bootstrap.min.css'));
     await cp(path.join(root, 'node_modules', 'datatables.net-bs5', 'css', 'dataTables.bootstrap5.min.css'), path.join(distRoot, 'assets', 'dataTables.bootstrap5.min.css'));
     await cp(path.join(root, 'node_modules', 'datatables.net-select-bs5', 'css', 'select.bootstrap5.min.css'), path.join(distRoot, 'assets', 'select.bootstrap5.min.css'));
@@ -133,7 +62,6 @@ export async function copyStaticFiles(options) {
     await cp(path.join(root, 'node_modules', 'flatpickr', 'dist', 'flatpickr.min.css'), path.join(distRoot, 'assets', 'flatpickr.min.css'));
 
     await bundleStyles(options.minifyCss === true);
-    await renderModulePages();
 }
 
 export function bundleDefinitions() {
