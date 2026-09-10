@@ -35,8 +35,8 @@ const pageConfig = {
         ],
         pages: {
             enquiry: { title: 'Todo Enquiry' },
-            create: { title: 'Create Todo', extraStyles: '<link rel="stylesheet" href="../assets/select2.min.css">' },
-            update: { title: 'Update Todo', extraStyles: '<link rel="stylesheet" href="../assets/select2.min.css">' },
+            create: { title: 'Create Todo' },
+            update: { title: 'Update Todo' },
             view: { title: 'View Todo' }
         }
     }
@@ -67,7 +67,7 @@ export async function renderModulePage(moduleName, pageName) {
         nav: renderNav(module.nav),
         content: content.trim(),
         script: module.script,
-        extraStyles: page.extraStyles ? '    ' + page.extraStyles + '\n' : ''
+        extraStyles: ''
     }));
 }
 
