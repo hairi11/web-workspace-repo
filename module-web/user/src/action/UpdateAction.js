@@ -1,17 +1,12 @@
 import UserFormAction from '../UserFormAction.js';
-import UserActionBase from './UserActionBase.js';
+import { requireId } from './userActionBase.js';
 
-class UpdateAction extends UserActionBase {
-    async init() {
-        const id = this.requireId();
-        const action = new UserFormAction('#userForm', {
-            mode: 'update',
-            id: id
-        });
+export async function initUpdate() {
+    const action = new UserFormAction('#userForm', {
+        mode: 'update',
+        id: requireId()
+    });
 
-        action.build();
-        await action.load();
-    }
+    action.build();
+    await action.load();
 }
-
-export default UpdateAction;
