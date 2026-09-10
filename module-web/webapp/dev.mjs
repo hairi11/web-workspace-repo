@@ -5,7 +5,6 @@ import { cp } from 'node:fs/promises';
 import path from 'node:path';
 import {
     copyStaticFiles,
-    bundleStyles,
     bundleDefinitions,
     sharedVendorPlugin,
     renderModulePage,
@@ -53,7 +52,6 @@ const copyWatch = chokidar.watch([
 async function refreshStatic(filePath) {
     if (filePath.endsWith('module-web.css') || filePath.includes(path.join('src', 'styles'))) {
         await copyStaticFiles();
-        await bundleStyles(false);
     } else if (filePath.endsWith('index.html')) {
         await cp(filePath, path.join(distRoot, 'index.html'));
     } else if (filePath.includes(path.join('src', 'templates'))) {
