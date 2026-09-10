@@ -1,34 +1,28 @@
+const { LRUCache } = require('lru-cache');
+
 class MemoryCache {
-    constructor() {
-        this.items = new Map();
+    constructor(options) {
+        options = options || {};
+        this.cache = new LRUCache({
+            max: options.max || 1000
+        });
     }
 
     get(key) {
-        var entry = this.items.get(key);
-        if (!entry) return undefined;
-
-        if (entry.expiresAt && Date.now() > entry.expiresAt) {
-            this.items.delete(key);
-            return undefined;
-        }
-
-        return entry.value;
+        return this.cache.get(key);
     }
 
     set(key, value, ttl) {
-        this.items.set(key, {
-            value: value,
-            expiresAt: ttl > 0 ? Date.now() + ttl : 0
-        });
+        this.cache.set(key, value, ttl > 0 ? { ttl: ttl } : undefined);
         return value;
     }
 
     delete(key) {
-        return this.items.delete(key);
+        return this.cache.delete(key);
     }
 
     clear() {
-        this.items.clear();
+        this.cache.clear();
     }
 }
 
