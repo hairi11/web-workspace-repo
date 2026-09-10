@@ -1,5 +1,6 @@
 import { mkdir, cp, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { transform } from 'esbuild';
 
 const root = process.cwd();
 const distRoot = path.join(root, 'dist', 'module-web');
@@ -78,7 +79,42 @@ export async function renderModulePages() {
     }
 }
 
-export async function copyStaticFiles() {
+async function inlineCssImports(filePath, seen) {
+    const absolutePath = path.resolve(filePath);
+    seen = seen || new Set();
+    if (seen.has(absolutePath)) return '';
+    seen.add(absolutePath);
+
+    const css = await readFile(absolutePath, 'utf8');
+    const importPattern = /@import\s+(?:url\()?['"]([^'"]+)['"]\)?\s*;/g;
+    let output = '';
+    let lastIndex = 0;
+    let match;
+
+    while ((match = importPattern.exec(css)) !== null) {
+        output += css.slice(lastIndex, match.index);
+        const importedPath = path.resolve(path.dirname(absolutePath), match[1]);
+        output += await inlineCssImports(importedPath, seen);
+        lastIndex = importPattern.lastIndex;
+    }
+
+    output += css.slice(lastIndex);
+    return output;
+}
+
+export async function bundleStyles(minify) {
+    const entry = path.join(distRoot, 'assets', 'module-web.css');
+    const bundled = await inlineCssImports(entry);
+    const result = await transform(bundled, {
+        loader: 'css',
+        minify: minify === true
+    });
+    await writeFile(entry, result.code);
+}
+
+export async function copyStaticFiles(options) {
+    options = options || {};
+
     await mkdir(path.join(distRoot, 'assets'), { recursive: true });
     await mkdir(path.join(distRoot, 'assets', 'styles'), { recursive: true });
     await mkdir(path.join(distRoot, 'webfonts'), { recursive: true });
@@ -96,6 +132,7 @@ export async function copyStaticFiles() {
     await cp(path.join(root, 'node_modules', 'select2', 'dist', 'css', 'select2.min.css'), path.join(distRoot, 'assets', 'select2.min.css'));
     await cp(path.join(root, 'node_modules', 'flatpickr', 'dist', 'flatpickr.min.css'), path.join(distRoot, 'assets', 'flatpickr.min.css'));
 
+    await bundleStyles(options.minifyCss === true);
     await renderModulePages();
 }
 
