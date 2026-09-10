@@ -6,6 +6,7 @@ const distRoot = path.join(root, 'dist', 'module-web');
 
 export async function copyStaticFiles() {
     await mkdir(path.join(distRoot, 'assets'), { recursive: true });
+    await mkdir(path.join(distRoot, 'webfonts'), { recursive: true });
     await mkdir(path.join(distRoot, 'user'), { recursive: true });
     await mkdir(path.join(distRoot, 'todos'), { recursive: true });
 
@@ -17,6 +18,32 @@ export async function copyStaticFiles() {
     await cp(
         path.join(root, 'src', 'module-web.css'),
         path.join(distRoot, 'assets', 'module-web.css')
+    );
+
+    await cp(
+        path.join(root, 'node_modules', 'bootstrap', 'dist', 'css', 'bootstrap.min.css'),
+        path.join(distRoot, 'assets', 'bootstrap.min.css')
+    );
+
+    await cp(
+        path.join(root, 'node_modules', 'datatables.net-bs5', 'css', 'dataTables.bootstrap5.min.css'),
+        path.join(distRoot, 'assets', 'dataTables.bootstrap5.min.css')
+    );
+
+    await cp(
+        path.join(root, 'node_modules', 'datatables.net-select-bs5', 'css', 'select.bootstrap5.min.css'),
+        path.join(distRoot, 'assets', 'select.bootstrap5.min.css')
+    );
+
+    await cp(
+        path.join(root, 'node_modules', '@fortawesome', 'fontawesome-free', 'css', 'all.min.css'),
+        path.join(distRoot, 'assets', 'fontawesome.min.css')
+    );
+
+    await cp(
+        path.join(root, 'node_modules', '@fortawesome', 'fontawesome-free', 'webfonts'),
+        path.join(distRoot, 'webfonts'),
+        { recursive: true }
     );
 
     await cp(
