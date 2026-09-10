@@ -1,10 +1,12 @@
 import $ from 'jquery';
 import 'datatables.net';
+import select2 from 'select2';
 import Common from '@company/common-js-web';
 import TodoFormAction from './TodoFormAction.js';
 import TodoService from './TodoService.js';
 
 window.jQuery = window.$ = $;
+select2(window, $);
 
 const { Actions, DataTableBuilder, Toast } = Common;
 
@@ -31,6 +33,16 @@ function asText(value) {
     return value === null || value === undefined ? '' : String(value);
 }
 
+function initStatusSelect() {
+    const status = $('#completed');
+    if (!status.length) return;
+
+    status.select2({
+        width: '100%',
+        minimumResultsForSearch: Infinity
+    });
+}
+
 async function init() {
     try {
         switch (pageName()) {
@@ -38,9 +50,11 @@ async function init() {
                 await initEnquiry();
                 break;
             case 'create':
+                initStatusSelect();
                 new TodoFormAction('#todoForm', { mode: 'create' }).build();
                 break;
             case 'update':
+                initStatusSelect();
                 await initUpdate();
                 break;
             case 'view':
