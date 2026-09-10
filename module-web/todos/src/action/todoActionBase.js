@@ -20,13 +20,3 @@ export function requireId() {
 export function asText(value) {
     return value === null || value === undefined ? '' : String(value);
 }
-
-export function initStatusSelect() {
-    const status = window.jQuery('#completed');
-    if (!status.length) return;
-
-    status.select2({
-        width: '100%',
-        minimumResultsForSearch: Infinity
-    });
-}
