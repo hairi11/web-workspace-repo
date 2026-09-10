@@ -81,7 +81,7 @@ async function initEnquiry() {
         .column('title', 'Title')
         .renderer('completed', 'Status', (completed) => completed ? 'Completed' : 'Pending')
         .searchInput('#searchInput')
-        .menuAction({ title: 'Actions', mode: 'inline' })
+        .menuAction({ mode: 'context' })
         .addAction(Actions.view((todo) => {
             window.location.href = './view.html?id=' + encodeURIComponent(todo.id);
         }))
