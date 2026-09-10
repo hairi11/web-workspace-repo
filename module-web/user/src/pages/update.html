@@ -1,14 +1,35 @@
-<h1>Update User</h1>
-<form id="userForm" novalidate>
-    <div class="form-group"><label for="name">Name</label><input id="name" name="name" type="text"></div>
-    <div class="form-group"><label for="username">Username</label><input id="username" name="username" type="text"></div>
-    <div class="form-group"><label for="email">Email</label><input id="email" name="email" type="email"></div>
-    <div class="form-group"><label for="phone">Phone</label><input id="phone" name="phone" type="text"></div>
-    <div class="form-group"><label for="website">Website</label><input id="website" name="website" type="text"></div>
-    <div class="form-actions">
-        <button type="submit">Update</button>
-        <a class="button" href="./enquiry.html">Cancel</a>
-    </div>
-</form>
-<h2>Response</h2>
-<pre id="resultOutput">-</pre>
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update User</title>
+    <link rel="stylesheet" href="../assets/module-web.css">
+</head>
+<body data-page="update">
+<main>
+    <nav>
+        <a class="button" href="../index.html">Modules</a>
+        <a class="button" href="./enquiry.html">User Enquiry</a>
+        <a class="button" href="./create.html">Create User</a>
+        <a class="button" href="../todos/enquiry.html">Todos</a>
+    </nav>
+
+    <h1>Update User</h1>
+    <form id="userForm" novalidate>
+        <div class="form-group"><label for="name">Name</label><input id="name" name="name" type="text"></div>
+        <div class="form-group"><label for="username">Username</label><input id="username" name="username" type="text"></div>
+        <div class="form-group"><label for="email">Email</label><input id="email" name="email" type="email"></div>
+        <div class="form-group"><label for="phone">Phone</label><input id="phone" name="phone" type="text"></div>
+        <div class="form-group"><label for="website">Website</label><input id="website" name="website" type="text"></div>
+        <div class="form-actions">
+            <button type="submit">Update</button>
+            <a class="button" href="./enquiry.html">Cancel</a>
+        </div>
+    </form>
+    <h2>Response</h2>
+    <pre id="resultOutput">-</pre>
+</main>
+<script src="./user.js"></script>
+</body>
+</html>
