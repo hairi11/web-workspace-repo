@@ -1,3 +1,4 @@
+const loglevel = require('loglevel');
 const SecurityUtil = require('../util/SecurityUtil');
 
 class Logger {
@@ -5,15 +6,16 @@ class Logger {
         options = options || {};
         this.namespace = namespace || 'CommonJS';
         this.enabled = options.enabled !== false;
-        this.sink = options.sink || console;
         this.redact = options.redact !== false;
         this.redactionOptions = options.redactionOptions || {};
+        this.logger = loglevel.getLogger(this.namespace);
+
+        if (options.level) this.logger.setLevel(options.level);
+        if (!this.enabled) this.logger.disableAll();
     }
 
     _write(level, args) {
-        if (!this.enabled || !this.sink) return;
-        var fn = this.sink[level] || this.sink.log;
-        if (typeof fn !== 'function') return;
+        if (!this.enabled) return;
 
         var values = Array.prototype.slice.call(args);
         if (this.redact) {
@@ -22,7 +24,7 @@ class Logger {
             }, this);
         }
 
-        fn.apply(this.sink, ['[' + this.namespace + ']'].concat(values));
+        this.logger[level].apply(this.logger, values);
     }
 
     debug() { this._write('debug', arguments); }
