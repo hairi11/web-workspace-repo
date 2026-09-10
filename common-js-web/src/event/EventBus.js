@@ -1,12 +1,13 @@
+const EventEmitter = require('eventemitter3');
+
 class EventBus {
     constructor() {
-        this.listeners = {};
+        this.emitter = new EventEmitter();
     }
 
     on(eventName, handler) {
         if (typeof handler !== 'function') throw new TypeError('Event handler must be a function.');
-        if (!this.listeners[eventName]) this.listeners[eventName] = [];
-        this.listeners[eventName].push(handler);
+        this.emitter.on(eventName, handler);
 
         var self = this;
         return function unsubscribe() {
@@ -15,34 +16,28 @@ class EventBus {
     }
 
     once(eventName, handler) {
-        var unsubscribe = null;
-        unsubscribe = this.on(eventName, function () {
-            unsubscribe();
-            return handler.apply(null, arguments);
-        });
-        return unsubscribe;
+        if (typeof handler !== 'function') throw new TypeError('Event handler must be a function.');
+        this.emitter.once(eventName, handler);
+
+        var self = this;
+        return function unsubscribe() {
+            self.off(eventName, handler);
+        };
     }
 
     off(eventName, handler) {
-        var handlers = this.listeners[eventName] || [];
-        this.listeners[eventName] = handlers.filter(function (item) {
-            return item !== handler;
-        });
+        this.emitter.off(eventName, handler);
         return this;
     }
 
-    emit(eventName) {
-        var args = Array.prototype.slice.call(arguments, 1);
-        var handlers = (this.listeners[eventName] || []).slice();
-        handlers.forEach(function (handler) {
-            handler.apply(null, args);
-        });
+    emit() {
+        this.emitter.emit.apply(this.emitter, arguments);
         return this;
     }
 
     clear(eventName) {
-        if (eventName) delete this.listeners[eventName];
-        else this.listeners = {};
+        if (eventName) this.emitter.removeAllListeners(eventName);
+        else this.emitter.removeAllListeners();
         return this;
     }
 }
