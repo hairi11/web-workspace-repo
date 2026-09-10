@@ -8,6 +8,7 @@ class Logger {
         this.enabled = options.enabled !== false;
         this.redact = options.redact !== false;
         this.redactionOptions = options.redactionOptions || {};
+        this.sink = options.sink || null;
         this.logger = loglevel.getLogger(this.namespace);
 
         if (options.level) this.logger.setLevel(options.level);
@@ -24,7 +25,16 @@ class Logger {
             }, this);
         }
 
-        this.logger[level].apply(this.logger, values);
+        if (this.sink) {
+            var sinkFn = this.sink[level] || this.sink.log;
+            if (typeof sinkFn === 'function') {
+                sinkFn.apply(this.sink, ['[' + this.namespace + ']'].concat(values));
+            }
+            return;
+        }
+
+        var loggerFn = this.logger[level] || this.logger.info;
+        loggerFn.apply(this.logger, values);
     }
 
     debug() { this._write('debug', arguments); }
