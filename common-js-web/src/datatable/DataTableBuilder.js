@@ -13,11 +13,12 @@ class DataTableBuilder {
     }
 
     ajax(url, config) { this.options.ajax = Object.assign({url: url, dataSrc: ''}, config || {}); return this; }
+    data(rows) { this.options.data = Array.isArray(rows) ? rows : []; return this; }
     option(name, value) { this.options[name] = value; return this; }
     optionsConfig(config) { this.options = Object.assign(this.options, config || {}); return this; }
     column(data, title, config) { this.options.columns.push(Object.assign({data: data, title: title}, config || {})); return this; }
     renderer(data, title, renderer, config) { return this.column(data, title, Object.assign({render: renderer}, config || {})); }
-    menuAction(config) { this.actionConfig = Object.assign({title: '', orderable: false, searchable: false}, config || {}); return this; }
+    menuAction(config) { this.actionConfig = Object.assign({title: '', orderable: false, searchable: false, mode: 'dropdown'}, config || {}); return this; }
     addAction(action) { if (!this.actionConfig) this.menuAction(); this.actions.push(action); return this; }
     searchInput(selector) { this.searchSelector = selector; return this; }
     filter(selector, columnIndex) { this.filterBindings.push({selector: selector, columnIndex: columnIndex}); return this; }
@@ -47,6 +48,13 @@ class DataTableBuilder {
     }
 
     refresh(resetPaging) { if (this.table) this.table.ajax.reload(null, resetPaging !== false); return this; }
+    replaceData(rows, resetPaging) {
+        if (!this.table) return this;
+        this.table.clear();
+        this.table.rows.add(Array.isArray(rows) ? rows : []);
+        this.table.draw(resetPaging === true);
+        return this;
+    }
     search(value) { if (this.table) this.table.search(value || '').draw(); return this; }
     destroy() { if (this.table) { this.table.destroy(); this.table = null; } return this; }
     selectedData() {
@@ -62,21 +70,38 @@ class DataTableBuilder {
 
     _appendActionColumn() {
         var self = this;
-        this.options.columns.push(Object.assign({}, this.actionConfig, {data: null, render: function () { return self._renderActions(); }}));
+        var config = Object.assign({}, this.actionConfig);
+        delete config.mode;
+        this.options.columns.push(Object.assign(config, {data: null, render: function () { return self._renderActions(); }}));
     }
 
     _renderActions() {
+        var self = this;
+
+        if (this.actionConfig && this.actionConfig.mode === 'inline') {
+            var inlineHtml = '<div class="dt-common-actions">';
+            this.actions.forEach(function (action, index) {
+                if (action.divider) return;
+                inlineHtml += self._renderActionButton(action, index, 'dt-common-action');
+            });
+            return inlineHtml + '</div>';
+        }
+
         var html = '<div class="dropdown"><button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">Actions</button><div class="dropdown-menu">';
         this.actions.forEach(function (action, index) {
             if (action.divider) { html += '<div class="dropdown-divider"></div>'; return; }
-            var safeClass = SecurityUtil.sanitizeClassList(action.className || '');
-            var safeIcon = SecurityUtil.sanitizeClassList(action.icon || '');
-            var className = safeClass ? ' ' + safeClass : '';
-            var icon = safeIcon ? '<i class="' + safeIcon + '"></i> ' : '';
-            var text = SecurityUtil.escapeHtml(action.text || '');
-            html += '<button type="button" class="dropdown-item dt-common-action' + className + '" data-action-index="' + index + '">' + icon + text + '</button>';
+            html += self._renderActionButton(action, index, 'dropdown-item dt-common-action');
         });
         return html + '</div></div>';
+    }
+
+    _renderActionButton(action, index, baseClass) {
+        var safeClass = SecurityUtil.sanitizeClassList(action.className || '');
+        var safeIcon = SecurityUtil.sanitizeClassList(action.icon || '');
+        var className = safeClass ? ' ' + safeClass : '';
+        var icon = safeIcon ? '<i class="' + safeIcon + '"></i> ' : '';
+        var text = SecurityUtil.escapeHtml(action.text || '');
+        return '<button type="button" class="' + baseClass + className + '" data-action-index="' + index + '">' + icon + text + '</button>';
     }
 
     _bindActions() {
