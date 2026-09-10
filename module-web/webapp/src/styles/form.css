@@ -1,0 +1,35 @@
+.form-group { margin-bottom: 14px; }
+
+label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="number"],
+input[type="search"] {
+    width: 100%;
+    padding: 9px;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+}
+
+.checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.checkbox-row label { margin: 0; }
+
+.form-actions { margin-top: 20px; }
+
+.invalid-feedback {
+    margin-top: 4px;
+    color: #a40000;
+    font-size: .9rem;
+}
+
+.is-invalid { border-color: #a40000; }
