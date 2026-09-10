@@ -1,10 +1,11 @@
 import browserSyncFactory from 'browser-sync';
 import chokidar from 'chokidar';
 import { context } from 'esbuild';
-import { cp, mkdir } from 'node:fs/promises';
+import { cp } from 'node:fs/promises';
 import path from 'node:path';
 import {
     copyStaticFiles,
+    bundleStyles,
     bundleDefinitions,
     sharedVendorPlugin,
     renderModulePage,
@@ -50,13 +51,9 @@ const copyWatch = chokidar.watch([
 ], { ignoreInitial: true });
 
 async function refreshStatic(filePath) {
-    if (filePath.endsWith('module-web.css')) {
-        await cp(filePath, path.join(distRoot, 'assets', 'module-web.css'));
-    } else if (filePath.includes(path.join('src', 'styles'))) {
-        const relativeStyle = path.relative(path.join(process.cwd(), 'src', 'styles'), filePath);
-        const target = path.join(distRoot, 'assets', 'styles', relativeStyle);
-        await mkdir(path.dirname(target), { recursive: true });
-        await cp(filePath, target);
+    if (filePath.endsWith('module-web.css') || filePath.includes(path.join('src', 'styles'))) {
+        await copyStaticFiles();
+        await bundleStyles(false);
     } else if (filePath.endsWith('index.html')) {
         await cp(filePath, path.join(distRoot, 'index.html'));
     } else if (filePath.includes(path.join('src', 'templates'))) {
