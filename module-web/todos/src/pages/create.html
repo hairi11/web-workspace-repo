@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Create Todo</title>
         <link rel="stylesheet" href="../assets/module-web.css">
+        <link rel="stylesheet" href="../assets/select2.min.css">
     </head>
     <body data-page="create">
     <main>
@@ -25,9 +26,12 @@
         <label for="title">Title</label>
         <input id="title" name="title" type="text">
     </div>
-    <div class="form-group checkbox-row">
-        <input id="completed" name="completed" type="checkbox" value="true">
-        <label for="completed">Completed</label>
+    <div class="form-group">
+        <label for="completed">Status</label>
+        <select id="completed" name="completed" class="js-select2">
+            <option value="false">Pending</option>
+            <option value="true">Completed</option>
+        </select>
     </div>
     <div class="form-actions">
         <button type="submit">Create</button>
