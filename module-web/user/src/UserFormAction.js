@@ -4,39 +4,49 @@ import { getDraft, saveDraft } from './action/userActionBase.js';
 
 const { FormAction, Validator, Toast } = Common;
 
-class UserFormAction extends FormAction {
-    constructor(selector, options) {
-        super(selector);
-        this.options = options || {};
-    }
+const STEP_CONFIG = {
+    profile: {
+        validationRules: function () {
+            return {
+                name: Validator.required('Name is required.'),
+                username: Validator.required('Username is required.'),
+                email: [
+                    Validator.required('Email is required.'),
+                    Validator.email('Please enter a valid email address.')
+                ]
+            };
+        },
+        buildRequestData: function (values) {
+            return {
+                name: values.name,
+                username: values.username,
+                email: values.email,
+                phone: values.phone || '',
+                website: values.website || ''
+            };
+        },
+        populate: function (action, values) {
+            Object.keys(values).forEach((name) => {
+                const field = action.form.elements[name];
+                if (!field || typeof values[name] === 'object') return;
 
-    getValidationRules() {
-        if (this.options.mode === 'create' && this.options.step === 'address') {
+                field.value = values[name] === null || values[name] === undefined
+                    ? ''
+                    : values[name];
+            });
+        },
+        nextUrl: './create-address.html'
+    },
+
+    address: {
+        validationRules: function () {
             return {
                 street: Validator.required('Street is required.'),
                 city: Validator.required('City is required.'),
                 zipcode: Validator.required('Zip code is required.')
             };
-        }
-
-        if (this.options.mode === 'create' && this.options.step === 'company') {
-            return {
-                companyName: Validator.required('Company name is required.')
-            };
-        }
-
-        return {
-            name: Validator.required('Name is required.'),
-            username: Validator.required('Username is required.'),
-            email: [
-                Validator.required('Email is required.'),
-                Validator.email('Please enter a valid email address.')
-            ]
-        };
-    }
-
-    buildRequestData(values) {
-        if (this.options.mode === 'create' && this.options.step === 'address') {
+        },
+        buildRequestData: function (values) {
             return {
                 address: {
                     street: values.street || '',
@@ -49,9 +59,28 @@ class UserFormAction extends FormAction {
                     }
                 }
             };
-        }
+        },
+        populate: function (action, values) {
+            const address = values.address || {};
+            const geo = address.geo || {};
 
-        if (this.options.mode === 'create' && this.options.step === 'company') {
+            action._setField('street', address.street);
+            action._setField('suite', address.suite);
+            action._setField('city', address.city);
+            action._setField('zipcode', address.zipcode);
+            action._setField('lat', geo.lat);
+            action._setField('lng', geo.lng);
+        },
+        nextUrl: './create-company.html'
+    },
+
+    company: {
+        validationRules: function () {
+            return {
+                companyName: Validator.required('Company name is required.')
+            };
+        },
+        buildRequestData: function (values) {
             return {
                 company: {
                     name: values.companyName || '',
@@ -59,15 +88,34 @@ class UserFormAction extends FormAction {
                     bs: values.bs || ''
                 }
             };
-        }
+        },
+        populate: function (action, values) {
+            const company = values.company || {};
 
-        return {
-            name: values.name,
-            username: values.username,
-            email: values.email,
-            phone: values.phone || '',
-            website: values.website || ''
-        };
+            action._setField('companyName', company.name);
+            action._setField('catchPhrase', company.catchPhrase);
+            action._setField('bs', company.bs);
+        },
+        nextUrl: './view.html?preview=1'
+    }
+};
+
+class UserFormAction extends FormAction {
+    constructor(selector, options) {
+        super(selector);
+        this.options = options || {};
+    }
+
+    _getStepConfig() {
+        return STEP_CONFIG[this.options.step || 'profile'];
+    }
+
+    getValidationRules() {
+        return this._getStepConfig().validationRules();
+    }
+
+    buildRequestData(values) {
+        return this._getStepConfig().buildRequestData(values);
     }
 
     async load() {
@@ -81,32 +129,7 @@ class UserFormAction extends FormAction {
     populate(values) {
         if (!this.form || !values) return this;
 
-        if (this.options.mode === 'create' && this.options.step === 'address') {
-            const address = values.address || {};
-            const geo = address.geo || {};
-
-            this._setField('street', address.street);
-            this._setField('suite', address.suite);
-            this._setField('city', address.city);
-            this._setField('zipcode', address.zipcode);
-            this._setField('lat', geo.lat);
-            this._setField('lng', geo.lng);
-        } else if (this.options.mode === 'create' && this.options.step === 'company') {
-            const company = values.company || {};
-
-            this._setField('companyName', company.name);
-            this._setField('catchPhrase', company.catchPhrase);
-            this._setField('bs', company.bs);
-        } else {
-            Object.keys(values).forEach((name) => {
-                const field = this.form.elements[name];
-                if (!field || typeof values[name] === 'object') return;
-
-                field.value = values[name] === null || values[name] === undefined
-                    ? ''
-                    : values[name];
-            });
-        }
+        this._getStepConfig().populate(this, values);
 
         if (this.formState) {
             this.formState.resetBaseline();
@@ -131,17 +154,7 @@ class UserFormAction extends FormAction {
             draft.data = Object.assign({}, draft.data, context.data);
             saveDraft(draft);
 
-            if (this.options.step === 'profile') {
-                window.location.href = './create-address.html';
-                return false;
-            }
-
-            if (this.options.step === 'address') {
-                window.location.href = './create-company.html';
-                return false;
-            }
-
-            window.location.href = './view.html?preview=1';
+            window.location.href = this._getStepConfig().nextUrl;
             return false;
         }
 
