@@ -6,6 +6,10 @@ const { Toast } = Common;
 
 function renderUser(user) {
     const container = document.querySelector('#userView');
+    const address = user.address || {};
+    const geo = address.geo || {};
+    const company = user.company || {};
+
     container.textContent = '';
 
     [
@@ -15,8 +19,15 @@ function renderUser(user) {
         ['Email', user.email],
         ['Phone', user.phone],
         ['Website', user.website],
-        ['Company', user.company && user.company.name],
-        ['City', user.address && user.address.city]
+        ['Street', address.street],
+        ['Suite', address.suite],
+        ['City', address.city],
+        ['Zip Code', address.zipcode],
+        ['Latitude', geo.lat],
+        ['Longitude', geo.lng],
+        ['Company', company.name],
+        ['Catch Phrase', company.catchPhrase],
+        ['BS', company.bs]
     ].forEach(([label, value]) => {
         const row = document.createElement('div');
         row.className = 'view-row';
@@ -58,7 +69,7 @@ export async function initView() {
         updateLink.hidden = true;
         backLink.href = draft.mode === 'update' && draft.id
             ? './update.html?id=' + encodeURIComponent(draft.id)
-            : './create.html';
+            : './create-company.html';
 
         saveButton.addEventListener('click', async () => {
             saveButton.disabled = true;
