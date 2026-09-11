@@ -7,6 +7,7 @@ export async function initUpdate() {
         id: requireId()
     });
 
+    await action.loadStatusOptions();
     action.build();
     await action.load();
 }
