@@ -11,6 +11,12 @@ const TodoService = {
         });
     },
 
+    getStatusOptions: function () {
+        return Ajax.get(TodoApi.statusOptions, {
+            cache: false
+        });
+    },
+
     getById: function (id) {
         return Ajax.get(TodoApi.getById(id), {
             cache: false
