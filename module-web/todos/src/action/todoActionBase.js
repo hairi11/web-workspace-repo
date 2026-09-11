@@ -1,7 +1,8 @@
 import Common from '@company/common-js-web';
 
-const { Toast } = Common;
+const { Storage, Toast } = Common;
 const DRAFT_KEY = 'module-web:todo:draft';
+const storage = new Storage(window.sessionStorage);
 
 export function getId() {
     return new URLSearchParams(window.location.search).get('id');
@@ -23,14 +24,13 @@ export function asText(value) {
 }
 
 export function saveDraft(draft) {
-    window.sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    storage.set(DRAFT_KEY, draft);
 }
 
 export function getDraft() {
-    const value = window.sessionStorage.getItem(DRAFT_KEY);
-    return value ? JSON.parse(value) : null;
+    return storage.get(DRAFT_KEY);
 }
 
 export function clearDraft() {
-    window.sessionStorage.removeItem(DRAFT_KEY);
+    storage.remove(DRAFT_KEY);
 }
