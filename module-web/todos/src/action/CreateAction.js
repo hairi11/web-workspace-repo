@@ -1,5 +1,8 @@
 import TodoFormAction from '../TodoFormAction.js';
 
-export function initCreate() {
-    new TodoFormAction('#todoForm', { mode: 'create' }).build();
+export async function initCreate() {
+    const action = new TodoFormAction('#todoForm', { mode: 'create' });
+
+    await action.loadStatusOptions();
+    action.build();
 }
