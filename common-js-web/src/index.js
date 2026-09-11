@@ -20,6 +20,7 @@ module.exports = {
     SafeDom: require('./util/SafeDom'),
     SecurityUtil: require('./util/SecurityUtil'),
     Select2: require('./select/Select2'),
+    Storage: require('./storage/Storage'),
     Repository: require('./repository/Repository'),
     Toast: require('./toast/Toast'),
     UrlUtil: require('./util/UrlUtil'),
