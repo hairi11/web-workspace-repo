@@ -1,5 +1,6 @@
 import Common from '@company/common-js-web';
 import UserService from './UserService.js';
+import { saveDraft } from './action/userActionBase.js';
 
 const { FormAction, Validator, Toast } = Common;
 
@@ -18,12 +19,6 @@ class UserFormAction extends FormAction {
                 Validator.email('Please enter a valid email address.')
             ]
         };
-    }
-
-    getConfirmation() {
-        return this.options.mode === 'update'
-            ? 'Update this user?'
-            : 'Create this user?';
     }
 
     buildRequestData(values) {
@@ -63,6 +58,21 @@ class UserFormAction extends FormAction {
         return this;
     }
 
+    beforeSubmit(context) {
+        saveDraft({
+            mode: this.options.mode,
+            id: this.options.id || null,
+            data: context.data
+        });
+
+        const id = this.options.id
+            ? '&id=' + encodeURIComponent(this.options.id)
+            : '';
+
+        window.location.href = './view.html?preview=1' + id;
+        return false;
+    }
+
     sendRequest(context) {
         if (this.options.mode === 'update') {
             return UserService.update(this.options.id, context.data);
@@ -73,21 +83,6 @@ class UserFormAction extends FormAction {
 
     shouldTrackDirty() {
         return true;
-    }
-
-    shouldResetOnSuccess() {
-        return this.options.mode === 'create';
-    }
-
-    onSuccess(data) {
-        Toast.success(
-            this.options.mode === 'update'
-                ? 'User updated successfully.'
-                : 'User created successfully.'
-        );
-
-        const output = document.querySelector('#resultOutput');
-        if (output) output.textContent = JSON.stringify(data, null, 2);
     }
 
     onError(error) {
