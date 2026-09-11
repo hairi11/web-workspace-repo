@@ -1,5 +1,6 @@
 import Common from '@company/common-js-web';
 import TodoService from './TodoService.js';
+import { saveDraft } from './action/todoActionBase.js';
 
 const { FormAction, Select2, Validator, Toast } = Common;
 
@@ -40,12 +41,6 @@ class TodoFormAction extends FormAction {
             title: Validator.required('Title is required.'),
             completed: Validator.required('Status is required.')
         };
-    }
-
-    getConfirmation() {
-        return this.options.mode === 'update'
-            ? 'Update this todo?'
-            : 'Create this todo?';
     }
 
     buildRequestData(values) {
@@ -92,6 +87,21 @@ class TodoFormAction extends FormAction {
         return this;
     }
 
+    beforeSubmit(context) {
+        saveDraft({
+            mode: this.options.mode,
+            id: this.options.id || null,
+            data: context.data
+        });
+
+        const id = this.options.id
+            ? '&id=' + encodeURIComponent(this.options.id)
+            : '';
+
+        window.location.href = './view.html?preview=1' + id;
+        return false;
+    }
+
     sendRequest(context) {
         if (this.options.mode === 'update') {
             return TodoService.update(this.options.id, context.data);
@@ -102,21 +112,6 @@ class TodoFormAction extends FormAction {
 
     shouldTrackDirty() {
         return true;
-    }
-
-    shouldResetOnSuccess() {
-        return this.options.mode === 'create';
-    }
-
-    onSuccess(data) {
-        Toast.success(
-            this.options.mode === 'update'
-                ? 'Todo updated successfully.'
-                : 'Todo created successfully.'
-        );
-
-        const output = document.querySelector('#resultOutput');
-        if (output) output.textContent = JSON.stringify(data, null, 2);
     }
 
     onError(error) {
