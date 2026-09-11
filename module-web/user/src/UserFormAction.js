@@ -1,11 +1,12 @@
 import Common from '@company/common-js-web';
+import { traceObject } from './Trace.js';
 
 const { FormAction, Toast } = Common;
 
 class UserFormAction extends FormAction {
     constructor(selector, options) {
         super(selector);
-        this.options = options || {};
+        this.options = traceObject(options || {}, 'UserFormAction.options');
     }
 
     getValidationRules() {
