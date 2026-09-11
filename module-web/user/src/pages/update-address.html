@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update User - Address</title>
+    <link rel="stylesheet" href="../assets/module-web.css">
+</head>
+<body data-page="update" data-step="address">
+<main>
+    <nav>
+        <a class="button" href="../index.html">Modules</a>
+        <a class="button" href="./enquiry.html">User Enquiry</a>
+        <a class="button" href="./create.html">Create User</a>
+        <a class="button" href="../todos/enquiry.html">Todos</a>
+    </nav>
+
+    <h1>Update User - Address</h1>
+    <form id="userForm" novalidate>
+        <div class="form-group"><label for="street">Street</label><input id="street" name="street" type="text"></div>
+        <div class="form-group"><label for="suite">Suite</label><input id="suite" name="suite" type="text"></div>
+        <div class="form-group"><label for="city">City</label><input id="city" name="city" type="text"></div>
+        <div class="form-group"><label for="zipcode">Zip Code</label><input id="zipcode" name="zipcode" type="text"></div>
+        <div class="form-group"><label for="lat">Latitude</label><input id="lat" name="lat" type="text"></div>
+        <div class="form-group"><label for="lng">Longitude</label><input id="lng" name="lng" type="text"></div>
+        <div class="form-actions">
+            <a class="button" id="backLink" href="./update.html">Back</a>
+            <button type="submit">Next</button>
+            <a class="button" href="./enquiry.html">Cancel</a>
+        </div>
+    </form>
+</main>
+<script>
+    const id = new URLSearchParams(window.location.search).get('id');
+    if (id) document.querySelector('#backLink').href = './update.html?id=' + encodeURIComponent(id);
+</script>
+<script src="./user.js"></script>
+</body>
+</html>
