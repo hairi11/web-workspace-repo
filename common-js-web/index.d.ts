@@ -122,6 +122,14 @@ export class Select2 {
     getInstance(): any;
 }
 
+export class Storage {
+    constructor(provider: Storage);
+    set(key: string, value: any): this;
+    get(key: string): any;
+    remove(key: string): this;
+    clear(): this;
+}
+
 export const Validator: any;
 export const Actions: any;
 export const Renderers: any;
