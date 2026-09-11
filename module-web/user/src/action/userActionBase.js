@@ -1,4 +1,5 @@
 import Common from '@company/common-js-web';
+import { traceFunction } from '../Trace.js';
 
 const { Storage, Toast, Validator } = Common;
 const DRAFT_KEY = 'module-web:user:draft';
@@ -86,7 +87,7 @@ const STEP_CONFIG = {
     }
 };
 
-export function getStepConfig(step) {
+function getStepConfigImpl(step) {
     const config = STEP_CONFIG[step || 'profile'];
 
     if (!config) {
@@ -96,11 +97,11 @@ export function getStepConfig(step) {
     return config;
 }
 
-export function getId() {
+function getIdImpl() {
     return new URLSearchParams(window.location.search).get('id');
 }
 
-export function requireId() {
+function requireIdImpl() {
     const id = getId();
 
     if (!id) {
@@ -111,18 +112,26 @@ export function requireId() {
     return id;
 }
 
-export function asText(value) {
+function asTextImpl(value) {
     return value === null || value === undefined ? '' : String(value);
 }
 
-export function saveDraft(draft) {
+function saveDraftImpl(draft) {
     storage.set(DRAFT_KEY, draft);
 }
 
-export function getDraft() {
+function getDraftImpl() {
     return storage.get(DRAFT_KEY);
 }
 
-export function clearDraft() {
+function clearDraftImpl() {
     storage.remove(DRAFT_KEY);
 }
+
+export const getStepConfig = traceFunction(getStepConfigImpl, 'userActionBase.getStepConfig');
+export const getId = traceFunction(getIdImpl, 'userActionBase.getId');
+export const requireId = traceFunction(requireIdImpl, 'userActionBase.requireId');
+export const asText = traceFunction(asTextImpl, 'userActionBase.asText');
+export const saveDraft = traceFunction(saveDraftImpl, 'userActionBase.saveDraft');
+export const getDraft = traceFunction(getDraftImpl, 'userActionBase.getDraft');
+export const clearDraft = traceFunction(clearDraftImpl, 'userActionBase.clearDraft');
