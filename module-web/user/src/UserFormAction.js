@@ -1,6 +1,6 @@
 import Common from '@company/common-js-web';
 import UserService from './UserService.js';
-import { saveDraft } from './action/userActionBase.js';
+import { getDraft, saveDraft } from './action/userActionBase.js';
 
 const { FormAction, Validator, Toast } = Common;
 
@@ -11,6 +11,20 @@ class UserFormAction extends FormAction {
     }
 
     getValidationRules() {
+        if (this.options.mode === 'create' && this.options.step === 'address') {
+            return {
+                street: Validator.required('Street is required.'),
+                city: Validator.required('City is required.'),
+                zipcode: Validator.required('Zip code is required.')
+            };
+        }
+
+        if (this.options.mode === 'create' && this.options.step === 'company') {
+            return {
+                companyName: Validator.required('Company name is required.')
+            };
+        }
+
         return {
             name: Validator.required('Name is required.'),
             username: Validator.required('Username is required.'),
@@ -22,6 +36,31 @@ class UserFormAction extends FormAction {
     }
 
     buildRequestData(values) {
+        if (this.options.mode === 'create' && this.options.step === 'address') {
+            return {
+                address: {
+                    street: values.street || '',
+                    suite: values.suite || '',
+                    city: values.city || '',
+                    zipcode: values.zipcode || '',
+                    geo: {
+                        lat: values.lat || '',
+                        lng: values.lng || ''
+                    }
+                }
+            };
+        }
+
+        if (this.options.mode === 'create' && this.options.step === 'company') {
+            return {
+                company: {
+                    name: values.companyName || '',
+                    catchPhrase: values.catchPhrase || '',
+                    bs: values.bs || ''
+                }
+            };
+        }
+
         return {
             name: values.name,
             username: values.username,
@@ -42,14 +81,32 @@ class UserFormAction extends FormAction {
     populate(values) {
         if (!this.form || !values) return this;
 
-        Object.keys(values).forEach((name) => {
-            const field = this.form.elements[name];
-            if (!field) return;
+        if (this.options.mode === 'create' && this.options.step === 'address') {
+            const address = values.address || {};
+            const geo = address.geo || {};
 
-            field.value = values[name] === null || values[name] === undefined
-                ? ''
-                : values[name];
-        });
+            this._setField('street', address.street);
+            this._setField('suite', address.suite);
+            this._setField('city', address.city);
+            this._setField('zipcode', address.zipcode);
+            this._setField('lat', geo.lat);
+            this._setField('lng', geo.lng);
+        } else if (this.options.mode === 'create' && this.options.step === 'company') {
+            const company = values.company || {};
+
+            this._setField('companyName', company.name);
+            this._setField('catchPhrase', company.catchPhrase);
+            this._setField('bs', company.bs);
+        } else {
+            Object.keys(values).forEach((name) => {
+                const field = this.form.elements[name];
+                if (!field || typeof values[name] === 'object') return;
+
+                field.value = values[name] === null || values[name] === undefined
+                    ? ''
+                    : values[name];
+            });
+        }
 
         if (this.formState) {
             this.formState.resetBaseline();
@@ -58,7 +115,36 @@ class UserFormAction extends FormAction {
         return this;
     }
 
+    _setField(name, value) {
+        const field = this.form && this.form.elements[name];
+        if (!field) return;
+        field.value = value === null || value === undefined ? '' : value;
+    }
+
     beforeSubmit(context) {
+        if (this.options.mode === 'create') {
+            const existing = getDraft();
+            const draft = existing && existing.mode === 'create'
+                ? existing
+                : { mode: 'create', id: null, data: {} };
+
+            draft.data = Object.assign({}, draft.data, context.data);
+            saveDraft(draft);
+
+            if (this.options.step === 'profile') {
+                window.location.href = './create-address.html';
+                return false;
+            }
+
+            if (this.options.step === 'address') {
+                window.location.href = './create-company.html';
+                return false;
+            }
+
+            window.location.href = './view.html?preview=1';
+            return false;
+        }
+
         saveDraft({
             mode: this.options.mode,
             id: this.options.id || null,
