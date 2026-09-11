@@ -6,7 +6,11 @@ export function traceFunction(fn, label) {
     }
 
     function tracedFunction(...args) {
-        console.log('[TRACE] ' + label, args);
+        console.groupCollapsed('[TRACE] ' + label);
+        console.log('args:', args);
+        console.trace('caller');
+        console.groupEnd();
+
         return fn.apply(this, args);
     }
 
