@@ -7,7 +7,14 @@ class TodoFormAction extends FormAction {
     constructor(selector, options) {
         super(selector);
         this.options = options || {};
+        this.statusOptions = [];
         this.statusSelect = null;
+    }
+
+    async loadStatusOptions() {
+        const response = await TodoService.getStatusOptions();
+        this.statusOptions = Array.isArray(response.data) ? response.data : [];
+        return this.statusOptions;
     }
 
     onBuild(form) {
@@ -15,7 +22,8 @@ class TodoFormAction extends FormAction {
 
         this.statusSelect = new Select2(form.elements.completed, {
             width: '100%',
-            minimumResultsForSearch: Infinity
+            minimumResultsForSearch: Infinity,
+            data: this.statusOptions
         }).build();
     }
 
