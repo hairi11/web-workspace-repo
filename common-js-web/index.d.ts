@@ -122,8 +122,15 @@ export class Select2 {
     getInstance(): any;
 }
 
+export interface StorageProvider {
+    setItem(key: string, value: string): void;
+    getItem(key: string): string | null;
+    removeItem(key: string): void;
+    clear(): void;
+}
+
 export class Storage {
-    constructor(provider: Storage);
+    constructor(provider: StorageProvider);
     set(key: string, value: any): this;
     get(key: string): any;
     remove(key: string): this;
