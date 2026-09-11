@@ -68,7 +68,7 @@ export async function initView() {
         saveButton.hidden = false;
         updateLink.hidden = true;
         backLink.href = draft.mode === 'update' && draft.id
-            ? './update.html?id=' + encodeURIComponent(draft.id)
+            ? './update-company.html?id=' + encodeURIComponent(draft.id)
             : './create-company.html';
 
         saveButton.addEventListener('click', async () => {
