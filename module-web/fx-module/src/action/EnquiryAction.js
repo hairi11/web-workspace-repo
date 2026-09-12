@@ -12,16 +12,13 @@ export async function initEnquiry() {
 
 function buildTable() {
     return new DataTableBuilder('#fxTable')
-        .serverPage((page, size, sort) => FxService.enquiry(
+        .serverPage((page, size, options) => FxService.enquiry(
             page,
             size,
-            sort.sortBy,
-            sort.sortDir
+            options.sort
         ), {
             pageLength: 20,
-            defaultSortBy: 'reportDate',
-            defaultSortDir: 'desc',
-            defaultOrder: [[0, 'desc']],
+            defaultOrder: [[0, 'desc'], [1, 'asc']],
             onError: (error) => {
                 Toast.error('Failed to load FX records.');
                 console.error(error);
