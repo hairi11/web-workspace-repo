@@ -1,3 +1,5 @@
+const DateUtil = require('../date/DateUtil');
+
 class Renderers {
     static text(fallback) {
         return function (value) {
@@ -10,13 +12,43 @@ class Renderers {
         return function (value) { return value ? (trueText || 'Yes') : (falseText || 'No'); };
     }
 
-    static date(formatter) {
-        return function (value) {
+    static date(pattern) {
+        return function (value, type) {
             if (!value) return '';
-            var date = new Date(value);
-            if (Number.isNaN(date.getTime())) return String(value);
-            return typeof formatter === 'function' ? formatter(date) : date.toLocaleDateString();
+            if (type && type !== 'display' && type !== 'filter') return value;
+
+            try {
+                return DateUtil.formatDate(value, pattern);
+            }
+            catch (error) {
+                return String(value);
+            }
         };
+    }
+
+    static number(options) {
+        options = options || {};
+        var locale = options.locale || 'en-US';
+        var formatOptions = Object.assign({}, options);
+        delete formatOptions.locale;
+        var formatter = new Intl.NumberFormat(locale, formatOptions);
+
+        return function (value, type) {
+            if (value === null || value === undefined || value === '') return '';
+
+            var number = Number(value);
+            if (!Number.isFinite(number)) return value;
+            if (type && type !== 'display' && type !== 'filter') return number;
+
+            return formatter.format(number);
+        };
+    }
+
+    static amount(options) {
+        return Renderers.number(Object.assign({
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }, options || {}));
     }
 }
 
