@@ -4,10 +4,14 @@ import FxApi from './FxApi.js';
 const { Ajax } = Common;
 
 const FxService = {
-    enquiry: function () {
+    enquiry: function (page, size) {
         return Ajax.get(FxApi.enquiry, {
             cache: false,
-            dedupe: true
+            dedupe: true,
+            query: {
+                page: page,
+                size: size
+            }
         });
     },
 
