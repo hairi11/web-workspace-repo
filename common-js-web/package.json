@@ -9,6 +9,7 @@
     "check": "find src examples test -name '*.js' -print0 | xargs -0 -n1 node --check"
   },
   "dependencies": {
+    "date-fns": "^4.1.0",
     "eventemitter3": "^5.0.1",
     "loglevel": "^1.9.2",
     "lru-cache": "^11.1.0",
