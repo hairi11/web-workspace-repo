@@ -26,9 +26,9 @@ function buildTable() {
         })
         .renderer('reportDate', 'Report Date', Renderers.date())
         .column('recordNo', 'Record No')
-        .column('fxCategory', 'FX Category')
-        .column('fxCode', 'FX Code')
-        .column('fxType', 'FX Type')
+        .renderer('fxCategory', 'FX Category', Renderers.property('fxCategoryDescription'))
+        .renderer('fxCode', 'FX Code', Renderers.property('fxCodeDescription'))
+        .renderer('fxType', 'FX Type', Renderers.property('fxTypeDescription'))
         .renderer('fxAmount', 'FX Amount', Renderers.amount())
         .renderer('fxDate', 'FX Date', Renderers.date())
         .build();
