@@ -47,6 +47,7 @@ export async function copyStaticFiles(options) {
     await mkdir(path.join(distRoot, 'webfonts'), { recursive: true });
     await mkdir(path.join(distRoot, 'user'), { recursive: true });
     await mkdir(path.join(distRoot, 'todos'), { recursive: true });
+    await mkdir(path.join(distRoot, 'fx'), { recursive: true });
 
     await cp(path.join(root, 'src', 'index.html'), path.join(distRoot, 'index.html'));
     await cp(path.join(root, 'src', 'module-web.css'), path.join(distRoot, 'assets', 'module-web.css'));
@@ -67,7 +68,8 @@ export async function copyStaticFiles(options) {
 export function bundleDefinitions() {
     return [
         { name: 'user', entry: path.join(root, '..', 'user', 'src', 'UserPage.js'), outfile: path.join(distRoot, 'user', 'user.js') },
-        { name: 'todos', entry: path.join(root, '..', 'todos', 'src', 'TodoPage.js'), outfile: path.join(distRoot, 'todos', 'todos.js') }
+        { name: 'todos', entry: path.join(root, '..', 'todos', 'src', 'TodoPage.js'), outfile: path.join(distRoot, 'todos', 'todos.js') },
+        { name: 'fx', entry: path.join(root, '..', 'fx-web', 'src', 'FxPage.js'), outfile: path.join(distRoot, 'fx', 'fx.js') }
     ];
 }
 
