@@ -9,7 +9,7 @@ export async function initEnquiry() {
     let records = [];
 
     try {
-        records = await loadFxMasters();
+        records = await loadFxRecords();
     } catch (error) {
         Toast.error('Failed to load FX records.');
         console.error(error);
@@ -19,17 +19,40 @@ export async function initEnquiry() {
     bindReloadButton();
 }
 
-async function loadFxMasters() {
-    const response = await FxService.findAllMasters();
-    return Array.isArray(response.data) ? response.data : [];
+async function loadFxRecords() {
+    const masterResponse = await FxService.findAllMasters();
+    const masters = Array.isArray(masterResponse.data) ? masterResponse.data : [];
+
+    const transactionGroups = await Promise.all(
+        masters.map(async (master) => {
+            const response = await FxService.findTransactionsByMasterId(master.id);
+            const transactions = Array.isArray(response.data) ? response.data : [];
+
+            return transactions.map((trx) => ({
+                reportDate: master.reportDate,
+                recordNo: trx.recordNo,
+                fxCategory: trx.fxCategory,
+                fxCode: trx.fxCode,
+                fxType: trx.fxType,
+                fxAmount: trx.fxAmount,
+                fxDate: trx.fxDate
+            }));
+        })
+    );
+
+    return transactionGroups.flat();
 }
 
 function buildTable(records) {
     return new DataTableBuilder('#fxTable')
         .data(records)
-        .column('id', 'ID')
-        .column('status', 'Status')
         .column('reportDate', 'Report Date')
+        .column('recordNo', 'Record No')
+        .column('fxCategory', 'FX Category')
+        .column('fxCode', 'FX Code')
+        .column('fxType', 'FX Type')
+        .column('fxAmount', 'FX Amount')
+        .column('fxDate', 'FX Date')
         .searchInput('#searchInput')
         .build();
 }
@@ -41,7 +64,7 @@ function bindReloadButton() {
         reload.disabled = true;
 
         try {
-            table.replaceData(await loadFxMasters());
+            table.replaceData(await loadFxRecords());
             Toast.success('FX records reloaded.');
         } catch (error) {
             Toast.error('Failed to reload FX records.');
