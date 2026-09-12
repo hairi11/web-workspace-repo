@@ -75,19 +75,32 @@ class DataTableBuilder {
             contentProperty: 'content',
             totalProperty: 'totalElements',
             filteredTotalProperty: null,
+            defaultSortBy: null,
+            defaultSortDir: 'asc',
+            defaultOrder: null,
             onError: null
         }, config || {});
 
         this.options.serverSide = true;
         this.options.processing = true;
         this.options.pageLength = config.pageLength;
+        if (Array.isArray(config.defaultOrder)) this.options.order = config.defaultOrder;
+
         this.options.ajax = async function (request, callback) {
             var size = Number(request.length) > 0 ? Number(request.length) : Number(config.pageLength) || 20;
             var start = Number(request.start) > 0 ? Number(request.start) : 0;
             var page = Math.floor(start / size);
+            var order = Array.isArray(request.order) && request.order.length ? request.order[0] : null;
+            var column = order && Array.isArray(request.columns) ? request.columns[Number(order.column)] : null;
+            var sortBy = column && column.data ? column.data : config.defaultSortBy;
+            var sortDir = order && String(order.dir).toLowerCase() === 'desc' ? 'desc' : config.defaultSortDir;
 
             try {
-                var response = await loader(page, size, request);
+                var response = await loader(page, size, {
+                    sortBy: sortBy,
+                    sortDir: sortDir,
+                    request: request
+                });
                 var result = response && response.data !== undefined ? response.data : (response || {});
                 var rows = Array.isArray(result[config.contentProperty]) ? result[config.contentProperty] : [];
                 var total = Number(result[config.totalProperty]) || 0;
