@@ -79,10 +79,19 @@ export class FormAction {
     onComplete(result: {context: FormActionContext | null; error: any; result: any}): any;
 }
 
+export interface ServerPageConfig {
+    pageLength?: number;
+    contentProperty?: string;
+    totalProperty?: string;
+    filteredTotalProperty?: string | null;
+    onError?: ((error: any, request: any) => void) | null;
+}
+
 export class DataTableBuilder {
     constructor(selector: string);
     ajax(url: string, config?: any): this;
     serverSide(config?: any): this;
+    serverPage(loader: (page: number, size: number, request: any) => Promise<any>, config?: ServerPageConfig): this;
     column(data: any, title: string, config?: any): this;
     renderer(data: any, title: string, renderer: Function, config?: any): this;
     menuAction(config?: any): this;
@@ -137,9 +146,20 @@ export class Storage {
     clear(): this;
 }
 
+export const DateUtil: {
+    formatDate(value: any, pattern?: string): string;
+    toApiDate(value: any): string;
+    parseDate(value: any): any;
+};
 export const Validator: any;
 export const Actions: any;
-export const Renderers: any;
+export const Renderers: {
+    text(fallback?: string): Function;
+    boolean(trueText?: string, falseText?: string): Function;
+    date(pattern?: string): Function;
+    number(options?: Intl.NumberFormatOptions & {locale?: string}): Function;
+    amount(options?: Intl.NumberFormatOptions & {locale?: string}): Function;
+};
 export const SafeDom: any;
 export const SecurityUtil: any;
 export const Repository: any;
