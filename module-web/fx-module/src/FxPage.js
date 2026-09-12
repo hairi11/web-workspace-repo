@@ -1,6 +1,8 @@
-import FxService from './FxService.js';
+import { initEnquiry } from './action/EnquiryAction.js';
 
-const actions = {};
+const actions = {
+    enquiry: initEnquiry
+};
 
 async function init() {
     const page = document.body.dataset.page;
@@ -11,7 +13,7 @@ async function init() {
 
     const action = actions[page];
     if (action) {
-        await action({ service: FxService });
+        await action();
     }
 }
 
