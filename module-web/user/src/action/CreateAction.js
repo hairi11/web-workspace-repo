@@ -1,10 +1,10 @@
 import UserFormAction from '../UserFormAction.js';
+import UserService from '../UserService.js';
 import { clearDraft, getDraft, getStepConfig, saveDraft } from './userActionBase.js';
 
 const NEXT_URL = {
     profile: './create-address.html',
-    address: './create-company.html',
-    company: './view.html?preview=1'
+    address: './create-company.html'
 };
 
 export function initCreate() {
@@ -20,16 +20,33 @@ export function initCreate() {
         validationRules: config.validationRules,
         buildRequestData: config.buildRequestData,
         populate: config.populate,
-        beforeSubmit: function (context) {
+        beforeSubmit: async function (context) {
             const existing = getDraft();
             const draft = existing && existing.mode === 'create'
                 ? existing
                 : { mode: 'create', id: null, data: {} };
 
             draft.data = Object.assign({}, draft.data, context.data);
-            saveDraft(draft);
 
-            window.location.href = NEXT_URL[step];
+            if (step !== 'company') {
+                saveDraft(draft);
+                window.location.href = NEXT_URL[step];
+                return false;
+            }
+
+            const response = await UserService.create(draft.data);
+            const saved = Object.assign({}, draft.data, response.data || {});
+
+            saveDraft({
+                mode: 'saved',
+                id: saved.id || null,
+                data: saved
+            });
+
+            window.location.href = './view.html?saved=1' + (
+                saved.id ? '&id=' + encodeURIComponent(saved.id) : ''
+            );
+
             return false;
         }
     });
