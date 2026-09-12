@@ -20,6 +20,16 @@ const FxService = {
         });
     },
 
+    findReferences: function (type) {
+        return Ajax.get(FxApi.references, {
+            cache: true,
+            dedupe: true,
+            query: {
+                type: type
+            }
+        });
+    },
+
     findAllMasters: function () {
         return Ajax.get(FxApi.masters, {
             cache: false,
