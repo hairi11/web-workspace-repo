@@ -54,6 +54,7 @@ export async function copyStaticFiles(options) {
     await cp(path.join(root, 'src', 'styles'), path.join(distRoot, 'assets', 'styles'), { recursive: true });
     await cp(path.join(root, '..', 'user', 'src', 'pages'), path.join(distRoot, 'user'), { recursive: true });
     await cp(path.join(root, '..', 'todos', 'src', 'pages'), path.join(distRoot, 'todos'), { recursive: true });
+    await cp(path.join(root, '..', 'fx-module', 'src', 'pages'), path.join(distRoot, 'fx'), { recursive: true });
     await cp(path.join(root, 'node_modules', 'bootstrap', 'dist', 'css', 'bootstrap.min.css'), path.join(distRoot, 'assets', 'bootstrap.min.css'));
     await cp(path.join(root, 'node_modules', 'datatables.net-bs5', 'css', 'dataTables.bootstrap5.min.css'), path.join(distRoot, 'assets', 'dataTables.bootstrap5.min.css'));
     await cp(path.join(root, 'node_modules', 'datatables.net-select-bs5', 'css', 'select.bootstrap5.min.css'), path.join(distRoot, 'assets', 'select.bootstrap5.min.css'));
