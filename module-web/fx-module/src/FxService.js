@@ -4,6 +4,13 @@ import FxApi from './FxApi.js';
 const { Ajax } = Common;
 
 const FxService = {
+    enquiry: function () {
+        return Ajax.get(FxApi.enquiry, {
+            cache: false,
+            dedupe: true
+        });
+    },
+
     findAllMasters: function () {
         return Ajax.get(FxApi.masters, {
             cache: false,
