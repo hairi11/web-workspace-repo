@@ -1,7 +1,7 @@
 import Common from '@company/common-js-web';
 import FxService from '../FxService.js';
 
-const { DataTableBuilder, Toast } = Common;
+const { DataTableBuilder, DateUtil, Toast } = Common;
 
 let table = null;
 
@@ -27,40 +27,15 @@ async function loadFxRecords() {
 function buildTable(records) {
     return new DataTableBuilder('#fxTable')
         .data(records)
-        .renderer('reportDate', 'Report Date', formatDate)
+        .renderer('reportDate', 'Report Date', DateUtil.formatDate)
         .column('recordNo', 'Record No')
         .column('fxCategory', 'FX Category')
         .column('fxCode', 'FX Code')
         .column('fxType', 'FX Type')
         .renderer('fxAmount', 'FX Amount', formatAmount)
-        .renderer('fxDate', 'FX Date', formatDate)
+        .renderer('fxDate', 'FX Date', DateUtil.formatDate)
         .searchInput('#searchInput')
         .build();
-}
-
-function formatDate(value) {
-    if (!value) {
-        return '';
-    }
-
-    const parts = String(value).split('-');
-    if (parts.length !== 3) {
-        return value;
-    }
-
-    const year = Number(parts[0]);
-    const month = Number(parts[1]);
-    const day = Number(parts[2]);
-
-    if (!year || !month || !day) {
-        return value;
-    }
-
-    const monthName = new Intl.DateTimeFormat('en-US', {
-        month: 'short'
-    }).format(new Date(year, month - 1, day));
-
-    return String(day).padStart(2, '0') + '-' + monthName + '-' + year;
 }
 
 function formatAmount(value) {
