@@ -69,7 +69,7 @@ export function bundleDefinitions() {
     return [
         { name: 'user', entry: path.join(root, '..', 'user', 'src', 'UserPage.js'), outfile: path.join(distRoot, 'user', 'user.js') },
         { name: 'todos', entry: path.join(root, '..', 'todos', 'src', 'TodoPage.js'), outfile: path.join(distRoot, 'todos', 'todos.js') },
-        { name: 'fx', entry: path.join(root, '..', 'fx-web', 'src', 'FxPage.js'), outfile: path.join(distRoot, 'fx', 'fx.js') }
+        { name: 'fx', entry: path.join(root, '..', 'fx-module', 'src', 'FxPage.js'), outfile: path.join(distRoot, 'fx', 'fx.js') }
     ];
 }
 
