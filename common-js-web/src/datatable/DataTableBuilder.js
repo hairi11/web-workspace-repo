@@ -75,8 +75,6 @@ class DataTableBuilder {
             contentProperty: 'content',
             totalProperty: 'totalElements',
             filteredTotalProperty: null,
-            defaultSortBy: null,
-            defaultSortDir: 'asc',
             defaultOrder: null,
             onError: null
         }, config || {});
@@ -90,15 +88,20 @@ class DataTableBuilder {
             var size = Number(request.length) > 0 ? Number(request.length) : Number(config.pageLength) || 20;
             var start = Number(request.start) > 0 ? Number(request.start) : 0;
             var page = Math.floor(start / size);
-            var order = Array.isArray(request.order) && request.order.length ? request.order[0] : null;
-            var column = order && Array.isArray(request.columns) ? request.columns[Number(order.column)] : null;
-            var sortBy = column && column.data ? column.data : config.defaultSortBy;
-            var sortDir = order && String(order.dir).toLowerCase() === 'desc' ? 'desc' : config.defaultSortDir;
+            var orders = Array.isArray(request.order) ? request.order : [];
+            var columns = Array.isArray(request.columns) ? request.columns : [];
+            var sort = orders.map(function (order) {
+                var column = columns[Number(order.column)];
+                if (!column || !column.data) return null;
+                return {
+                    field: column.data,
+                    dir: String(order.dir).toLowerCase() === 'desc' ? 'desc' : 'asc'
+                };
+            }).filter(Boolean);
 
             try {
                 var response = await loader(page, size, {
-                    sortBy: sortBy,
-                    sortDir: sortDir,
+                    sort: sort,
                     request: request
                 });
                 var result = response && response.data !== undefined ? response.data : (response || {});
