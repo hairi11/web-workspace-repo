@@ -44,72 +44,33 @@ function renderUser(user) {
     });
 }
 
-export async function initView() {
-    const params = new URLSearchParams(window.location.search);
-    const preview = params.get('preview') === '1';
-    const saveButton = document.querySelector('#saveButton');
+function configureLinks(user) {
     const updateLink = document.querySelector('#updateLink');
     const backLink = document.querySelector('#backLink');
 
-    if (preview) {
+    updateLink.hidden = !user.id;
+    updateLink.href = user.id
+        ? './update.html?id=' + encodeURIComponent(user.id)
+        : '#';
+    backLink.href = './enquiry.html';
+}
+
+export async function initView() {
+    const params = new URLSearchParams(window.location.search);
+    const saved = params.get('saved') === '1';
+
+    if (saved) {
         const draft = getDraft();
 
-        if (!draft) {
-            Toast.error('Preview data is not available.');
+        if (!draft || draft.mode !== 'saved') {
+            Toast.error('Saved user data is not available.');
             window.location.href = './enquiry.html';
             return;
         }
 
-        const user = Object.assign({}, draft.data, {
-            id: draft.id || null
-        });
-
-        renderUser(user);
-        saveButton.hidden = false;
-        updateLink.hidden = true;
-        backLink.href = draft.mode === 'update' && draft.id
-            ? './update-company.html?id=' + encodeURIComponent(draft.id)
-            : './create-company.html';
-
-        saveButton.addEventListener('click', async () => {
-            saveButton.disabled = true;
-
-            try {
-                const response = draft.mode === 'update'
-                    ? await UserService.update(draft.id, draft.data)
-                    : await UserService.create(draft.data);
-
-                const saved = Object.assign({}, draft.data, response.data || {});
-
-                if (draft.mode === 'update') {
-                    saved.id = draft.id;
-                }
-
-                clearDraft();
-                renderUser(saved);
-
-                saveButton.hidden = true;
-                updateLink.hidden = !saved.id;
-                backLink.href = './enquiry.html';
-
-                if (saved.id) {
-                    updateLink.href = './update.html?id=' + encodeURIComponent(saved.id);
-                    window.history.replaceState({}, '', './view.html?id=' + encodeURIComponent(saved.id));
-                }
-
-                Toast.success(
-                    draft.mode === 'update'
-                        ? 'User updated successfully.'
-                        : 'User created successfully.'
-                );
-            } catch (error) {
-                Toast.error(error && error.message ? error.message : 'Save failed.');
-                console.error(error);
-            } finally {
-                saveButton.disabled = false;
-            }
-        });
-
+        renderUser(draft.data);
+        configureLinks(draft.data);
+        clearDraft();
         return;
     }
 
@@ -117,8 +78,5 @@ export async function initView() {
     const user = response.data;
 
     renderUser(user);
-    saveButton.hidden = true;
-    updateLink.hidden = false;
-    updateLink.href = './update.html?id=' + encodeURIComponent(user.id);
-    backLink.href = './enquiry.html';
+    configureLinks(user);
 }
