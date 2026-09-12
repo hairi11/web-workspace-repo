@@ -7,7 +7,7 @@ function nextUrl(step, id) {
 
     if (step === 'profile') return './update-address.html?id=' + encodedId;
     if (step === 'address') return './update-company.html?id=' + encodedId;
-    return './view.html?preview=1&id=' + encodedId;
+    return null;
 }
 
 export async function initUpdate() {
@@ -31,7 +31,7 @@ export async function initUpdate() {
         validationRules: config.validationRules,
         buildRequestData: config.buildRequestData,
         populate: config.populate,
-        beforeSubmit: function (context) {
+        beforeSubmit: async function (context) {
             const current = getDraft() || {
                 mode: 'update',
                 id: id,
@@ -41,9 +41,25 @@ export async function initUpdate() {
             current.mode = 'update';
             current.id = id;
             current.data = Object.assign({}, current.data, context.data);
-            saveDraft(current);
 
-            window.location.href = nextUrl(step, id);
+            if (step !== 'company') {
+                saveDraft(current);
+                window.location.href = nextUrl(step, id);
+                return false;
+            }
+
+            const response = await UserService.update(id, current.data);
+            const saved = Object.assign({}, current.data, response.data || {}, {
+                id: id
+            });
+
+            saveDraft({
+                mode: 'saved',
+                id: id,
+                data: saved
+            });
+
+            window.location.href = './view.html?saved=1&id=' + encodeURIComponent(id);
             return false;
         }
     });
