@@ -4,15 +4,18 @@ import FxApi from './FxApi.js';
 const { Ajax } = Common;
 
 const FxService = {
-    enquiry: function (page, size, sortBy, sortDir) {
+    enquiry: function (page, size, sort) {
+        const sortParams = Array.isArray(sort)
+            ? sort.map((item) => item.field + ',' + item.dir)
+            : [];
+
         return Ajax.get(FxApi.enquiry, {
             cache: false,
             dedupe: true,
             query: {
                 page: page,
                 size: size,
-                sortBy: sortBy,
-                sortDir: sortDir
+                sort: sortParams
             }
         });
     },
