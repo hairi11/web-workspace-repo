@@ -12,6 +12,24 @@ class Renderers {
         return function (value) { return value ? (trueText || 'Yes') : (falseText || 'No'); };
     }
 
+    static property(property, options) {
+        options = Object.assign({fallbackToValue: true}, options || {});
+
+        return function (value, type, row) {
+            if (type && type !== 'display' && type !== 'filter') return value;
+
+            var displayValue = row && property ? row[property] : null;
+            if (displayValue !== null && displayValue !== undefined && displayValue !== '') {
+                return String(displayValue);
+            }
+
+            if (!options.fallbackToValue || value === null || value === undefined || value === '') {
+                return '';
+            }
+            return String(value);
+        };
+    }
+
     static date(pattern) {
         return function (value, type) {
             if (!value) return '';
