@@ -27,13 +27,13 @@ async function loadFxRecords() {
 function buildTable(records) {
     return new DataTableBuilder('#fxTable')
         .data(records)
-        .renderer('reportDate', 'Report Date', DateUtil.formatDate)
+        .renderer('reportDate', 'Report Date', (value) => DateUtil.formatDate(value))
         .column('recordNo', 'Record No')
         .column('fxCategory', 'FX Category')
         .column('fxCode', 'FX Code')
         .column('fxType', 'FX Type')
         .renderer('fxAmount', 'FX Amount', formatAmount)
-        .renderer('fxDate', 'FX Date', DateUtil.formatDate)
+        .renderer('fxDate', 'FX Date', (value) => DateUtil.formatDate(value))
         .searchInput('#searchInput')
         .build();
 }
