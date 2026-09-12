@@ -20,27 +20,8 @@ export async function initEnquiry() {
 }
 
 async function loadFxRecords() {
-    const masterResponse = await FxService.findAllMasters();
-    const masters = Array.isArray(masterResponse.data) ? masterResponse.data : [];
-
-    const transactionGroups = await Promise.all(
-        masters.map(async (master) => {
-            const response = await FxService.findTransactionsByMasterId(master.id);
-            const transactions = Array.isArray(response.data) ? response.data : [];
-
-            return transactions.map((trx) => ({
-                reportDate: master.reportDate,
-                recordNo: trx.recordNo,
-                fxCategory: trx.fxCategory,
-                fxCode: trx.fxCode,
-                fxType: trx.fxType,
-                fxAmount: trx.fxAmount,
-                fxDate: trx.fxDate
-            }));
-        })
-    );
-
-    return transactionGroups.flat();
+    const response = await FxService.enquiry();
+    return Array.isArray(response.data) ? response.data : [];
 }
 
 function buildTable(records) {
