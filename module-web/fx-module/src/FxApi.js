@@ -2,6 +2,7 @@ const BASE_URL = 'http://localhost:8080/api';
 
 const FxApi = {
     enquiry: BASE_URL + '/fx/enquiry',
+    references: BASE_URL + '/fx/references',
     masters: BASE_URL + '/fx-masters',
     save: BASE_URL + '/fx/save',
     submit: BASE_URL + '/fx/submit',
