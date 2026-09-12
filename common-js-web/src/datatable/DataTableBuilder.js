@@ -67,6 +67,53 @@ class DataTableBuilder {
         if (config) this.options.ajax = Object.assign({}, this.options.ajax || {}, config);
         return this;
     }
+    serverPage(loader, config) {
+        if (typeof loader !== 'function') throw new Error('serverPage requires a loader function.');
+
+        config = Object.assign({
+            pageLength: 20,
+            contentProperty: 'content',
+            totalProperty: 'totalElements',
+            filteredTotalProperty: null,
+            onError: null
+        }, config || {});
+
+        this.options.serverSide = true;
+        this.options.processing = true;
+        this.options.pageLength = config.pageLength;
+        this.options.ajax = async function (request, callback) {
+            var size = Number(request.length) > 0 ? Number(request.length) : Number(config.pageLength) || 20;
+            var start = Number(request.start) > 0 ? Number(request.start) : 0;
+            var page = Math.floor(start / size);
+
+            try {
+                var response = await loader(page, size, request);
+                var result = response && response.data !== undefined ? response.data : (response || {});
+                var rows = Array.isArray(result[config.contentProperty]) ? result[config.contentProperty] : [];
+                var total = Number(result[config.totalProperty]) || 0;
+                var filteredTotal = config.filteredTotalProperty
+                    ? Number(result[config.filteredTotalProperty]) || 0
+                    : total;
+
+                callback({
+                    draw: request.draw,
+                    recordsTotal: total,
+                    recordsFiltered: filteredTotal,
+                    data: rows
+                });
+            }
+            catch (error) {
+                if (typeof config.onError === 'function') config.onError(error, request);
+                callback({
+                    draw: request.draw,
+                    recordsTotal: 0,
+                    recordsFiltered: 0,
+                    data: []
+                });
+            }
+        };
+        return this;
+    }
 
     build() {
         if (typeof window === 'undefined' || !window.jQuery || !window.jQuery.fn || !window.jQuery.fn.DataTable) {
