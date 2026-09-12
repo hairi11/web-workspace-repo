@@ -6,27 +6,16 @@ const { DataTableBuilder, DateUtil, Toast } = Common;
 let table = null;
 
 export async function initEnquiry() {
-    let records = [];
-
-    try {
-        records = await loadFxRecords();
-    } catch (error) {
-        Toast.error('Failed to load FX records.');
-        console.error(error);
-    }
-
-    table = buildTable(records);
+    table = buildTable();
     bindReloadButton();
 }
 
-async function loadFxRecords() {
-    const response = await FxService.enquiry();
-    return Array.isArray(response.data) ? response.data : [];
-}
-
-function buildTable(records) {
+function buildTable() {
     return new DataTableBuilder('#fxTable')
-        .data(records)
+        .option('pageLength', 20)
+        .option('processing', true)
+        .option('serverSide', true)
+        .option('ajax', loadFxPage)
         .renderer('reportDate', 'Report Date', (value) => DateUtil.formatDate(value))
         .column('recordNo', 'Record No')
         .column('fxCategory', 'FX Category')
@@ -34,8 +23,36 @@ function buildTable(records) {
         .column('fxType', 'FX Type')
         .renderer('fxAmount', 'FX Amount', formatAmount)
         .renderer('fxDate', 'FX Date', (value) => DateUtil.formatDate(value))
-        .searchInput('#searchInput')
         .build();
+}
+
+async function loadFxPage(request, callback) {
+    const size = Number(request.length) > 0 ? Number(request.length) : 20;
+    const start = Number(request.start) > 0 ? Number(request.start) : 0;
+    const page = Math.floor(start / size);
+
+    try {
+        const response = await FxService.enquiry(page, size);
+        const result = response.data || {};
+        const total = Number(result.totalElements) || 0;
+
+        callback({
+            draw: request.draw,
+            recordsTotal: total,
+            recordsFiltered: total,
+            data: Array.isArray(result.content) ? result.content : []
+        });
+    } catch (error) {
+        Toast.error('Failed to load FX records.');
+        console.error(error);
+
+        callback({
+            draw: request.draw,
+            recordsTotal: 0,
+            recordsFiltered: 0,
+            data: []
+        });
+    }
 }
 
 function formatAmount(value) {
@@ -57,17 +74,16 @@ function formatAmount(value) {
 function bindReloadButton() {
     const reload = document.querySelector('#reloadButton');
 
-    reload.addEventListener('click', async () => {
+    reload.addEventListener('click', () => {
         reload.disabled = true;
 
         try {
-            table.replaceData(await loadFxRecords());
+            table.refresh(false);
             Toast.success('FX records reloaded.');
-        } catch (error) {
-            Toast.error('Failed to reload FX records.');
-            console.error(error);
         } finally {
-            reload.disabled = false;
+            window.setTimeout(() => {
+                reload.disabled = false;
+            }, 300);
         }
     });
 }
