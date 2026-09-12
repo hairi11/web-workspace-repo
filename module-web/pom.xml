@@ -15,7 +15,7 @@
     <modules>
         <module>user</module>
         <module>todos</module>
-        <module>fx-web</module>
+        <module>fx-module</module>
         <module>webapp</module>
     </modules>
 </project>
