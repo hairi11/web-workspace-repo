@@ -10,6 +10,13 @@ th, td {
     vertical-align: top;
 }
 
+/* Keep all DataTables headers consistently left aligned, regardless of detected data type. */
+table.dataTable thead > tr > th,
+table.dataTable thead > tr > th.dt-type-numeric,
+table.dataTable thead > tr > th.dt-type-date {
+    text-align: left;
+}
+
 /* Keep DataTables ordering icon pinned to the right edge of every sortable header. */
 table.dataTable thead > tr > th.dt-orderable-asc,
 table.dataTable thead > tr > th.dt-orderable-desc,
