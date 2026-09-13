@@ -13,18 +13,37 @@ const REFERENCE_TYPES = {
 
 let references = null;
 let editIndex = null;
+let mode = 'create';
+let transactionId = null;
 
 export async function initTransaction() {
+    resolveMode();
     editIndex = resolveEditIndex();
     bindActions();
 
     try {
         references = await loadReferences();
         populateReferenceSelects();
-        populateExistingTransaction();
+
+        if (mode === 'view' || mode === 'edit') {
+            await populateBackendTransaction();
+            configureBackendMode();
+        } else {
+            populateExistingTransaction();
+        }
     } catch (error) {
-        Toast.error('Failed to load FX reference data.');
+        Toast.error('Failed to load FX transaction data.');
         console.error(error);
+    }
+}
+
+function resolveMode() {
+    const params = new URLSearchParams(window.location.search);
+    const requested = params.get('mode');
+    transactionId = params.get('id');
+
+    if ((requested === 'view' || requested === 'edit') && transactionId) {
+        mode = requested;
     }
 }
 
@@ -62,6 +81,10 @@ function unwrapData(response) {
     return [];
 }
 
+function unwrapObject(response) {
+    return response && response.data !== undefined ? response.data : response;
+}
+
 function populateReferenceSelects() {
     fillSelect('#fxCategory', references.category);
     fillSelect('#fxCode', references.code);
@@ -76,6 +99,35 @@ function fillSelect(selector, items) {
     items.forEach((item) => select.appendChild(new Option(item.description, item.code)));
 }
 
+async function populateBackendTransaction() {
+    const response = await FxService.findTransactionById(transactionId);
+    const transaction = unwrapObject(response);
+
+    if (!transaction) {
+        throw new Error('FX transaction not found.');
+    }
+
+    populateTransaction(transaction);
+}
+
+function configureBackendMode() {
+    const title = document.querySelector('h1');
+    const submitButton = document.querySelector('#transactionForm button[type="submit"]');
+    const cancelLink = document.querySelector('#transactionForm .button');
+
+    cancelLink.href = './enquiry.html';
+
+    if (mode === 'view') {
+        title.textContent = 'View FX Transaction';
+        submitButton.hidden = true;
+        document.querySelectorAll('#transactionForm input, #transactionForm select, #transactionForm textarea')
+            .forEach((element) => { element.disabled = true; });
+    } else {
+        title.textContent = 'Edit FX Transaction';
+        submitButton.textContent = 'Save Changes';
+    }
+}
+
 function populateExistingTransaction() {
     if (editIndex === null) return;
 
@@ -88,6 +140,10 @@ function populateExistingTransaction() {
     }
 
     document.querySelector('h1').textContent = 'Edit FX Transaction';
+    populateTransaction(transaction);
+}
+
+function populateTransaction(transaction) {
     setValue('fxDate', transaction.fxDate);
     setValue('fxCategory', transaction.fxCategory);
     setValue('fxCode', transaction.fxCode);
@@ -105,11 +161,13 @@ function setValue(id, value) {
     document.querySelector('#' + id).value = value === null || value === undefined ? '' : value;
 }
 
-function saveTransaction(event) {
+async function saveTransaction(event) {
     event.preventDefault();
 
+    if (mode === 'view') return;
+
     const transaction = {
-        id: null,
+        id: mode === 'edit' ? Number(transactionId) : null,
         fxDate: valueOf('fxDate'),
         fxCategory: valueOf('fxCategory'),
         fxCategoryDescription: selectedText('fxCategory'),
@@ -128,6 +186,20 @@ function saveTransaction(event) {
     };
 
     if (!validateTransaction(transaction)) return;
+
+    if (mode === 'edit') {
+        try {
+            await FxService.updateTransaction(transactionId, transaction);
+            Toast.success('FX transaction updated.');
+            window.setTimeout(() => {
+                window.location.href = './enquiry.html';
+            }, 300);
+        } catch (error) {
+            Toast.error('Failed to update FX transaction.');
+            console.error(error);
+        }
+        return;
+    }
 
     upsertTransaction(editIndex, transaction);
     window.location.href = './create.html?resume=1';
