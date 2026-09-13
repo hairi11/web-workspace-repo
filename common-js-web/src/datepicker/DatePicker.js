@@ -1,6 +1,8 @@
 const DEFAULT_OPTIONS = {
     allowInput: true,
-    dateFormat: 'd-M-Y',
+    dateFormat: 'Y-m-d',
+    altInput: true,
+    altFormat: 'd-M-Y',
     position: 'auto'
 };
 
