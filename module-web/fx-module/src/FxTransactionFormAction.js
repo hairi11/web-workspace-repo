@@ -2,7 +2,13 @@ import Common from '@company/common-js-web';
 import FxService from './FxService.js';
 import { upsertTransaction } from './action/fxCreateDraft.js';
 
-const { FormAction, Toast } = Common;
+const {
+    DatePicker,
+    FormAction,
+    Select2,
+    Toast,
+    Validator
+} = Common;
 
 const REFERENCE_TYPES = {
     category: 'FX_CATEGORY',
@@ -11,7 +17,7 @@ const REFERENCE_TYPES = {
     type: 'FX_TYPE'
 };
 
-export const TransactionFlow = {
+const TransactionFlow = {
     CREATE: 'create',
     DRAFT_EDIT: 'draft-edit',
     BACKEND_EDIT: 'backend-edit',
@@ -19,11 +25,12 @@ export const TransactionFlow = {
 };
 
 class FxTransactionFormAction extends FormAction {
-    constructor(selector, flow, recordKey) {
+    constructor(selector, options) {
         super(selector);
-        this.flow = flow;
-        this.recordKey = recordKey;
+        this.options = options || {};
         this.references = null;
+        this.datePicker = null;
+        this.selects = {};
     }
 
     async loadReferences() {
@@ -45,46 +52,48 @@ class FxTransactionFormAction extends FormAction {
     }
 
     onBuild() {
-        if (!this.references) return;
-        this.fillSelect('fxCategory', this.references.category);
-        this.fillSelect('fxCode', this.references.code);
-        this.fillSelect('fxCurrency', this.references.currency);
-        this.fillSelect('fxType', this.references.type);
+        this.datePicker = new DatePicker('#fxDate').build();
+
+        this.selects.fxCategory = this.buildSelect('#fxCategory', this.references.category);
+        this.selects.fxCode = this.buildSelect('#fxCode', this.references.code);
+        this.selects.fxCurrency = this.buildSelect('#fxCurrency', this.references.currency);
+        this.selects.fxType = this.buildSelect('#fxType', this.references.type);
+    }
+
+    onDestroy() {
+        if (this.datePicker) this.datePicker.destroy();
+        Object.values(this.selects).forEach((select) => select.destroy());
+        this.datePicker = null;
+        this.selects = {};
     }
 
     getValidationRules() {
-        const required = (message) => (value) => String(value || '').trim() ? null : message;
-        const decimal = (message) => (value) => {
-            if (value === null || value === undefined || String(value).trim() === '') return message;
-            return Number.isFinite(Number(value)) ? null : message;
-        };
-
         return {
-            fxDate: required('FX Date is required.'),
-            fxCategory: required('Category is required.'),
-            fxCode: required('Code is required.'),
-            fxType: required('Type is required.'),
-            fxCurrency: required('Currency is required.'),
-            fxAmount: decimal('Enter a valid FX amount.'),
-            fxRate: decimal('Enter a valid FX rate.')
+            fxDate: Validator.required('FX Date is required.'),
+            fxCategory: Validator.required('Category is required.'),
+            fxCode: Validator.required('Code is required.'),
+            fxType: Validator.required('Type is required.'),
+            fxCurrency: Validator.required('Currency is required.'),
+            fxAmount: Validator.custom((value) => this.validateDecimal(value, 'Enter a valid FX amount.')),
+            fxRate: Validator.custom((value) => this.validateDecimal(value, 'Enter a valid FX rate.'))
         };
     }
 
     buildRequestData(values) {
         return {
-            id: this.flow === TransactionFlow.BACKEND_EDIT ? Number(this.recordKey) : null,
+            id: this.options.flow === TransactionFlow.BACKEND_EDIT ? Number(this.options.key) : null,
             fxDate: values.fxDate || '',
             fxCategory: values.fxCategory || '',
-            fxCategoryDescription: this.selectedText('fxCategory'),
+            fxCategoryDescription: this.referenceDescription('category', values.fxCategory),
             fxCode: values.fxCode || '',
-            fxCodeDescription: this.selectedText('fxCode'),
+            fxCodeDescription: this.referenceDescription('code', values.fxCode),
             fxType: values.fxType || '',
-            fxTypeDescription: this.selectedText('fxType'),
+            fxTypeDescription: this.referenceDescription('type', values.fxType),
             fxRefno: values.fxRefno || '',
             fxParty: values.fxParty || '',
             fxPrincipal: values.fxPrincipal || '',
             fxCurrency: values.fxCurrency || '',
-            fxCurrencyDescription: this.selectedText('fxCurrency'),
+            fxCurrencyDescription: this.referenceDescription('currency', values.fxCurrency),
             fxAmount: this.toDecimal(values.fxAmount),
             fxRate: this.toDecimal(values.fxRate),
             fxDescription: values.fxDescription || ''
@@ -92,8 +101,8 @@ class FxTransactionFormAction extends FormAction {
     }
 
     beforeSubmit(context) {
-        if (this.flow === TransactionFlow.CREATE || this.flow === TransactionFlow.DRAFT_EDIT) {
-            const index = this.flow === TransactionFlow.DRAFT_EDIT ? this.recordKey : null;
+        if (this.options.flow === TransactionFlow.CREATE || this.options.flow === TransactionFlow.DRAFT_EDIT) {
+            const index = this.options.flow === TransactionFlow.DRAFT_EDIT ? this.options.key : null;
             upsertTransaction(index, context.data);
             window.location.href = './create.html?resume=1';
             return false;
@@ -103,20 +112,20 @@ class FxTransactionFormAction extends FormAction {
     }
 
     sendRequest(context) {
-        if (this.flow === TransactionFlow.BACKEND_EDIT) {
-            return FxService.updateTransaction(this.recordKey, context.data);
+        if (this.options.flow === TransactionFlow.BACKEND_EDIT) {
+            return FxService.updateTransaction(this.options.key, context.data);
         }
 
         return super.sendRequest(context);
     }
 
     async onSuccess() {
-        if (this.flow !== TransactionFlow.BACKEND_EDIT) return;
-
-        Toast.success('FX transaction updated.');
-        window.setTimeout(() => {
-            window.location.href = './enquiry.html';
-        }, 300);
+        if (this.options.flow === TransactionFlow.BACKEND_EDIT) {
+            Toast.success('FX transaction updated.');
+            window.setTimeout(() => {
+                window.location.href = './enquiry.html';
+            }, 300);
+        }
     }
 
     populate(values) {
@@ -125,27 +134,45 @@ class FxTransactionFormAction extends FormAction {
         Object.keys(values).forEach((name) => {
             const field = this.form.elements[name];
             if (!field || typeof values[name] === 'object') return;
-            field.value = values[name] === null || values[name] === undefined ? '' : values[name];
+
+            const value = values[name] === null || values[name] === undefined ? '' : values[name];
+
+            if (name === 'fxDate' && this.datePicker) {
+                this.datePicker.setDate(value, false);
+                return;
+            }
+
+            if (this.selects[name]) {
+                this.selects[name].setValue(String(value), false);
+                return;
+            }
+
+            field.value = value;
         });
 
         if (this.formState) this.formState.resetBaseline();
         return this;
     }
 
-    setReadOnly() {
+    setReadOnly(readOnly) {
         if (!this.form) return this;
 
-        this.form.querySelectorAll('input, select, textarea').forEach((element) => {
-            element.disabled = true;
+        if (this.selects.fxCategory) this.selects.fxCategory.disable();
+        if (this.selects.fxCode) this.selects.fxCode.disable();
+        if (this.selects.fxCurrency) this.selects.fxCurrency.disable();
+        if (this.selects.fxType) this.selects.fxType.disable();
+
+        this.form.querySelectorAll('input, textarea').forEach((element) => {
+            element.disabled = Boolean(readOnly);
         });
 
         const submitButton = this.form.querySelector('button[type="submit"]');
-        if (submitButton) submitButton.hidden = true;
+        if (submitButton) submitButton.hidden = Boolean(readOnly);
         return this;
     }
 
     shouldTrackDirty() {
-        return this.flow !== TransactionFlow.VIEW;
+        return this.options.flow !== TransactionFlow.VIEW;
     }
 
     onError(error) {
@@ -153,25 +180,29 @@ class FxTransactionFormAction extends FormAction {
         console.error(error);
     }
 
+    buildSelect(selector, items) {
+        return new Select2(selector, {
+            width: '100%',
+            data: items.map((item) => ({
+                id: item.code,
+                text: item.description
+            }))
+        }).build();
+    }
+
+    referenceDescription(type, code) {
+        const item = (this.references[type] || []).find((entry) => entry.code === code);
+        return item ? item.description : code || '';
+    }
+
+    validateDecimal(value, message) {
+        if (value === null || value === undefined || String(value).trim() === '') return message;
+        return Number.isFinite(Number(value)) ? null : message;
+    }
+
     unwrapData(response) {
         if (Array.isArray(response)) return response;
         return response && Array.isArray(response.data) ? response.data : [];
-    }
-
-    fillSelect(name, items) {
-        const select = this.form.elements[name];
-        if (!select) return;
-
-        select.innerHTML = '';
-        select.appendChild(new Option('Select...', ''));
-        items.forEach((item) => select.appendChild(new Option(item.description, item.code)));
-    }
-
-    selectedText(name) {
-        const select = this.form && this.form.elements[name];
-        if (!select) return '';
-        const option = select.options[select.selectedIndex];
-        return option && select.value ? option.text : '';
     }
 
     toDecimal(value) {
@@ -180,5 +211,7 @@ class FxTransactionFormAction extends FormAction {
             : Number(value);
     }
 }
+
+FxTransactionFormAction.Flow = TransactionFlow;
 
 export default FxTransactionFormAction;
