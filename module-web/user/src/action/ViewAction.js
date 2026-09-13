@@ -1,8 +1,8 @@
 import Common from '@company/common-js-web';
 import UserService from '../UserService.js';
-import { asText, clearDraft, getDraft, requireId } from './userActionBase.js';
+import { asText, clearDraft, getDraft } from './userActionBase.js';
 
-const { Toast } = Common;
+const { NavigationState, Toast } = Common;
 
 function renderUser(user) {
     const container = document.querySelector('#userView');
@@ -49,17 +49,17 @@ function configureLinks(user) {
     const backLink = document.querySelector('#backLink');
 
     updateLink.hidden = !user.id;
-    updateLink.href = user.id
-        ? './update.html?id=' + encodeURIComponent(user.id)
-        : '#';
+    updateLink.href = user.id ? './update.html' : '#';
+    updateLink.onclick = user.id
+        ? () => NavigationState.set({ page: 'user-update', id: user.id })
+        : null;
     backLink.href = './enquiry.html';
 }
 
 export async function initView() {
-    const params = new URLSearchParams(window.location.search);
-    const saved = params.get('saved') === '1';
+    const navigation = NavigationState.consume();
 
-    if (saved) {
+    if (navigation && navigation.saved) {
         const draft = getDraft();
 
         if (!draft || draft.mode !== 'saved') {
@@ -74,7 +74,14 @@ export async function initView() {
         return;
     }
 
-    const response = await UserService.getById(requireId());
+    const id = navigation && navigation.id;
+    if (!id) {
+        Toast.error('User id is required.');
+        window.location.href = './enquiry.html';
+        return;
+    }
+
+    const response = await UserService.getById(id);
     const user = response.data;
 
     renderUser(user);
