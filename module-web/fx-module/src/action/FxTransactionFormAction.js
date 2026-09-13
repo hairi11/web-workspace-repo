@@ -1,6 +1,6 @@
 import Common from '@company/common-js-web';
+import { ReferenceType, TransactionMode } from '../FxConstants.js';
 import FxService from '../FxService.js';
-import { TransactionMode } from '../FxTransactionMode.js';
 import FxCreateFormAction from './FxCreateFormAction.js';
 
 const {
@@ -11,13 +11,6 @@ const {
     Toast,
     Validator
 } = Common;
-
-const REFERENCE_TYPES = {
-    category: 'FX_CATEGORY',
-    code: 'FX_CODE',
-    currency: 'FX_CURRENCY',
-    type: 'FX_TYPE'
-};
 
 class FxTransactionFormAction extends FormAction {
     constructor(selector, options) {
@@ -30,10 +23,10 @@ class FxTransactionFormAction extends FormAction {
 
     async loadReferences() {
         const [categories, codes, currencies, types] = await Promise.all([
-            FxService.findReferences(REFERENCE_TYPES.category),
-            FxService.findReferences(REFERENCE_TYPES.code),
-            FxService.findReferences(REFERENCE_TYPES.currency),
-            FxService.findReferences(REFERENCE_TYPES.type)
+            FxService.findReferences(ReferenceType.CATEGORY),
+            FxService.findReferences(ReferenceType.CODE),
+            FxService.findReferences(ReferenceType.CURRENCY),
+            FxService.findReferences(ReferenceType.TYPE)
         ]);
 
         this.references = {
