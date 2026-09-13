@@ -1,7 +1,7 @@
 import Common from '@company/common-js-web';
 import UserService from '../UserService.js';
 
-const { Actions, DataTableBuilder, Toast } = Common;
+const { Actions, DataTableBuilder, NavigationState, Toast } = Common;
 
 let table = null;
 
@@ -35,10 +35,12 @@ function buildTable(records) {
         .searchInput('#searchInput')
         .menuAction({ mode: 'context' })
         .addAction(Actions.view((user) => {
-            window.location.href = './view.html?id=' + encodeURIComponent(user.id);
+            NavigationState.set({ page: 'user-view', id: user.id });
+            window.location.href = './view.html';
         }))
         .addAction(Actions.edit((user) => {
-            window.location.href = './update.html?id=' + encodeURIComponent(user.id);
+            NavigationState.set({ page: 'user-update', id: user.id });
+            window.location.href = './update.html';
         }, { text: 'Update' }))
         .addAction(Actions.delete(async (user, row) => {
             if (!window.confirm('Delete user #' + user.id + '?')) return;
