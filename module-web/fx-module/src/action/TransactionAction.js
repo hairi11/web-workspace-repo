@@ -1,7 +1,8 @@
 import Common from '@company/common-js-web';
 import FxService from '../FxService.js';
+import { TransactionMode } from '../FxTransactionMode.js';
 import FxCreateFormAction from './FxCreateFormAction.js';
-import FxTransactionFormAction, { TransactionMode } from './FxTransactionFormAction.js';
+import FxTransactionFormAction from './FxTransactionFormAction.js';
 
 const { NavigationState, Router, Toast } = Common;
 
