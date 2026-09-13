@@ -1,17 +1,25 @@
+import Common from '@company/common-js-web';
 import UserFormAction from '../UserFormAction.js';
 import UserService from '../UserService.js';
-import { getDraft, getStepConfig, requireId, saveDraft } from './userActionBase.js';
+import { getDraft, getStepConfig, saveDraft } from './userActionBase.js';
 
-function nextUrl(step, id) {
-    const encodedId = encodeURIComponent(id);
+const { NavigationState, Toast } = Common;
 
-    if (step === 'profile') return './update-address.html?id=' + encodedId;
-    if (step === 'address') return './update-company.html?id=' + encodedId;
+function nextUrl(step) {
+    if (step === 'profile') return './update-address.html';
+    if (step === 'address') return './update-company.html';
     return null;
 }
 
 export async function initUpdate() {
-    const id = requireId();
+    const navigation = NavigationState.consume();
+    const id = navigation && navigation.id;
+
+    if (!id) {
+        Toast.error('User id is required.');
+        throw new Error('Missing user id.');
+    }
+
     const step = document.body.dataset.step || 'profile';
     const config = getStepConfig(step);
 
@@ -44,7 +52,8 @@ export async function initUpdate() {
 
             if (step !== 'company') {
                 saveDraft(current);
-                window.location.href = nextUrl(step, id);
+                NavigationState.set({ page: 'user-update', id: id });
+                window.location.href = nextUrl(step);
                 return false;
             }
 
@@ -59,7 +68,8 @@ export async function initUpdate() {
                 data: saved
             });
 
-            window.location.href = './view.html?saved=1&id=' + encodeURIComponent(id);
+            NavigationState.set({ page: 'user-view', id: id, saved: true });
+            window.location.href = './view.html';
             return false;
         }
     });
