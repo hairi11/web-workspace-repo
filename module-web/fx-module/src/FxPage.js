@@ -1,7 +1,9 @@
 import { initEnquiry } from './action/EnquiryAction.js';
+import { initCreate } from './action/CreateAction.js';
 
 const actions = {
-    enquiry: initEnquiry
+    enquiry: initEnquiry,
+    create: initCreate
 };
 
 async function init() {
