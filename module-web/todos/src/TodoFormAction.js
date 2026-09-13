@@ -2,7 +2,7 @@ import Common from '@company/common-js-web';
 import TodoService from './TodoService.js';
 import { saveDraft } from './action/todoActionBase.js';
 
-const { FormAction, Select2, Validator, Toast } = Common;
+const { FormAction, NavigationState, Select2, Validator, Toast } = Common;
 
 class TodoFormAction extends FormAction {
     constructor(selector, options) {
@@ -94,11 +94,13 @@ class TodoFormAction extends FormAction {
             data: context.data
         });
 
-        const id = this.options.id
-            ? '&id=' + encodeURIComponent(this.options.id)
-            : '';
-
-        window.location.href = './view.html?preview=1' + id;
+        NavigationState.set({
+            page: 'todo-view',
+            preview: true,
+            mode: this.options.mode,
+            id: this.options.id || null
+        });
+        window.location.href = './view.html';
         return false;
     }
 
