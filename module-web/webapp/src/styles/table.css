@@ -10,45 +10,34 @@ th, td {
     vertical-align: top;
 }
 
-/* Header labels are always left aligned. Body cells keep DataTables type alignment. */
+/* Keep header labels left aligned while leaving body type alignment untouched. */
 table.dataTable thead > tr > th,
 table.dataTable thead > tr > th.dt-type-numeric,
 table.dataTable thead > tr > th.dt-type-date {
     text-align: left;
 }
 
-/* Reserve the same right-side area for ordering controls on every sortable header. */
-table.dataTable thead > tr > th.dt-orderable-asc,
-table.dataTable thead > tr > th.dt-orderable-desc,
-table.dataTable thead > tr > th.dt-ordering-asc,
-table.dataTable thead > tr > th.dt-ordering-desc {
-    position: relative;
-    padding-left: 10px !important;
-    padding-right: 30px !important;
+/* DataTables 2.3 uses a flex header wrapper and reverses numeric/date headers.
+   Force one consistent layout: title on the left, sort control on the right. */
+table.dataTable thead > tr > th > div.dt-column-header,
+table.dataTable thead > tr > th.dt-type-numeric > div.dt-column-header,
+table.dataTable thead > tr > th.dt-type-date > div.dt-column-header {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100%;
 }
 
-/* DataTables 2 gives numeric/date headers a left-side ordering rule.
-   Normalize the ordering wrapper itself, then let its native pseudo-elements
-   vertically position the up/down arrows. */
-table.dataTable thead > tr > th span.dt-column-order,
-table.dataTable thead > tr > th.dt-type-numeric span.dt-column-order,
-table.dataTable thead > tr > th.dt-type-date span.dt-column-order {
-    position: absolute !important;
-    left: auto !important;
-    right: 10px !important;
-    top: 0 !important;
-    bottom: 0 !important;
-    width: 12px !important;
-    margin: 0 !important;
+table.dataTable thead > tr > th > div.dt-column-header > span.dt-column-title {
+    order: 1;
+    text-align: left;
 }
 
-/* Override DataTables numeric/date pseudo-element horizontal offsets too. */
-table.dataTable thead > tr > th.dt-type-numeric span.dt-column-order::before,
-table.dataTable thead > tr > th.dt-type-numeric span.dt-column-order::after,
-table.dataTable thead > tr > th.dt-type-date span.dt-column-order::before,
-table.dataTable thead > tr > th.dt-type-date span.dt-column-order::after {
-    left: auto !important;
-    right: 0 !important;
+table.dataTable thead > tr > th > div.dt-column-header > span.dt-column-order {
+    order: 2;
+    margin-left: auto !important;
+    margin-right: 0 !important;
 }
 
 .dt-common-actions {
