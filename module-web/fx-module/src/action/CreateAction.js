@@ -1,109 +1,84 @@
 import Common from '@company/common-js-web';
 import FxService from '../FxService.js';
+import {
+    clearCreateDraft,
+    getCreateDraft,
+    removeTransaction
+} from './fxCreateDraft.js';
 
-const { Toast } = Common;
+const { DataTableBuilder, Renderers, Toast } = Common;
 
-const REFERENCE_TYPES = {
-    category: 'FX_CATEGORY',
-    code: 'FX_CODE',
-    currency: 'FX_CURRENCY',
-    type: 'FX_TYPE'
-};
-
-let references = null;
-let nextRowNo = 1;
+let table = null;
 
 export async function initCreate() {
-    bindActions();
+    const params = new URLSearchParams(window.location.search);
 
-    try {
-        references = await loadReferences();
-        addTransactionRow();
-    } catch (error) {
-        Toast.error('Failed to load FX reference data.');
-        console.error(error);
+    if (params.get('resume') !== '1') {
+        clearCreateDraft();
     }
+
+    bindActions();
+    table = buildTable(getRows());
 }
 
 function bindActions() {
-    document.querySelector('#addTransactionButton').addEventListener('click', addTransactionRow);
+    document.querySelector('#addTransactionButton').addEventListener('click', () => {
+        window.location.href = './transaction.html';
+    });
     document.querySelector('#saveButton').addEventListener('click', () => submit(false));
     document.querySelector('#submitButton').addEventListener('click', () => submit(true));
 }
 
-async function loadReferences() {
-    const [categories, codes, currencies, types] = await Promise.all([
-        FxService.findReferences(REFERENCE_TYPES.category),
-        FxService.findReferences(REFERENCE_TYPES.code),
-        FxService.findReferences(REFERENCE_TYPES.currency),
-        FxService.findReferences(REFERENCE_TYPES.type)
-    ]);
-
-    return {
-        category: unwrapData(categories),
-        code: unwrapData(codes),
-        currency: unwrapData(currencies),
-        type: unwrapData(types)
-    };
+function getRows() {
+    return getCreateDraft().transactions.map((transaction, index) => Object.assign({}, transaction, {
+        rowIndex: index,
+        recordNo: index + 1
+    }));
 }
 
-function unwrapData(response) {
-    if (Array.isArray(response)) return response;
-    if (response && Array.isArray(response.data)) return response.data;
-    return [];
-}
-
-function addTransactionRow() {
-    if (!references) return;
-
-    const template = document.querySelector('#fxTransactionRowTemplate');
-    const fragment = template.content.cloneNode(true);
-    const row = fragment.querySelector('tr');
-    const rowNo = nextRowNo++;
-
-    row.dataset.rowNo = String(rowNo);
-    row.querySelector('[data-field="recordNo"]').textContent = String(rowNo);
-
-    fillSelect(row.querySelector('[data-field="fxCategory"]'), references.category);
-    fillSelect(row.querySelector('[data-field="fxCode"]'), references.code);
-    fillSelect(row.querySelector('[data-field="fxCurrency"]'), references.currency);
-    fillSelect(row.querySelector('[data-field="fxType"]'), references.type);
-
-    row.querySelector('[data-action="remove"]').addEventListener('click', () => {
-        row.remove();
-        renumberRows();
-    });
-
-    document.querySelector('#fxTransactionBody').appendChild(fragment);
-}
-
-function fillSelect(select, items) {
-    select.appendChild(new Option('Select...', ''));
-
-    items.forEach((item) => {
-        select.appendChild(new Option(item.description, item.code));
-    });
-}
-
-function renumberRows() {
-    const rows = Array.from(document.querySelectorAll('#fxTransactionBody tr'));
-    rows.forEach((row, index) => {
-        row.dataset.rowNo = String(index + 1);
-        row.querySelector('[data-field="recordNo"]').textContent = String(index + 1);
-    });
-    nextRowNo = rows.length + 1;
+function buildTable(rows) {
+    return new DataTableBuilder('#fxCreateTable')
+        .data(rows)
+        .option('paging', false)
+        .option('info', false)
+        .option('ordering', false)
+        .column('recordNo', 'No.')
+        .renderer('fxDate', 'FX Date', Renderers.date())
+        .column('fxCategoryDescription', 'Category')
+        .column('fxCodeDescription', 'Code')
+        .column('fxTypeDescription', 'Type')
+        .column('fxRefno', 'Reference No.')
+        .column('fxParty', 'Party')
+        .column('fxPrincipal', 'Principal')
+        .column('fxCurrencyDescription', 'Currency')
+        .renderer('fxAmount', 'Amount', Renderers.amount())
+        .renderer('fxRate', 'Rate', Renderers.number({ maximumFractionDigits: 8 }))
+        .column('fxDescription', 'Description')
+        .menuAction({ title: 'Action', mode: 'inline' })
+        .addAction({
+            text: 'Edit',
+            icon: 'fa fa-pen',
+            onClick: (row) => {
+                window.location.href = './transaction.html?index=' + encodeURIComponent(row.rowIndex);
+            }
+        })
+        .addAction({
+            text: 'Remove',
+            icon: 'fa fa-trash',
+            className: 'text-danger',
+            onClick: (row) => {
+                removeTransaction(row.rowIndex);
+                table.replaceData(getRows(), false);
+            }
+        })
+        .build();
 }
 
 async function submit(isSubmit) {
-    const rows = Array.from(document.querySelectorAll('#fxTransactionBody tr'));
+    const draft = getCreateDraft();
 
-    if (!rows.length) {
+    if (!draft.transactions.length) {
         Toast.error('Add at least one FX transaction.');
-        return;
-    }
-
-    const transactions = rows.map(readTransactionRow);
-    if (!validateTransactions(transactions)) {
         return;
     }
 
@@ -111,7 +86,7 @@ async function submit(isSubmit) {
         master: {
             id: null
         },
-        transactions: transactions
+        transactions: draft.transactions.map(toRequestTransaction)
     };
 
     setSubmitting(true);
@@ -125,6 +100,7 @@ async function submit(isSubmit) {
             Toast.success('FX draft saved successfully.');
         }
 
+        clearCreateDraft();
         window.setTimeout(() => {
             window.location.href = './enquiry.html';
         }, 300);
@@ -136,56 +112,21 @@ async function submit(isSubmit) {
     }
 }
 
-function readTransactionRow(row, index) {
+function toRequestTransaction(transaction) {
     return {
         id: null,
-        recordNo: index + 1,
-        fxDate: valueOf(row, 'fxDate'),
-        fxCategory: valueOf(row, 'fxCategory'),
-        fxCode: valueOf(row, 'fxCode'),
-        fxType: valueOf(row, 'fxType'),
-        fxRefno: valueOf(row, 'fxRefno'),
-        fxParty: valueOf(row, 'fxParty'),
-        fxPrincipal: valueOf(row, 'fxPrincipal'),
-        fxCurrency: valueOf(row, 'fxCurrency'),
-        fxAmount: decimalValueOf(row, 'fxAmount'),
-        fxRate: decimalValueOf(row, 'fxRate'),
-        fxDescription: valueOf(row, 'fxDescription')
+        fxDate: transaction.fxDate,
+        fxCategory: transaction.fxCategory,
+        fxCode: transaction.fxCode,
+        fxType: transaction.fxType,
+        fxRefno: transaction.fxRefno,
+        fxParty: transaction.fxParty,
+        fxPrincipal: transaction.fxPrincipal,
+        fxCurrency: transaction.fxCurrency,
+        fxAmount: transaction.fxAmount,
+        fxRate: transaction.fxRate,
+        fxDescription: transaction.fxDescription
     };
-}
-
-function valueOf(row, field) {
-    const element = row.querySelector('[data-field="' + field + '"]');
-    return element ? String(element.value || '').trim() : '';
-}
-
-function decimalValueOf(row, field) {
-    const value = valueOf(row, field);
-    return value === '' ? null : Number(value);
-}
-
-function validateTransactions(transactions) {
-    for (let index = 0; index < transactions.length; index++) {
-        const trx = transactions[index];
-        const rowNo = index + 1;
-
-        if (!trx.fxDate || !trx.fxCategory || !trx.fxCode || !trx.fxType || !trx.fxCurrency) {
-            Toast.error('Complete the required fields for transaction ' + rowNo + '.');
-            return false;
-        }
-
-        if (trx.fxAmount === null || !Number.isFinite(trx.fxAmount)) {
-            Toast.error('Enter a valid FX amount for transaction ' + rowNo + '.');
-            return false;
-        }
-
-        if (trx.fxRate === null || !Number.isFinite(trx.fxRate)) {
-            Toast.error('Enter a valid FX rate for transaction ' + rowNo + '.');
-            return false;
-        }
-    }
-
-    return true;
 }
 
 function setSubmitting(submitting) {
