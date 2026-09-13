@@ -54,8 +54,7 @@ function initDraftTransaction(action, index) {
 }
 
 async function initExistingTransaction(action, id, page) {
-    const response = await FxService.findTransactionById(id);
-    const transaction = unwrapObject(response);
+    const transaction = await FxService.findTransactionById(id);
 
     if (!transaction) throw new Error('FX transaction not found.');
 
@@ -77,8 +76,4 @@ function configureExistingPage(action, page) {
 function setPageTitle(title) {
     const heading = document.querySelector('h1');
     if (heading) heading.textContent = title;
-}
-
-function unwrapObject(response) {
-    return response && response.data !== undefined ? response.data : response;
 }
