@@ -1,66 +1,50 @@
 import Common from '@company/common-js-web';
 import FxService from '../FxService.js';
-import FxTransactionFormAction, { TransactionMode } from '../FxTransactionFormAction.js';
-import { getCreateDraft } from './fxCreateDraft.js';
+import FxCreateFormAction from './FxCreateFormAction.js';
+import FxTransactionFormAction, { TransactionMode } from './FxTransactionFormAction.js';
 
 const { NavigationState, Router, Toast } = Common;
 
 export async function initTransaction() {
-    const navigation = NavigationState.consume({
-        page: 'transaction',
-        action: TransactionMode.CREATE
-    });
-    const route = resolveRoute(navigation);
-    const action = new FxTransactionFormAction('#transactionForm', route);
+    const navigation = NavigationState.consume();
+    const mode = navigation && navigation.page === 'transaction'
+        ? navigation.action
+        : TransactionMode.CREATE;
+    const key = navigation && navigation.page === 'transaction'
+        ? navigation.key
+        : null;
+    const action = new FxTransactionFormAction('#transactionForm', { mode, key });
 
     try {
         await action.loadReferences();
         action.build();
 
         await new Router()
-            .route(TransactionMode.CREATE, () => initCreateTransaction())
-            .route(TransactionMode.EDIT_DRAFT, () => initDraftTransaction(action, route.key))
-            .route(TransactionMode.EDIT, () => initExistingTransaction(action, route.key, {
+            .route(TransactionMode.CREATE, () => undefined)
+            .route(TransactionMode.EDIT_DRAFT, () => initDraftTransaction(action, key))
+            .route(TransactionMode.EDIT, () => initExistingTransaction(action, key, {
                 title: 'Edit FX Transaction',
                 readOnly: false,
                 submitLabel: 'Save Changes'
             }))
-            .route(TransactionMode.VIEW, () => initExistingTransaction(action, route.key, {
+            .route(TransactionMode.VIEW, () => initExistingTransaction(action, key, {
                 title: 'View FX Transaction',
                 readOnly: true
             }))
-            .dispatch(route.mode);
+            .dispatch(mode);
     } catch (error) {
         Toast.error('Failed to load FX transaction data.');
         console.error(error);
     }
 }
 
-function resolveRoute(navigation) {
-    if (!navigation || navigation.page !== 'transaction') {
-        return { mode: TransactionMode.CREATE, key: null };
-    }
-
-    if (navigation.action === TransactionMode.VIEW || navigation.action === TransactionMode.EDIT) {
-        return { mode: navigation.action, key: navigation.id };
-    }
-
-    if (navigation.action === TransactionMode.EDIT_DRAFT) {
-        return { mode: navigation.action, key: navigation.index };
-    }
-
-    return { mode: TransactionMode.CREATE, key: null };
-}
-
-function initCreateTransaction() {
-    return undefined;
-}
-
 function initDraftTransaction(action, index) {
-    const transaction = getCreateDraft().transactions[index];
+    const transaction = FxCreateFormAction.getDraft().transactions[index];
+
     if (!transaction) {
         Toast.error('FX transaction not found.');
-        window.location.href = './create.html?resume=1';
+        NavigationState.set({ page: 'create', action: 'resume' });
+        window.location.href = './create.html';
         return;
     }
 
