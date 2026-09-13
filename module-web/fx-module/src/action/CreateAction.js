@@ -1,10 +1,12 @@
 import Common from '@company/common-js-web';
 import FxService from '../FxService.js';
+import { TransactionMode } from '../FxTransactionFormAction.js';
 import {
     clearCreateDraft,
     getCreateDraft,
     removeTransaction
 } from './fxCreateDraft.js';
+import { setTransactionRoute } from './TransactionRoute.js';
 
 const { DataTableBuilder, Renderers, Toast } = Common;
 
@@ -23,6 +25,7 @@ export async function initCreate() {
 
 function bindActions() {
     document.querySelector('#addTransactionButton').addEventListener('click', () => {
+        setTransactionRoute(TransactionMode.CREATE);
         window.location.href = './transaction.html';
     });
     document.querySelector('#saveButton').addEventListener('click', () => submit(false));
@@ -54,7 +57,8 @@ function buildTable(rows) {
             text: 'Edit',
             icon: 'fa fa-pen',
             onClick: (row) => {
-                window.location.href = './transaction.html?index=' + encodeURIComponent(row.rowIndex);
+                setTransactionRoute(TransactionMode.EDIT_DRAFT, row.rowIndex);
+                window.location.href = './transaction.html';
             }
         })
         .addAction({
