@@ -6,9 +6,8 @@ import {
     getCreateDraft,
     removeTransaction
 } from './fxCreateDraft.js';
-import { setTransactionRoute } from './TransactionRoute.js';
 
-const { DataTableBuilder, Renderers, Toast } = Common;
+const { DataTableBuilder, NavigationState, Renderers, Toast } = Common;
 
 let table = null;
 
@@ -25,7 +24,10 @@ export async function initCreate() {
 
 function bindActions() {
     document.querySelector('#addTransactionButton').addEventListener('click', () => {
-        setTransactionRoute(TransactionMode.CREATE);
+        NavigationState.set({
+            page: 'transaction',
+            action: TransactionMode.CREATE
+        });
         window.location.href = './transaction.html';
     });
     document.querySelector('#saveButton').addEventListener('click', () => submit(false));
@@ -57,7 +59,11 @@ function buildTable(rows) {
             text: 'Edit',
             icon: 'fa fa-pen',
             onClick: (row) => {
-                setTransactionRoute(TransactionMode.EDIT_DRAFT, row.rowIndex);
+                NavigationState.set({
+                    page: 'transaction',
+                    action: TransactionMode.EDIT_DRAFT,
+                    index: row.rowIndex
+                });
                 window.location.href = './transaction.html';
             }
         })
