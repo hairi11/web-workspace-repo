@@ -1,23 +1,30 @@
+import Common from '@company/common-js-web';
+
+const { Storage } = Common;
 const STORAGE_KEY = 'fx.create.draft';
+const storage = new Storage(window.sessionStorage);
+
+function emptyDraft() {
+    return { master: { id: null }, transactions: [] };
+}
 
 export function getCreateDraft() {
     try {
-        const raw = window.sessionStorage.getItem(STORAGE_KEY);
-        const draft = raw ? JSON.parse(raw) : null;
+        const draft = storage.get(STORAGE_KEY);
         return draft && Array.isArray(draft.transactions)
             ? draft
-            : { master: { id: null }, transactions: [] };
+            : emptyDraft();
     } catch (error) {
-        return { master: { id: null }, transactions: [] };
+        return emptyDraft();
     }
 }
 
 export function saveCreateDraft(draft) {
-    window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
+    storage.set(STORAGE_KEY, draft);
 }
 
 export function clearCreateDraft() {
-    window.sessionStorage.removeItem(STORAGE_KEY);
+    storage.remove(STORAGE_KEY);
 }
 
 export function upsertTransaction(index, transaction) {
