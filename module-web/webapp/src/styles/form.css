@@ -9,11 +9,24 @@ label {
 input[type="text"],
 input[type="email"],
 input[type="number"],
-input[type="search"] {
+input[type="search"],
+input[type="date"],
+select,
+textarea {
     width: 100%;
     padding: 9px;
     border: 1px solid #bbb;
     border-radius: 4px;
+    background: #fff;
+    font: inherit;
+    box-sizing: border-box;
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+    background: #f3f3f3;
+    color: #666;
 }
 
 .checkbox-row {
