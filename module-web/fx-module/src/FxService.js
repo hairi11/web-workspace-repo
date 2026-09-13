@@ -3,6 +3,20 @@ import FxApi from './FxApi.js';
 
 const { Ajax } = Common;
 
+function responseData(response) {
+    return response ? response.data : null;
+}
+
+function responseObject(response) {
+    const data = responseData(response);
+    return data && typeof data === 'object' && !Array.isArray(data) ? data : null;
+}
+
+function responseArray(response) {
+    const data = responseData(response);
+    return Array.isArray(data) ? data : [];
+}
+
 const FxService = {
     enquiry: function (page, size, sort) {
         const sortParams = Array.isArray(sort)
@@ -17,7 +31,7 @@ const FxService = {
                 size: size,
                 sort: sortParams
             }
-        });
+        }).then(responseObject);
     },
 
     findReferences: function (type) {
@@ -27,32 +41,32 @@ const FxService = {
             query: {
                 type: type
             }
-        });
+        }).then(responseArray);
     },
 
     findAllMasters: function () {
         return Ajax.get(FxApi.masters, {
             cache: false,
             dedupe: true
-        });
+        }).then(responseArray);
     },
 
     findMasterById: function (id) {
         return Ajax.get(FxApi.masterById(id), {
             cache: false
-        });
+        }).then(responseObject);
     },
 
     findTransactionsByMasterId: function (masterId) {
         return Ajax.get(FxApi.transactionsByMasterId(masterId), {
             cache: false
-        });
+        }).then(responseArray);
     },
 
     findTransactionById: function (id) {
         return Ajax.get(FxApi.transactionById(id), {
             cache: false
-        });
+        }).then(responseObject);
     },
 
     updateTransaction: function (id, data) {
