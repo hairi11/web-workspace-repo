@@ -31,6 +31,39 @@ function buildTable() {
         .renderer('fxType', 'FX Type', Renderers.property('fxTypeDescription'))
         .renderer('fxAmount', 'FX Amount', Renderers.amount())
         .renderer('fxDate', 'FX Date', Renderers.date())
+        .menuAction({ mode: 'context' })
+        .addAction({
+            text: 'View',
+            icon: 'fa fa-eye',
+            onClick: (row) => {
+                window.location.href = './transaction.html?mode=view&id=' + encodeURIComponent(row.id);
+            }
+        })
+        .addAction({
+            text: 'Edit',
+            icon: 'fa fa-pen',
+            onClick: (row) => {
+                window.location.href = './transaction.html?mode=edit&id=' + encodeURIComponent(row.id);
+            }
+        })
+        .addAction({ divider: true })
+        .addAction({
+            text: 'Delete',
+            icon: 'fa fa-trash',
+            className: 'text-danger',
+            onClick: async (row) => {
+                if (!window.confirm('Delete this FX transaction?')) return;
+
+                try {
+                    await FxService.deleteTransaction(row.id);
+                    Toast.success('FX transaction deleted.');
+                    table.refresh(false);
+                } catch (error) {
+                    Toast.error('Failed to delete FX transaction.');
+                    console.error(error);
+                }
+            }
+        })
         .build();
 }
 
