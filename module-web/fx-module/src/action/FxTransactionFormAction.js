@@ -37,10 +37,10 @@ class FxTransactionFormAction extends FormAction {
         ]);
 
         this.references = {
-            category: this.unwrapData(categories),
-            code: this.unwrapData(codes),
-            currency: this.unwrapData(currencies),
-            type: this.unwrapData(types)
+            category: categories,
+            code: codes,
+            currency: currencies,
+            type: types
         };
 
         return this.references;
@@ -194,11 +194,6 @@ class FxTransactionFormAction extends FormAction {
     validateDecimal(value, message) {
         if (value === null || value === undefined || String(value).trim() === '') return message;
         return Number.isFinite(Number(value)) ? null : message;
-    }
-
-    unwrapData(response) {
-        if (Array.isArray(response)) return response;
-        return response && Array.isArray(response.data) ? response.data : [];
     }
 
     toDecimal(value) {
