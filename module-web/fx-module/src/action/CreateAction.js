@@ -49,7 +49,7 @@ function buildTable(rows) {
         .column('fxTypeDescription', 'Type')
         .column('fxCurrencyDescription', 'Currency')
         .renderer('fxAmount', 'Amount', Renderers.amount())
-        .menuAction({ title: 'Action', mode: 'inline' })
+        .menuAction({ mode: 'context' })
         .addAction({
             text: 'Edit',
             icon: 'fa fa-pen',
