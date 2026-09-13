@@ -52,11 +52,7 @@ class FxTransactionFormAction extends FormAction {
     }
 
     onBuild() {
-        this.datePicker = new DatePicker('#fxDate', {
-            dateFormat: 'Y-m-d',
-            altInput: true,
-            altFormat: 'd-M-Y'
-        }).build();
+        this.datePicker = new DatePicker('#fxDate').build();
 
         this.selects.fxCategory = this.buildSelect('#fxCategory', this.references.category);
         this.selects.fxCode = this.buildSelect('#fxCode', this.references.code);
