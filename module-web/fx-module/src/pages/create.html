@@ -16,45 +16,47 @@
 
     <h1>Create FX</h1>
 
-    <section class="card fx-create-summary">
-        <div class="form-grid">
-            <div class="form-group">
-                <label>Status</label>
-                <input type="text" value="DRAFT / ACTIVE by action" disabled>
+    <form id="fxCreateForm">
+        <section class="card fx-create-summary">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Status</label>
+                    <input type="text" value="DRAFT / ACTIVE by action" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Report Date</label>
+                    <input type="text" value="Auto generated" disabled>
+                </div>
             </div>
-            <div class="form-group">
-                <label>Report Date</label>
-                <input type="text" value="Auto generated" disabled>
-            </div>
+        </section>
+
+        <div class="toolbar fx-create-toolbar">
+            <button id="addTransactionButton" type="button">Add Transaction</button>
         </div>
-    </section>
 
-    <div class="toolbar fx-create-toolbar">
-        <button id="addTransactionButton" type="button">Add Transaction</button>
-    </div>
+        <div class="table-responsive fx-create-table-wrap">
+            <table id="fxCreateTable" class="fx-create-table">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>FX Date</th>
+                        <th>Category</th>
+                        <th>Code</th>
+                        <th>Type</th>
+                        <th>Currency</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
 
-    <div class="table-responsive fx-create-table-wrap">
-        <table id="fxCreateTable" class="fx-create-table">
-            <thead>
-                <tr>
-                    <th>No.</th>
-                    <th>FX Date</th>
-                    <th>Category</th>
-                    <th>Code</th>
-                    <th>Type</th>
-                    <th>Currency</th>
-                    <th>Amount</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
-
-    <div class="form-actions fx-create-actions">
-        <button id="saveButton" type="button">Save Draft</button>
-        <button id="submitButton" type="button">Submit</button>
-        <a class="button" href="./enquiry.html">Cancel</a>
-    </div>
+        <div class="form-actions fx-create-actions">
+            <button id="saveButton" type="submit" name="action" value="save">Save Draft</button>
+            <button id="submitButton" type="submit" name="action" value="submit">Submit</button>
+            <a class="button" href="./enquiry.html">Cancel</a>
+        </div>
+    </form>
 </main>
 <script src="./fx.js"></script>
 </body>
