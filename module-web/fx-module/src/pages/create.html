@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create FX</title>
+    <link rel="stylesheet" href="../assets/module-web.css">
+</head>
+<body data-page="create">
+<main>
+    <nav>
+        <a class="button" href="../index.html">Modules</a>
+        <a class="button" href="./enquiry.html">FX Enquiry</a>
+        <a class="button" href="./create.html">Create FX</a>
+    </nav>
+
+    <h1>Create FX</h1>
+
+    <section class="card fx-create-summary">
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Status</label>
+                <input type="text" value="DRAFT / ACTIVE by action" disabled>
+            </div>
+            <div class="form-group">
+                <label>Report Date</label>
+                <input type="text" value="Auto generated" disabled>
+            </div>
+        </div>
+    </section>
+
+    <div class="toolbar fx-create-toolbar">
+        <button id="addTransactionButton" type="button">Add Transaction</button>
+    </div>
+
+    <div class="table-responsive fx-create-table-wrap">
+        <table id="fxCreateTable" class="fx-create-table">
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>FX Date *</th>
+                    <th>Category *</th>
+                    <th>Code *</th>
+                    <th>Type *</th>
+                    <th>Reference No.</th>
+                    <th>Party</th>
+                    <th>Principal</th>
+                    <th>Currency *</th>
+                    <th>Amount *</th>
+                    <th>Rate *</th>
+                    <th>Description</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="fxTransactionBody"></tbody>
+        </table>
+    </div>
+
+    <div class="form-actions fx-create-actions">
+        <button id="saveButton" type="button">Save Draft</button>
+        <button id="submitButton" type="button">Submit</button>
+        <a class="button" href="./enquiry.html">Cancel</a>
+    </div>
+</main>
+
+<template id="fxTransactionRowTemplate">
+    <tr>
+        <td data-field="recordNo"></td>
+        <td><input data-field="fxDate" type="date"></td>
+        <td><select data-field="fxCategory"></select></td>
+        <td><select data-field="fxCode"></select></td>
+        <td><select data-field="fxType"></select></td>
+        <td><input data-field="fxRefno" type="text"></td>
+        <td><input data-field="fxParty" type="text"></td>
+        <td><input data-field="fxPrincipal" type="text"></td>
+        <td><select data-field="fxCurrency"></select></td>
+        <td><input data-field="fxAmount" type="number" min="0" step="0.0001"></td>
+        <td><input data-field="fxRate" type="number" min="0" step="0.00000001"></td>
+        <td><input data-field="fxDescription" type="text"></td>
+        <td><button data-action="remove" type="button" class="danger">Remove</button></td>
+    </tr>
+</template>
+
+<script src="./fx.js"></script>
+</body>
+</html>
