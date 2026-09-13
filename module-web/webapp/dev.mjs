@@ -11,7 +11,11 @@ import {
 } from './build-common.mjs';
 
 const browserSync = browserSyncFactory.create();
-const nodeModules = path.join(process.cwd(), 'node_modules');
+const root = process.cwd();
+const nodeModules = path.join(root, 'node_modules');
+const userPages = path.join(root, '..', 'user', 'src', 'pages');
+const todoPages = path.join(root, '..', 'todos', 'src', 'pages');
+const fxPages = path.join(root, '..', 'fx-module', 'src', 'pages');
 
 await copyStaticFiles();
 
@@ -37,36 +41,61 @@ for (const item of bundleDefinitions()) {
 }
 
 browserSync.init({
-    server: { baseDir: path.join(process.cwd(), 'dist') },
+    server: { baseDir: path.join(root, 'dist') },
     startPath: '/module-web/', port: 3000, open: false, notify: false, ui: false
 });
 
+/* Chokidar v4 no longer supports glob patterns. Watch real directories/files
+   so local edits and files replaced by git pull are detected reliably. */
 const copyWatch = chokidar.watch([
-    path.join(process.cwd(), 'src', '**/*'),
-    path.join(process.cwd(), '..', 'user', 'src', 'pages', '**/*.html'),
-    path.join(process.cwd(), '..', 'todos', 'src', 'pages', '**/*.html'),
-    path.join(process.cwd(), '..', 'fx-module', 'src', 'pages', '**/*.html')
-], { ignoreInitial: true });
+    path.join(root, 'src'),
+    userPages,
+    todoPages,
+    fxPages
+], {
+    ignoreInitial: true,
+    awaitWriteFinish: {
+        stabilityThreshold: 100,
+        pollInterval: 25
+    }
+});
+
+let staticRefreshQueue = Promise.resolve();
+
+function isInside(filePath, directory) {
+    const relative = path.relative(directory, filePath);
+    return relative !== '' && !relative.startsWith('..') && !path.isAbsolute(relative);
+}
 
 async function refreshStatic(filePath) {
-    if (filePath.endsWith('module-web.css') || filePath.includes(path.join('src', 'styles'))) {
+    const normalized = path.resolve(filePath);
+
+    if (normalized === path.join(root, 'src', 'module-web.css')
+        || isInside(normalized, path.join(root, 'src', 'styles'))) {
         await copyStaticFiles();
-    } else if (filePath.endsWith('index.html')) {
-        await cp(filePath, path.join(distRoot, 'index.html'));
-    } else if (filePath.includes(path.join('user', 'src', 'pages'))) {
-        await cp(filePath, path.join(distRoot, 'user', path.basename(filePath)));
-    } else if (filePath.includes(path.join('todos', 'src', 'pages'))) {
-        await cp(filePath, path.join(distRoot, 'todos', path.basename(filePath)));
-    } else if (filePath.includes(path.join('fx-module', 'src', 'pages'))) {
-        await cp(filePath, path.join(distRoot, 'fx', path.basename(filePath)));
+    } else if (normalized === path.join(root, 'src', 'index.html')) {
+        await cp(normalized, path.join(distRoot, 'index.html'));
+    } else if (isInside(normalized, userPages) && normalized.endsWith('.html')) {
+        await cp(normalized, path.join(distRoot, 'user', path.basename(normalized)));
+    } else if (isInside(normalized, todoPages) && normalized.endsWith('.html')) {
+        await cp(normalized, path.join(distRoot, 'todos', path.basename(normalized)));
+    } else if (isInside(normalized, fxPages) && normalized.endsWith('.html')) {
+        await cp(normalized, path.join(distRoot, 'fx', path.basename(normalized)));
     } else {
         return;
     }
-    browserSync.reload();
+
+    if (browserSync.active) browserSync.reload();
 }
 
-copyWatch.on('add', refreshStatic);
-copyWatch.on('change', refreshStatic);
+function queueStaticRefresh(filePath) {
+    staticRefreshQueue = staticRefreshQueue
+        .then(() => refreshStatic(filePath))
+        .catch((error) => console.error('Static refresh failed:', error));
+}
+
+copyWatch.on('add', queueStaticRefresh);
+copyWatch.on('change', queueStaticRefresh);
 
 async function shutdown() {
     await copyWatch.close();
