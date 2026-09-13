@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FX Transaction</title>
+    <link rel="stylesheet" href="../assets/module-web.css">
+</head>
+<body data-page="transaction">
+<main>
+    <nav>
+        <a class="button" href="../index.html">Modules</a>
+        <a class="button" href="./enquiry.html">FX Enquiry</a>
+        <a class="button" href="./create.html?resume=1">Create FX</a>
+    </nav>
+
+    <h1>Add FX Transaction</h1>
+
+    <form id="transactionForm" novalidate>
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="fxDate">FX Date *</label>
+                <input id="fxDate" name="fxDate" type="date">
+            </div>
+            <div class="form-group">
+                <label for="fxCategory">Category *</label>
+                <select id="fxCategory" name="fxCategory"></select>
+            </div>
+            <div class="form-group">
+                <label for="fxCode">Code *</label>
+                <select id="fxCode" name="fxCode"></select>
+            </div>
+            <div class="form-group">
+                <label for="fxType">Type *</label>
+                <select id="fxType" name="fxType"></select>
+            </div>
+            <div class="form-group">
+                <label for="fxRefno">Reference No.</label>
+                <input id="fxRefno" name="fxRefno" type="text">
+            </div>
+            <div class="form-group">
+                <label for="fxParty">Party</label>
+                <input id="fxParty" name="fxParty" type="text">
+            </div>
+            <div class="form-group">
+                <label for="fxPrincipal">Principal</label>
+                <input id="fxPrincipal" name="fxPrincipal" type="text">
+            </div>
+            <div class="form-group">
+                <label for="fxCurrency">Currency *</label>
+                <select id="fxCurrency" name="fxCurrency"></select>
+            </div>
+            <div class="form-group">
+                <label for="fxAmount">Amount *</label>
+                <input id="fxAmount" name="fxAmount" type="number" min="0" step="0.0001">
+            </div>
+            <div class="form-group">
+                <label for="fxRate">Rate *</label>
+                <input id="fxRate" name="fxRate" type="number" min="0" step="0.00000001">
+            </div>
+            <div class="form-group form-grid-full">
+                <label for="fxDescription">Description</label>
+                <input id="fxDescription" name="fxDescription" type="text">
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit">Save Transaction</button>
+            <a class="button" href="./create.html?resume=1">Cancel</a>
+        </div>
+    </form>
+</main>
+<script src="./fx.js"></script>
+</body>
+</html>
