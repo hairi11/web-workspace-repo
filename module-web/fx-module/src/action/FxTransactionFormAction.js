@@ -1,5 +1,6 @@
 import Common from '@company/common-js-web';
 import FxService from '../FxService.js';
+import { TransactionMode } from '../FxTransactionMode.js';
 import FxCreateFormAction from './FxCreateFormAction.js';
 
 const {
@@ -16,13 +17,6 @@ const REFERENCE_TYPES = {
     code: 'FX_CODE',
     currency: 'FX_CURRENCY',
     type: 'FX_TYPE'
-};
-
-export const TransactionMode = {
-    CREATE: 'create',
-    EDIT_DRAFT: 'edit-draft',
-    EDIT: 'edit',
-    VIEW: 'view'
 };
 
 class FxTransactionFormAction extends FormAction {
