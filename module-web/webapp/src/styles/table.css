@@ -26,10 +26,14 @@ table.dataTable thead > tr > th.dt-ordering-desc {
     padding-right: 30px;
 }
 
-table.dataTable thead > tr > th > span.dt-column-order {
+/* DataTables 2 moves numeric/date ordering controls to the left by default.
+   Override all header types so the ordering control is always on the right. */
+table.dataTable thead > tr > th span.dt-column-order,
+table.dataTable thead > tr > th.dt-type-numeric span.dt-column-order,
+table.dataTable thead > tr > th.dt-type-date span.dt-column-order {
     position: absolute;
-    right: 10px;
-    left: auto;
+    right: 10px !important;
+    left: auto !important;
     top: 50%;
     transform: translateY(-50%);
     margin: 0;
