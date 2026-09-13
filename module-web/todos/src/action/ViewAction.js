@@ -1,8 +1,8 @@
 import Common from '@company/common-js-web';
 import TodoService from '../TodoService.js';
-import { asText, clearDraft, getDraft, requireId } from './todoActionBase.js';
+import { asText, clearDraft, getDraft } from './todoActionBase.js';
 
-const { Toast } = Common;
+const { NavigationState, Toast } = Common;
 
 function renderTodo(todo) {
     const container = document.querySelector('#todoView');
@@ -29,14 +29,21 @@ function renderTodo(todo) {
     });
 }
 
+function configureUpdateLink(updateLink, id) {
+    updateLink.hidden = !id;
+    updateLink.href = id ? './update.html' : '#';
+    updateLink.onclick = id
+        ? () => NavigationState.set({ page: 'todo-update', id: id })
+        : null;
+}
+
 export async function initView() {
-    const params = new URLSearchParams(window.location.search);
-    const preview = params.get('preview') === '1';
+    const navigation = NavigationState.consume();
     const saveButton = document.querySelector('#saveButton');
     const updateLink = document.querySelector('#updateLink');
     const backLink = document.querySelector('#backLink');
 
-    if (preview) {
+    if (navigation && navigation.preview) {
         const draft = getDraft();
 
         if (!draft) {
@@ -52,9 +59,14 @@ export async function initView() {
         renderTodo(todo);
         saveButton.hidden = false;
         updateLink.hidden = true;
-        backLink.href = draft.mode === 'update' && draft.id
-            ? './update.html?id=' + encodeURIComponent(draft.id)
-            : './create.html';
+
+        if (draft.mode === 'update' && draft.id) {
+            backLink.href = './update.html';
+            backLink.onclick = () => NavigationState.set({ page: 'todo-update', id: draft.id });
+        } else {
+            backLink.href = './create.html';
+            backLink.onclick = null;
+        }
 
         saveButton.addEventListener('click', async () => {
             saveButton.disabled = true;
@@ -74,13 +86,9 @@ export async function initView() {
                 renderTodo(saved);
 
                 saveButton.hidden = true;
-                updateLink.hidden = !saved.id;
+                configureUpdateLink(updateLink, saved.id);
                 backLink.href = './enquiry.html';
-
-                if (saved.id) {
-                    updateLink.href = './update.html?id=' + encodeURIComponent(saved.id);
-                    window.history.replaceState({}, '', './view.html?id=' + encodeURIComponent(saved.id));
-                }
+                backLink.onclick = null;
 
                 Toast.success(
                     draft.mode === 'update'
@@ -98,12 +106,19 @@ export async function initView() {
         return;
     }
 
-    const response = await TodoService.getById(requireId());
+    const id = navigation && navigation.id;
+    if (!id) {
+        Toast.error('Todo id is required.');
+        window.location.href = './enquiry.html';
+        return;
+    }
+
+    const response = await TodoService.getById(id);
     const todo = response.data;
 
     renderTodo(todo);
     saveButton.hidden = true;
-    updateLink.hidden = false;
-    updateLink.href = './update.html?id=' + encodeURIComponent(todo.id);
+    configureUpdateLink(updateLink, todo.id);
     backLink.href = './enquiry.html';
+    backLink.onclick = null;
 }
