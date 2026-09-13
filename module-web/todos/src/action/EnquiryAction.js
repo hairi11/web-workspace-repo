@@ -1,7 +1,7 @@
 import Common from '@company/common-js-web';
 import TodoService from '../TodoService.js';
 
-const { Actions, DataTableBuilder, Toast } = Common;
+const { Actions, DataTableBuilder, NavigationState, Toast } = Common;
 
 let table = null;
 
@@ -34,10 +34,12 @@ function buildTable(records) {
         .searchInput('#searchInput')
         .menuAction({ mode: 'context' })
         .addAction(Actions.view((todo) => {
-            window.location.href = './view.html?id=' + encodeURIComponent(todo.id);
+            NavigationState.set({ page: 'todo-view', id: todo.id });
+            window.location.href = './view.html';
         }))
         .addAction(Actions.edit((todo) => {
-            window.location.href = './update.html?id=' + encodeURIComponent(todo.id);
+            NavigationState.set({ page: 'todo-update', id: todo.id });
+            window.location.href = './update.html';
         }, { text: 'Update' }))
         .addAction(Actions.delete(async (todo, row) => {
             if (!window.confirm('Delete todo #' + todo.id + '?')) return;
