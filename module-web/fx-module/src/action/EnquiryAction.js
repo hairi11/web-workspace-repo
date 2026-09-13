@@ -1,6 +1,6 @@
 import Common from '@company/common-js-web';
 import FxService from '../FxService.js';
-import { TransactionMode } from '../FxTransactionFormAction.js';
+import { TransactionMode } from './FxTransactionFormAction.js';
 
 const { DataTableBuilder, NavigationState, Renderers, Toast } = Common;
 
@@ -40,7 +40,7 @@ function buildTable() {
                 NavigationState.set({
                     page: 'transaction',
                     action: TransactionMode.VIEW,
-                    id: row.id
+                    key: row.id
                 });
                 window.location.href = './transaction.html';
             }
@@ -52,7 +52,7 @@ function buildTable() {
                 NavigationState.set({
                     page: 'transaction',
                     action: TransactionMode.EDIT,
-                    id: row.id
+                    key: row.id
                 });
                 window.location.href = './transaction.html';
             }
