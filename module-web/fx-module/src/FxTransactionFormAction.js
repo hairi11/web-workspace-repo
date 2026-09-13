@@ -11,10 +11,18 @@ const REFERENCE_TYPES = {
     type: 'FX_TYPE'
 };
 
+export const TransactionFlow = {
+    CREATE: 'create',
+    DRAFT_EDIT: 'draft-edit',
+    BACKEND_EDIT: 'backend-edit',
+    VIEW: 'view'
+};
+
 class FxTransactionFormAction extends FormAction {
-    constructor(selector, options) {
+    constructor(selector, flow, recordKey) {
         super(selector);
-        this.options = options || {};
+        this.flow = flow;
+        this.recordKey = recordKey;
         this.references = null;
     }
 
@@ -64,7 +72,7 @@ class FxTransactionFormAction extends FormAction {
 
     buildRequestData(values) {
         return {
-            id: this.options.mode === 'edit' ? Number(this.options.id) : null,
+            id: this.flow === TransactionFlow.BACKEND_EDIT ? Number(this.recordKey) : null,
             fxDate: values.fxDate || '',
             fxCategory: values.fxCategory || '',
             fxCategoryDescription: this.selectedText('fxCategory'),
@@ -84,8 +92,9 @@ class FxTransactionFormAction extends FormAction {
     }
 
     beforeSubmit(context) {
-        if (this.options.mode === 'create') {
-            upsertTransaction(this.options.editIndex, context.data);
+        if (this.flow === TransactionFlow.CREATE || this.flow === TransactionFlow.DRAFT_EDIT) {
+            const index = this.flow === TransactionFlow.DRAFT_EDIT ? this.recordKey : null;
+            upsertTransaction(index, context.data);
             window.location.href = './create.html?resume=1';
             return false;
         }
@@ -94,20 +103,20 @@ class FxTransactionFormAction extends FormAction {
     }
 
     sendRequest(context) {
-        if (this.options.mode === 'edit') {
-            return FxService.updateTransaction(this.options.id, context.data);
+        if (this.flow === TransactionFlow.BACKEND_EDIT) {
+            return FxService.updateTransaction(this.recordKey, context.data);
         }
 
         return super.sendRequest(context);
     }
 
     async onSuccess() {
-        if (this.options.mode === 'edit') {
-            Toast.success('FX transaction updated.');
-            window.setTimeout(() => {
-                window.location.href = './enquiry.html';
-            }, 300);
-        }
+        if (this.flow !== TransactionFlow.BACKEND_EDIT) return;
+
+        Toast.success('FX transaction updated.');
+        window.setTimeout(() => {
+            window.location.href = './enquiry.html';
+        }, 300);
     }
 
     populate(values) {
@@ -123,20 +132,20 @@ class FxTransactionFormAction extends FormAction {
         return this;
     }
 
-    setReadOnly(readOnly) {
+    setReadOnly() {
         if (!this.form) return this;
 
         this.form.querySelectorAll('input, select, textarea').forEach((element) => {
-            element.disabled = Boolean(readOnly);
+            element.disabled = true;
         });
 
         const submitButton = this.form.querySelector('button[type="submit"]');
-        if (submitButton) submitButton.hidden = Boolean(readOnly);
+        if (submitButton) submitButton.hidden = true;
         return this;
     }
 
     shouldTrackDirty() {
-        return this.options.mode !== 'view';
+        return this.flow !== TransactionFlow.VIEW;
     }
 
     onError(error) {
