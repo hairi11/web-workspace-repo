@@ -1,21 +1,19 @@
 import Common from '@company/common-js-web';
-import FxCreateFormAction from '../FxCreateFormAction.js';
-import { TransactionMode } from '../FxTransactionFormAction.js';
-import {
-    clearCreateDraft,
-    getCreateDraft,
-    removeTransaction
-} from './fxCreateDraft.js';
+import FxCreateFormAction from './FxCreateFormAction.js';
+import { TransactionMode } from './FxTransactionFormAction.js';
 
 const { DataTableBuilder, NavigationState, Renderers } = Common;
 
 let table = null;
 
 export async function initCreate() {
-    const params = new URLSearchParams(window.location.search);
+    const navigation = NavigationState.consume();
+    const resume = navigation
+        && navigation.page === 'create'
+        && navigation.action === 'resume';
 
-    if (params.get('resume') !== '1') {
-        clearCreateDraft();
+    if (!resume) {
+        FxCreateFormAction.clearDraft();
     }
 
     new FxCreateFormAction('#fxCreateForm').build();
@@ -27,14 +25,15 @@ function bindActions() {
     document.querySelector('#addTransactionButton').addEventListener('click', () => {
         NavigationState.set({
             page: 'transaction',
-            action: TransactionMode.CREATE
+            action: TransactionMode.CREATE,
+            key: null
         });
         window.location.href = './transaction.html';
     });
 }
 
 function getRows() {
-    return getCreateDraft().transactions.map((transaction, index) => Object.assign({}, transaction, {
+    return FxCreateFormAction.getDraft().transactions.map((transaction, index) => Object.assign({}, transaction, {
         rowIndex: index,
         recordNo: index + 1
     }));
@@ -61,7 +60,7 @@ function buildTable(rows) {
                 NavigationState.set({
                     page: 'transaction',
                     action: TransactionMode.EDIT_DRAFT,
-                    index: row.rowIndex
+                    key: row.rowIndex
                 });
                 window.location.href = './transaction.html';
             }
@@ -71,7 +70,7 @@ function buildTable(rows) {
             icon: 'fa fa-trash',
             className: 'text-danger',
             onClick: (row) => {
-                removeTransaction(row.rowIndex);
+                FxCreateFormAction.removeTransaction(row.rowIndex);
                 table.replaceData(getRows(), false);
             }
         })
