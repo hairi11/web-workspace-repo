@@ -47,13 +47,8 @@ function buildTable(rows) {
         .column('fxCategoryDescription', 'Category')
         .column('fxCodeDescription', 'Code')
         .column('fxTypeDescription', 'Type')
-        .column('fxRefno', 'Reference No.')
-        .column('fxParty', 'Party')
-        .column('fxPrincipal', 'Principal')
         .column('fxCurrencyDescription', 'Currency')
         .renderer('fxAmount', 'Amount', Renderers.amount())
-        .renderer('fxRate', 'Rate', Renderers.number({ maximumFractionDigits: 8 }))
-        .column('fxDescription', 'Description')
         .menuAction({ title: 'Action', mode: 'inline' })
         .addAction({
             text: 'Edit',
