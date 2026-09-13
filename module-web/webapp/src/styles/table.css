@@ -49,3 +49,58 @@ table.dataTable thead > tr > th > div.dt-column-header > span.dt-column-order {
 .dt-common-actions button {
     padding: 5px 8px;
 }
+
+.fx-create-summary {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.fx-create-summary .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.fx-create-toolbar {
+    margin-bottom: 10px;
+}
+
+.fx-create-table-wrap {
+    overflow-x: auto;
+}
+
+.fx-create-table {
+    min-width: 1700px;
+}
+
+.fx-create-table th {
+    white-space: nowrap;
+}
+
+.fx-create-table input,
+.fx-create-table select {
+    width: 100%;
+    min-width: 120px;
+    padding: 7px;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    background: #fff;
+}
+
+.fx-create-table [data-field="fxDescription"] {
+    min-width: 220px;
+}
+
+.fx-create-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+@media (max-width: 700px) {
+    .fx-create-summary .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
