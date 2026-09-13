@@ -38,21 +38,21 @@
             <thead>
                 <tr>
                     <th>No.</th>
-                    <th>FX Date *</th>
-                    <th>Category *</th>
-                    <th>Code *</th>
-                    <th>Type *</th>
+                    <th>FX Date</th>
+                    <th>Category</th>
+                    <th>Code</th>
+                    <th>Type</th>
                     <th>Reference No.</th>
                     <th>Party</th>
                     <th>Principal</th>
-                    <th>Currency *</th>
-                    <th>Amount *</th>
-                    <th>Rate *</th>
+                    <th>Currency</th>
+                    <th>Amount</th>
+                    <th>Rate</th>
                     <th>Description</th>
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody id="fxTransactionBody"></tbody>
+            <tbody></tbody>
         </table>
     </div>
 
@@ -62,25 +62,6 @@
         <a class="button" href="./enquiry.html">Cancel</a>
     </div>
 </main>
-
-<template id="fxTransactionRowTemplate">
-    <tr>
-        <td data-field="recordNo"></td>
-        <td><input data-field="fxDate" type="date"></td>
-        <td><select data-field="fxCategory"></select></td>
-        <td><select data-field="fxCode"></select></td>
-        <td><select data-field="fxType"></select></td>
-        <td><input data-field="fxRefno" type="text"></td>
-        <td><input data-field="fxParty" type="text"></td>
-        <td><input data-field="fxPrincipal" type="text"></td>
-        <td><select data-field="fxCurrency"></select></td>
-        <td><input data-field="fxAmount" type="number" min="0" step="0.0001"></td>
-        <td><input data-field="fxRate" type="number" min="0" step="0.00000001"></td>
-        <td><input data-field="fxDescription" type="text"></td>
-        <td><button data-action="remove" type="button" class="danger">Remove</button></td>
-    </tr>
-</template>
-
 <script src="./fx.js"></script>
 </body>
 </html>
