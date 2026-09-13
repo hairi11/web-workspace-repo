@@ -55,6 +55,14 @@ const FxService = {
         });
     },
 
+    updateTransaction: function (id, data) {
+        return Ajax.post(FxApi.transactionById(id), data);
+    },
+
+    deleteTransaction: function (id) {
+        return Ajax.post(FxApi.transactionById(id) + '/delete', {});
+    },
+
     save: function (data) {
         return Ajax.post(FxApi.save, data);
     },
