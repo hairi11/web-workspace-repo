@@ -1,5 +1,7 @@
 import Common from '@company/common-js-web';
 import FxService from '../FxService.js';
+import { TransactionMode } from '../FxTransactionFormAction.js';
+import { setTransactionRoute } from './TransactionRoute.js';
 
 const { DataTableBuilder, Renderers, Toast } = Common;
 
@@ -36,14 +38,16 @@ function buildTable() {
             text: 'View',
             icon: 'fa fa-eye',
             onClick: (row) => {
-                window.location.href = './transaction.html?mode=view&id=' + encodeURIComponent(row.id);
+                setTransactionRoute(TransactionMode.VIEW, row.id);
+                window.location.href = './transaction.html';
             }
         })
         .addAction({
             text: 'Edit',
             icon: 'fa fa-pen',
             onClick: (row) => {
-                window.location.href = './transaction.html?mode=edit&id=' + encodeURIComponent(row.id);
+                setTransactionRoute(TransactionMode.EDIT, row.id);
+                window.location.href = './transaction.html';
             }
         })
         .addAction({ divider: true })
