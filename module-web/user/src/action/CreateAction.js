@@ -1,6 +1,9 @@
+import Common from '@company/common-js-web';
 import UserFormAction from '../UserFormAction.js';
 import UserService from '../UserService.js';
 import { clearDraft, getDraft, getStepConfig, saveDraft } from './userActionBase.js';
+
+const { NavigationState } = Common;
 
 const NEXT_URL = {
     profile: './create-address.html',
@@ -43,9 +46,12 @@ export function initCreate() {
                 data: saved
             });
 
-            window.location.href = './view.html?saved=1' + (
-                saved.id ? '&id=' + encodeURIComponent(saved.id) : ''
-            );
+            NavigationState.set({
+                page: 'user-view',
+                id: saved.id || null,
+                saved: true
+            });
+            window.location.href = './view.html';
 
             return false;
         }
