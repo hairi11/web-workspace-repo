@@ -1,6 +1,6 @@
 import Common from '@company/common-js-web';
+import { TransactionMode } from '../FxTransactionMode.js';
 import FxCreateFormAction from './FxCreateFormAction.js';
-import { TransactionMode } from './FxTransactionFormAction.js';
 
 const { DataTableBuilder, NavigationState, Renderers } = Common;
 
