@@ -68,39 +68,34 @@ table.dataTable thead > tr > th > div.dt-column-header > span.dt-column-order {
 }
 
 .fx-create-table-wrap {
+    width: 100%;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .fx-create-table {
-    min-width: 1700px;
+    width: 100% !important;
+    min-width: 700px;
 }
 
-.fx-create-table th {
+.fx-create-table th,
+.fx-create-table td {
     white-space: nowrap;
-}
-
-.fx-create-table input,
-.fx-create-table select {
-    width: 100%;
-    min-width: 120px;
-    padding: 7px;
-    border: 1px solid #bbb;
-    border-radius: 4px;
-    background: #fff;
-}
-
-.fx-create-table [data-field="fxDescription"] {
-    min-width: 220px;
 }
 
 .fx-create-actions {
     display: flex;
     gap: 8px;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 @media (max-width: 700px) {
     .fx-create-summary .form-grid {
         grid-template-columns: 1fr;
+    }
+
+    .fx-create-table {
+        min-width: 620px;
     }
 }
