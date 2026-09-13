@@ -2,11 +2,12 @@ import Common from '@company/common-js-web';
 import FxService from '../FxService.js';
 import FxTransactionFormAction, { TransactionMode } from '../FxTransactionFormAction.js';
 import { getCreateDraft } from './fxCreateDraft.js';
+import { getTransactionRoute } from './TransactionRoute.js';
 
 const { Router, Toast } = Common;
 
 export async function initTransaction() {
-    const route = resolveRoute(new URLSearchParams(window.location.search));
+    const route = getTransactionRoute();
     const action = new FxTransactionFormAction('#transactionForm', route);
 
     try {
@@ -30,26 +31,6 @@ export async function initTransaction() {
         Toast.error('Failed to load FX transaction data.');
         console.error(error);
     }
-}
-
-function resolveRoute(params) {
-    const mode = params.get('mode');
-    const id = params.get('id');
-    const index = parseIndex(params.get('index'));
-
-    const route = [
-        mode === 'view' && id ? { mode: TransactionMode.VIEW, key: id } : null,
-        mode === 'edit' && id ? { mode: TransactionMode.EDIT, key: id } : null,
-        index !== null ? { mode: TransactionMode.EDIT_DRAFT, key: index } : null
-    ].find(Boolean);
-
-    return route || { mode: TransactionMode.CREATE, key: null };
-}
-
-function parseIndex(value) {
-    if (value === null || value === '') return null;
-    const index = Number(value);
-    return Number.isInteger(index) && index >= 0 ? index : null;
 }
 
 function initCreateTransaction() {
