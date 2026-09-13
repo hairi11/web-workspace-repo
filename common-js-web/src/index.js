@@ -17,6 +17,7 @@ module.exports = {
     Logger: require('./logging/Logger'),
     MemoryCache: require('./cache/MemoryCache'),
     Modal: require('./modal/Modal'),
+    NavigationState: require('./navigation/NavigationState'),
     PageRouter: require('./router/PageRouter'),
     Router: require('./router/Router'),
     Renderers: require('./datatable/Renderers'),
