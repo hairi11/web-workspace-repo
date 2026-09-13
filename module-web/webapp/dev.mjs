@@ -44,7 +44,8 @@ browserSync.init({
 const copyWatch = chokidar.watch([
     path.join(process.cwd(), 'src', '**/*'),
     path.join(process.cwd(), '..', 'user', 'src', 'pages', '**/*.html'),
-    path.join(process.cwd(), '..', 'todos', 'src', 'pages', '**/*.html')
+    path.join(process.cwd(), '..', 'todos', 'src', 'pages', '**/*.html'),
+    path.join(process.cwd(), '..', 'fx-module', 'src', 'pages', '**/*.html')
 ], { ignoreInitial: true });
 
 async function refreshStatic(filePath) {
@@ -56,6 +57,8 @@ async function refreshStatic(filePath) {
         await cp(filePath, path.join(distRoot, 'user', path.basename(filePath)));
     } else if (filePath.includes(path.join('todos', 'src', 'pages'))) {
         await cp(filePath, path.join(distRoot, 'todos', path.basename(filePath)));
+    } else if (filePath.includes(path.join('fx-module', 'src', 'pages'))) {
+        await cp(filePath, path.join(distRoot, 'fx', path.basename(filePath)));
     } else {
         return;
     }
