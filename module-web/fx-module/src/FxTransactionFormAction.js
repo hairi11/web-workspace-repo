@@ -17,10 +17,10 @@ const REFERENCE_TYPES = {
     type: 'FX_TYPE'
 };
 
-const TransactionFlow = {
+export const TransactionMode = {
     CREATE: 'create',
-    DRAFT_EDIT: 'draft-edit',
-    BACKEND_EDIT: 'backend-edit',
+    EDIT_DRAFT: 'edit-draft',
+    EDIT: 'edit',
     VIEW: 'view'
 };
 
@@ -81,7 +81,7 @@ class FxTransactionFormAction extends FormAction {
 
     buildRequestData(values) {
         return {
-            id: this.options.flow === TransactionFlow.BACKEND_EDIT ? Number(this.options.key) : null,
+            id: this.options.mode === TransactionMode.EDIT ? Number(this.options.key) : null,
             fxDate: values.fxDate || '',
             fxCategory: values.fxCategory || '',
             fxCategoryDescription: this.referenceDescription('category', values.fxCategory),
@@ -101,8 +101,8 @@ class FxTransactionFormAction extends FormAction {
     }
 
     beforeSubmit(context) {
-        if (this.options.flow === TransactionFlow.CREATE || this.options.flow === TransactionFlow.DRAFT_EDIT) {
-            const index = this.options.flow === TransactionFlow.DRAFT_EDIT ? this.options.key : null;
+        if (this.options.mode === TransactionMode.CREATE || this.options.mode === TransactionMode.EDIT_DRAFT) {
+            const index = this.options.mode === TransactionMode.EDIT_DRAFT ? this.options.key : null;
             upsertTransaction(index, context.data);
             window.location.href = './create.html?resume=1';
             return false;
@@ -112,7 +112,7 @@ class FxTransactionFormAction extends FormAction {
     }
 
     sendRequest(context) {
-        if (this.options.flow === TransactionFlow.BACKEND_EDIT) {
+        if (this.options.mode === TransactionMode.EDIT) {
             return FxService.updateTransaction(this.options.key, context.data);
         }
 
@@ -120,7 +120,7 @@ class FxTransactionFormAction extends FormAction {
     }
 
     async onSuccess() {
-        if (this.options.flow === TransactionFlow.BACKEND_EDIT) {
+        if (this.options.mode === TransactionMode.EDIT) {
             Toast.success('FX transaction updated.');
             window.setTimeout(() => {
                 window.location.href = './enquiry.html';
@@ -172,7 +172,7 @@ class FxTransactionFormAction extends FormAction {
     }
 
     shouldTrackDirty() {
-        return this.options.flow !== TransactionFlow.VIEW;
+        return this.options.mode !== TransactionMode.VIEW;
     }
 
     onError(error) {
@@ -212,6 +212,6 @@ class FxTransactionFormAction extends FormAction {
     }
 }
 
-FxTransactionFormAction.Flow = TransactionFlow;
+FxTransactionFormAction.Mode = TransactionMode;
 
 export default FxTransactionFormAction;
