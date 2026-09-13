@@ -27,7 +27,7 @@ class FormAction {
 
         this._submitListener = function (event) {
             event.preventDefault();
-            self.execute();
+            self.execute(event.submitter || null);
         };
 
         this.form.addEventListener('submit', this._submitListener);
@@ -69,7 +69,7 @@ class FormAction {
         return this;
     }
 
-    async execute() {
+    async execute(submitter) {
         if (this.isSubmitting) return;
 
         var context = null;
@@ -101,7 +101,7 @@ class FormAction {
 
             if (!confirmed) return;
 
-            context = await this.createContext(formValues);
+            context = await this.createContext(formValues, submitter);
 
             var beforeResult = await this.beforeSubmit(context);
             if (beforeResult === false) return;
@@ -211,11 +211,12 @@ class FormAction {
         );
     }
 
-    async createContext(formValues) {
+    async createContext(formValues, submitter) {
         return {
             method: String(this.getMethod() || 'POST').toUpperCase(),
             url: this.getUrl(),
             form: this.form,
+            submitter: submitter || null,
             formValues: formValues,
             data: await this.buildRequestData(formValues, this.form),
             requestOptions: ConfigUtil.merge({}, this.getRequestOptions() || {})
