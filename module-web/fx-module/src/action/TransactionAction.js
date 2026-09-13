@@ -8,12 +8,10 @@ const { NavigationState, Router, Toast } = Common;
 
 export async function initTransaction() {
     const navigation = NavigationState.consume();
-    const mode = navigation && navigation.page === 'transaction'
-        ? navigation.action
-        : TransactionMode.CREATE;
-    const key = navigation && navigation.page === 'transaction'
-        ? navigation.key
-        : null;
+    const {
+        action: mode = TransactionMode.CREATE,
+        key = null
+    } = navigation?.page === 'transaction' ? navigation : {};
     const action = new FxTransactionFormAction('#transactionForm', { mode, key });
 
     try {
