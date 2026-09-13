@@ -10,6 +10,24 @@ th, td {
     vertical-align: top;
 }
 
+/* Keep DataTables ordering icon pinned to the right edge of every sortable header. */
+table.dataTable thead > tr > th.dt-orderable-asc,
+table.dataTable thead > tr > th.dt-orderable-desc,
+table.dataTable thead > tr > th.dt-ordering-asc,
+table.dataTable thead > tr > th.dt-ordering-desc {
+    position: relative;
+    padding-right: 30px;
+}
+
+table.dataTable thead > tr > th > span.dt-column-order {
+    position: absolute;
+    right: 10px;
+    left: auto;
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0;
+}
+
 .dt-common-actions {
     display: flex;
     gap: 6px;
