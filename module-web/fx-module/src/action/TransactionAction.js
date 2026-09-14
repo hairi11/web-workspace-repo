@@ -1,5 +1,5 @@
 import Common from '@company/common-js-web';
-import { MasterMode, TransactionMode } from '../FxConstants.js';
+import { TransactionMode } from '../FxConstants.js';
 import FxRows from '../FxRows.js';
 import FxService from '../FxService.js';
 import FxTransactionFormAction from './FxTransactionFormAction.js';
@@ -11,7 +11,8 @@ export async function initTransaction() {
     const {
         action: mode = TransactionMode.CREATE,
         key = null,
-        rowsKey = null
+        rowsKey = null,
+        returnTo = { page: 'enquiry' }
     } = navigation?.page === 'transaction' ? navigation : {};
 
     if (mode !== TransactionMode.VIEW && !FxRows.get(rowsKey)) {
@@ -32,13 +33,13 @@ export async function initTransaction() {
         await new Router()
             .route(TransactionMode.CREATE, () => {
                 configurePage('Add FX Transaction', 'Add', false);
-                bindBackToMaster(rowsKey);
+                bindReturnButton(returnTo);
             })
             .route(TransactionMode.EDIT, () => {
                 initEditTransaction(action, FxRows.get(rowsKey), key);
-                bindBackToMaster(rowsKey);
+                bindReturnButton(returnTo);
             })
-            .route(TransactionMode.VIEW, () => initViewTransaction(action, key))
+            .route(TransactionMode.VIEW, () => initViewTransaction(action, key, returnTo))
             .dispatch(mode);
     } catch (error) {
         Toast.error('Failed to load FX transaction data.');
@@ -57,7 +58,7 @@ function initEditTransaction(action, rows, index) {
     configurePage('Update FX Transaction', 'Update', false);
 }
 
-async function initViewTransaction(action, transactionId) {
+async function initViewTransaction(action, transactionId, returnTo) {
     const transaction = await FxService.findTransactionById(transactionId);
 
     if (!transaction) throw new Error('FX transaction not found.');
@@ -65,7 +66,7 @@ async function initViewTransaction(action, transactionId) {
     action.populate(transaction);
     FormRenderers.view(action, transaction);
     configurePage('View FX Transaction', null, true);
-    bindBackToEnquiry();
+    bindReturnButton(returnTo);
 }
 
 function configurePage(title, submitLabel, viewMode) {
@@ -76,30 +77,27 @@ function configurePage(title, submitLabel, viewMode) {
     if (heading) heading.textContent = title;
     if (submitButton && submitLabel) submitButton.textContent = submitLabel;
     if (submitButton) submitButton.hidden = Boolean(viewMode);
-    if (cancelButton && viewMode) cancelButton.textContent = 'Back';
+    if (cancelButton) cancelButton.textContent = viewMode ? 'Back' : 'Cancel';
 }
 
-function bindBackToMaster(rowsKey) {
-    const cancel = document.querySelector('#cancelButton');
-    if (!cancel) return;
+function bindReturnButton(returnTo) {
+    const button = document.querySelector('#cancelButton');
+    if (!button) return;
 
-    cancel.addEventListener('click', (event) => {
+    button.addEventListener('click', (event) => {
         event.preventDefault();
-        NavigationState.set({
-            page: 'master',
-            action: MasterMode.EDIT,
-            rowsKey: rowsKey
-        });
+        navigateTo(returnTo);
+    });
+}
+
+function navigateTo(target) {
+    const destination = target && target.page ? target : { page: 'enquiry' };
+
+    if (destination.page === 'master') {
+        NavigationState.set(destination);
         window.location.href = './master.html';
-    });
-}
+        return;
+    }
 
-function bindBackToEnquiry() {
-    const back = document.querySelector('#cancelButton');
-    if (!back) return;
-
-    back.addEventListener('click', (event) => {
-        event.preventDefault();
-        window.location.href = './enquiry.html';
-    });
+    window.location.href = './enquiry.html';
 }
