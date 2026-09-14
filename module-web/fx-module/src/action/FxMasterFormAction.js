@@ -1,6 +1,6 @@
 import Common from '@company/common-js-web';
 import { MasterMode } from '../FxConstants.js';
-import FxDraft from '../FxDraft.js';
+import FxRows from '../FxRows.js';
 import FxService from '../FxService.js';
 
 const { FormAction, NavigationState, Toast } = Common;
@@ -74,7 +74,7 @@ class FxMasterFormAction extends FormAction {
                 : 'FX draft saved successfully.'
         );
 
-        FxDraft.clear(this.options.draftKey);
+        FxRows.clear(this.options.rowsKey);
 
         NavigationState.set({
             page: 'master',
