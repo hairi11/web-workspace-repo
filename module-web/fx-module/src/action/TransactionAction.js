@@ -4,7 +4,7 @@ import FxService from '../FxService.js';
 import FxCreateFormAction from './FxCreateFormAction.js';
 import FxTransactionFormAction from './FxTransactionFormAction.js';
 
-const { NavigationState, Router, Toast } = Common;
+const { NavigationState, renderFormView, Router, Toast } = Common;
 
 export async function initTransaction() {
     const navigation = NavigationState.consume();
@@ -58,30 +58,10 @@ async function initExistingTransaction(action, id, page) {
     action.populate(transaction);
 
     if (page.viewMode) {
-        renderTransactionView(action, transaction);
+        renderFormView(action, transaction);
     }
 
     configureExistingPage(page);
-}
-
-function renderTransactionView(action, values) {
-    if (action.datePicker) {
-        action.datePicker.destroy();
-        action.datePicker = null;
-    }
-
-    Object.values(action.selects).forEach((select) => select.destroy());
-    action.selects = {};
-
-    const form = document.querySelector('#transactionForm');
-    if (!form) return;
-
-    form.querySelectorAll('input, select, textarea').forEach((field) => {
-        const display = document.createElement('div');
-        display.className = 'view-value';
-        display.textContent = action.viewValue(field.name, values[field.name]);
-        field.replaceWith(display);
-    });
 }
 
 function configureExistingPage(page) {
