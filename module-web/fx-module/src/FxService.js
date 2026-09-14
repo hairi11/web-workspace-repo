@@ -57,10 +57,8 @@ const FxService = {
         }).then(responseObject);
     },
 
-    createMaster: function (data) {
-        return Ajax.post(FxApi.masters, data || {
-            status: 'DRAFT'
-        }).then(responseObject);
+    createMaster: function () {
+        return Ajax.post(FxApi.masters, {}).then(responseObject);
     },
 
     findTransactionsByMasterId: function (masterId) {
