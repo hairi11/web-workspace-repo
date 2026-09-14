@@ -23,6 +23,7 @@ module.exports = {
     PageRouter: require('./router/PageRouter'),
     Router: require('./router/Router'),
     Renderers: require('./datatable/Renderers'),
+    renderFormView: require('./form/renderFormView'),
     SafeDom: require('./util/SafeDom'),
     SecurityUtil: require('./util/SecurityUtil'),
     Select2: require('./select/Select2'),
