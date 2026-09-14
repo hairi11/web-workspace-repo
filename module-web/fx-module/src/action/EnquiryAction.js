@@ -71,8 +71,8 @@ function bindCreateButton() {
     if (!button) return;
 
     button.addEventListener('click', () => {
-        FxDraft.create();
-        openTransaction(TransactionMode.CREATE, null);
+        const draft = FxDraft.create();
+        openTransaction(TransactionMode.CREATE, null, draft.draftKey);
     });
 }
 
@@ -86,8 +86,8 @@ async function openExistingTransaction(masterId, transactionId) {
         const index = transactions.findIndex((transaction) => transaction.id === transactionId);
         if (!master || index < 0) throw new Error('FX transaction not found.');
 
-        FxDraft.load(master, transactions);
-        openTransaction(TransactionMode.EDIT, index);
+        const draft = FxDraft.load(master, transactions);
+        openTransaction(TransactionMode.EDIT, index, draft.draftKey);
     } catch (error) {
         Toast.error('Failed to load FX record.');
         console.error(error);
@@ -103,11 +103,12 @@ function openMaster(masterId, mode) {
     window.location.href = './master.html';
 }
 
-function openTransaction(mode, index) {
+function openTransaction(mode, index, draftKey) {
     NavigationState.set({
         page: 'transaction',
         action: mode,
-        key: index
+        key: index,
+        draftKey: draftKey
     });
     window.location.href = './transaction.html';
 }
