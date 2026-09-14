@@ -38,7 +38,12 @@ function buildTable() {
         .addAction({
             text: 'View',
             icon: 'fa fa-eye',
-            onClick: (row) => openTransaction(TransactionMode.VIEW, row.id, null)
+            onClick: (row) => openTransaction(
+                TransactionMode.VIEW,
+                row.id,
+                null,
+                { page: 'enquiry' }
+            )
         })
         .addAction({
             text: 'Edit',
@@ -72,7 +77,12 @@ function bindCreateButton() {
 
     button.addEventListener('click', () => {
         const rows = FxRows.create();
-        openTransaction(TransactionMode.CREATE, null, rows.rowsKey);
+        openTransaction(
+            TransactionMode.CREATE,
+            null,
+            rows.rowsKey,
+            { page: 'enquiry' }
+        );
     });
 }
 
@@ -87,19 +97,25 @@ async function openExistingTransaction(masterId, transactionId) {
         if (!master || index < 0) throw new Error('FX transaction not found.');
 
         const rows = FxRows.load(master, transactions);
-        openTransaction(TransactionMode.EDIT, index, rows.rowsKey);
+        openTransaction(
+            TransactionMode.EDIT,
+            index,
+            rows.rowsKey,
+            { page: 'enquiry' }
+        );
     } catch (error) {
         Toast.error('Failed to load FX record.');
         console.error(error);
     }
 }
 
-function openTransaction(mode, key, rowsKey) {
+function openTransaction(mode, key, rowsKey, returnTo) {
     NavigationState.set({
         page: 'transaction',
         action: mode,
         key: key,
-        rowsKey: rowsKey
+        rowsKey: rowsKey,
+        returnTo: returnTo
     });
     window.location.href = './transaction.html';
 }
