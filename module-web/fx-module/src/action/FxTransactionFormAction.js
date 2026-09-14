@@ -172,6 +172,7 @@ class FxTransactionFormAction extends FormAction {
     buildSelect(selector, items) {
         return new Select2(selector, {
             width: '100%',
+            placeholder: 'Select...',
             data: items.map((item) => ({
                 id: item.code,
                 text: item.description
