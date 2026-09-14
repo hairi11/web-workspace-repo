@@ -29,6 +29,80 @@ textarea:disabled {
     color: #666;
 }
 
+.select2-container {
+    width: 100% !important;
+}
+
+.select2-container .select2-selection--single {
+    height: 39px;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    background: #fff;
+}
+
+.select2-container .select2-selection--single .select2-selection__rendered {
+    padding: 0 30px 0 9px;
+    line-height: 37px;
+    color: #222;
+}
+
+.select2-container .select2-selection--single .select2-selection__arrow {
+    top: 0;
+    right: 4px;
+    height: 37px;
+}
+
+.select2-container--disabled .select2-selection--single {
+    background: #f3f3f3;
+    color: #666;
+}
+
+.date-picker-control {
+    display: flex;
+    width: 100%;
+}
+
+.date-picker-control > input {
+    flex: 1 1 auto;
+    min-width: 0;
+    border-radius: 4px 0 0 4px;
+}
+
+.date-picker-button {
+    flex: 0 0 39px;
+    width: 39px;
+    padding: 0;
+    border: 1px solid #bbb;
+    border-left: 0;
+    background: #fff;
+    color: #444;
+    cursor: pointer;
+    font: inherit;
+}
+
+.date-picker-button:hover {
+    background: #f3f3f3;
+}
+
+.date-picker-button:focus-visible {
+    outline: 2px solid #6b9cff;
+    outline-offset: -2px;
+}
+
+.date-picker-toggle {
+    border-radius: 0 4px 4px 0;
+}
+
+.date-picker-clear[hidden] {
+    display: none;
+}
+
+.date-picker-control > input:disabled ~ .date-picker-button {
+    background: #f3f3f3;
+    color: #888;
+    cursor: default;
+}
+
 .form-row {
     display: grid;
     gap: 14px;
