@@ -4,7 +4,7 @@ import FxService from '../FxService.js';
 import FxCreateFormAction from './FxCreateFormAction.js';
 import FxTransactionFormAction from './FxTransactionFormAction.js';
 
-const { NavigationState, renderFormView, Router, Toast } = Common;
+const { FormRenderers, NavigationState, Router, Toast } = Common;
 
 export async function initTransaction() {
     const navigation = NavigationState.consume();
@@ -58,7 +58,7 @@ async function initExistingTransaction(action, id, page) {
     action.populate(transaction);
 
     if (page.viewMode) {
-        renderFormView(action, transaction);
+        FormRenderers.view(action, transaction);
     }
 
     configureExistingPage(page);
