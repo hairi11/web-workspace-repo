@@ -146,6 +146,13 @@ export class Storage {
     clear(): this;
 }
 
+export const CaseUtil: {
+    toCamelCase(value: any): string;
+    toSnakeCase(value: any): string;
+    toCamelKeys<T = any>(value: T): T;
+    toSnakeKeys<T = any>(value: T): T;
+};
+
 export const DateUtil: {
     formatDate(value: any, pattern?: string): string;
     toApiDate(value: any): string;
