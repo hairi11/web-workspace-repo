@@ -1,6 +1,6 @@
 import Common from '@company/common-js-web';
 import { MasterMode, TransactionMode } from '../FxConstants.js';
-import FxDraft from '../FxDraft.js';
+import FxRows from '../FxRows.js';
 import FxService from '../FxService.js';
 import FxTransactionFormAction from './FxTransactionFormAction.js';
 
@@ -11,10 +11,10 @@ export async function initTransaction() {
     const {
         action: mode = TransactionMode.CREATE,
         key = null,
-        draftKey = null
+        rowsKey = null
     } = navigation?.page === 'transaction' ? navigation : {};
 
-    if (mode !== TransactionMode.VIEW && !FxDraft.get(draftKey)) {
+    if (mode !== TransactionMode.VIEW && !FxRows.get(rowsKey)) {
         window.location.href = './enquiry.html';
         return;
     }
@@ -23,7 +23,7 @@ export async function initTransaction() {
         const action = new FxTransactionFormAction('#transactionForm', {
             mode: mode,
             key: key,
-            draftKey: draftKey
+            rowsKey: rowsKey
         });
 
         await action.loadReferences();
@@ -32,11 +32,11 @@ export async function initTransaction() {
         await new Router()
             .route(TransactionMode.CREATE, () => {
                 configurePage('Add FX Transaction', 'Add', false);
-                bindBackToMaster(draftKey);
+                bindBackToMaster(rowsKey);
             })
             .route(TransactionMode.EDIT, () => {
-                initEditTransaction(action, FxDraft.get(draftKey), key);
-                bindBackToMaster(draftKey);
+                initEditTransaction(action, FxRows.get(rowsKey), key);
+                bindBackToMaster(rowsKey);
             })
             .route(TransactionMode.VIEW, () => initViewTransaction(action, key))
             .dispatch(mode);
@@ -46,9 +46,9 @@ export async function initTransaction() {
     }
 }
 
-function initEditTransaction(action, draft, index) {
-    const transaction = draft && Number.isInteger(index)
-        ? draft.transactions[index]
+function initEditTransaction(action, rows, index) {
+    const transaction = rows && Number.isInteger(index)
+        ? rows.transactions[index]
         : null;
 
     if (!transaction) throw new Error('FX transaction not found.');
@@ -79,7 +79,7 @@ function configurePage(title, submitLabel, viewMode) {
     if (cancelButton && viewMode) cancelButton.textContent = 'Back';
 }
 
-function bindBackToMaster(draftKey) {
+function bindBackToMaster(rowsKey) {
     const cancel = document.querySelector('#cancelButton');
     if (!cancel) return;
 
@@ -88,7 +88,7 @@ function bindBackToMaster(draftKey) {
         NavigationState.set({
             page: 'master',
             action: MasterMode.EDIT,
-            draftKey: draftKey
+            rowsKey: rowsKey
         });
         window.location.href = './master.html';
     });
