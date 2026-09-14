@@ -1,5 +1,5 @@
 import Common from '@company/common-js-web';
-import { MasterMode, TransactionMode } from '../FxConstants.js';
+import { TransactionMode } from '../FxConstants.js';
 import FxDraft from '../FxDraft.js';
 import FxService from '../FxService.js';
 
@@ -38,7 +38,7 @@ function buildTable() {
         .addAction({
             text: 'View',
             icon: 'fa fa-eye',
-            onClick: (row) => openMaster(row.masterId, MasterMode.VIEW)
+            onClick: (row) => openTransaction(TransactionMode.VIEW, row.id, null)
         })
         .addAction({
             text: 'Edit',
@@ -94,20 +94,11 @@ async function openExistingTransaction(masterId, transactionId) {
     }
 }
 
-function openMaster(masterId, mode) {
-    NavigationState.set({
-        page: 'master',
-        action: mode,
-        key: masterId
-    });
-    window.location.href = './master.html';
-}
-
-function openTransaction(mode, index, draftKey) {
+function openTransaction(mode, key, draftKey) {
     NavigationState.set({
         page: 'transaction',
         action: mode,
-        key: index,
+        key: key,
         draftKey: draftKey
     });
     window.location.href = './transaction.html';
