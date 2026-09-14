@@ -1,5 +1,6 @@
 import Common from '@company/common-js-web';
 import { MasterMode } from '../FxConstants.js';
+import FxDraft from '../FxDraft.js';
 import FxService from '../FxService.js';
 
 const { FormAction, NavigationState, Toast } = Common;
@@ -22,10 +23,15 @@ class FxMasterFormAction extends FormAction {
     buildRequestData() {
         return {
             master: {
-                id: this.master ? this.master.id : null
+                id: this.master ? this.master.id : null,
+                status: this.master ? this.master.status : 'DRAFT',
+                reportDate: this.master ? this.master.reportDate : null
             },
             transactions: this.transactions.map((transaction) => ({
                 id: transaction.id,
+                masterId: transaction.masterId,
+                recordNo: transaction.recordNo,
+                status: transaction.status,
                 fxDate: transaction.fxDate,
                 fxCategory: transaction.fxCategory,
                 fxCode: transaction.fxCode,
@@ -67,6 +73,8 @@ class FxMasterFormAction extends FormAction {
                 ? 'FX record submitted successfully.'
                 : 'FX draft saved successfully.'
         );
+
+        FxDraft.clear();
 
         NavigationState.set({
             page: 'master',
