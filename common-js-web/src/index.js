@@ -14,6 +14,7 @@ module.exports = {
     FieldErrorRenderer: require('./form/FieldErrorRenderer'),
     FileValidator: require('./form/FileValidator'),
     FormAction: require('./form/FormAction'),
+    FormDataConverter: require('./form/FormDataConverter'),
     FormRenderers: require('./form/FormRenderers'),
     FormSerializer: require('./form/FormSerializer'),
     FormState: require('./state/FormState'),
