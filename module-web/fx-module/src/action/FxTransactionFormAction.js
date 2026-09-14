@@ -1,6 +1,6 @@
 import Common from '@company/common-js-web';
 import { MasterMode, ReferenceType, TransactionMode } from '../FxConstants.js';
-import FxDraft from '../FxDraft.js';
+import FxRows from '../FxRows.js';
 import FxService from '../FxService.js';
 
 const {
@@ -91,20 +91,20 @@ class FxTransactionFormAction extends FormAction {
     }
 
     buildRequestData(values) {
-        const draft = FxDraft.get(this.options.draftKey);
+        const rows = FxRows.get(this.options.rowsKey);
         const index = this.options.mode === TransactionMode.EDIT
             ? this.options.key
             : null;
-        const existing = draft && Number.isInteger(index)
-            ? draft.transactions[index] || {}
+        const existing = rows && Number.isInteger(index)
+            ? rows.transactions[index] || {}
             : {};
         const data = FormDataConverter.fromForm(values, this.getDataSchema());
 
         return {
             id: existing.id || null,
-            masterId: draft && draft.master ? draft.master.id || null : null,
+            masterId: rows && rows.master ? rows.master.id || null : null,
             recordNo: existing.recordNo || null,
-            status: draft && draft.master ? draft.master.status || 'DRAFT' : 'DRAFT',
+            status: rows && rows.master ? rows.master.status || 'DRAFT' : 'DRAFT',
             ...data
         };
     }
@@ -115,21 +115,21 @@ class FxTransactionFormAction extends FormAction {
         const index = this.options.mode === TransactionMode.EDIT
             ? this.options.key
             : null;
-        const draft = FxDraft.upsertTransaction(
-            this.options.draftKey,
+        const rows = FxRows.upsertTransaction(
+            this.options.rowsKey,
             index,
             context.data
         );
 
-        if (!draft) {
-            Toast.error('FX draft not found.');
+        if (!rows) {
+            Toast.error('FX working rows not found.');
             return false;
         }
 
         NavigationState.set({
             page: 'master',
             action: MasterMode.EDIT,
-            draftKey: this.options.draftKey
+            rowsKey: this.options.rowsKey
         });
         window.location.href = './master.html';
         return false;
@@ -193,7 +193,7 @@ class FxTransactionFormAction extends FormAction {
     }
 
     onError(error) {
-        Toast.error(error && error.message ? error.message : 'Failed to update FX transaction draft.');
+        Toast.error(error && error.message ? error.message : 'Failed to update FX transaction.');
         console.error(error);
     }
 
