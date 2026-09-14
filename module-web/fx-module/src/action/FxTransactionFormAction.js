@@ -90,7 +90,7 @@ class FxTransactionFormAction extends FormAction {
     }
 
     buildRequestData(values) {
-        const draft = FxDraft.get();
+        const draft = FxDraft.get(this.options.draftKey);
         const index = this.options.mode === TransactionMode.EDIT
             ? this.options.key
             : null;
@@ -112,12 +112,21 @@ class FxTransactionFormAction extends FormAction {
         const index = this.options.mode === TransactionMode.EDIT
             ? this.options.key
             : null;
+        const draft = FxDraft.upsertTransaction(
+            this.options.draftKey,
+            index,
+            context.data
+        );
 
-        FxDraft.upsertTransaction(index, context.data);
+        if (!draft) {
+            Toast.error('FX draft not found.');
+            return false;
+        }
 
         NavigationState.set({
             page: 'master',
-            action: MasterMode.EDIT
+            action: MasterMode.EDIT,
+            draftKey: this.options.draftKey
         });
         window.location.href = './master.html';
         return false;
