@@ -1,8 +1,8 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const renderFormView = require('../src/form/renderFormView');
+const FormRenderers = require('../src/form/FormRenderers');
 
-test('renderFormView replaces controls and uses action hooks', function () {
+test('FormRenderers.view replaces controls and uses action hooks', function () {
     const originalDocument = global.document;
     const replacements = {};
     const events = [];
@@ -49,7 +49,7 @@ test('renderFormView replaces controls and uses action hooks', function () {
     };
 
     try {
-        const result = renderFormView(action, {
+        const result = FormRenderers.view(action, {
             name: 'Ali',
             amount: 100
         });
@@ -65,7 +65,7 @@ test('renderFormView replaces controls and uses action hooks', function () {
     }
 });
 
-test('renderFormView uses default dash for empty values', function () {
+test('FormRenderers.view uses default dash for empty values', function () {
     const originalDocument = global.document;
     let replacement = null;
 
@@ -92,7 +92,7 @@ test('renderFormView uses default dash for empty values', function () {
     };
 
     try {
-        renderFormView(action, {description: ''});
+        FormRenderers.view(action, {description: ''});
         assert.equal(replacement.textContent, '-');
     }
     finally {
