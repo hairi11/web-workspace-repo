@@ -23,12 +23,11 @@ export async function initTransaction() {
             .route(TransactionMode.EDIT_DRAFT, () => initDraftTransaction(action, key))
             .route(TransactionMode.EDIT, () => initExistingTransaction(action, key, {
                 title: 'Edit FX Transaction',
-                readOnly: false,
                 submitLabel: 'Save Changes'
             }))
             .route(TransactionMode.VIEW, () => initExistingTransaction(action, key, {
                 title: 'View FX Transaction',
-                readOnly: true
+                viewMode: true
             }))
             .dispatch(mode);
     } catch (error) {
@@ -57,10 +56,15 @@ async function initExistingTransaction(action, id, page) {
     if (!transaction) throw new Error('FX transaction not found.');
 
     action.populate(transaction);
-    configureExistingPage(action, page);
+
+    if (page.viewMode) {
+        action.renderView(transaction);
+    }
+
+    configureExistingPage(page);
 }
 
-function configureExistingPage(action, page) {
+function configureExistingPage(page) {
     setPageTitle(page.title);
 
     const submitButton = document.querySelector('#transactionForm button[type="submit"]');
@@ -68,7 +72,7 @@ function configureExistingPage(action, page) {
 
     if (cancelLink) cancelLink.href = './enquiry.html';
     if (submitButton && page.submitLabel) submitButton.textContent = page.submitLabel;
-    if (page.readOnly) action.setReadOnly(true);
+    if (submitButton && page.viewMode) submitButton.hidden = true;
 }
 
 function setPageTitle(title) {
