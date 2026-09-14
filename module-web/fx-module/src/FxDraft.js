@@ -2,8 +2,22 @@ import Common from '@company/common-js-web';
 
 const { DateUtil, Storage } = Common;
 
-const DRAFT_KEY = 'fx.master.draft';
+const DRAFT_KEY_PREFIX = 'fx.master.draft.';
 const storage = new Storage(window.sessionStorage);
+
+function newDraftKey() {
+    return 'new-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+}
+
+function draftKeyForMaster(masterId) {
+    return masterId === null || masterId === undefined
+        ? newDraftKey()
+        : 'master-' + String(masterId);
+}
+
+function storageKey(draftKey) {
+    return DRAFT_KEY_PREFIX + draftKey;
+}
 
 function cloneTransaction(transaction) {
     return Object.assign({}, transaction || {});
@@ -11,6 +25,7 @@ function cloneTransaction(transaction) {
 
 function cloneDraft(draft) {
     return {
+        draftKey: draft.draftKey,
         master: Object.assign({}, draft.master || {}),
         transactions: Array.isArray(draft.transactions)
             ? draft.transactions.map(cloneTransaction)
@@ -21,6 +36,7 @@ function cloneDraft(draft) {
 const FxDraft = {
     create: function () {
         return this.save({
+            draftKey: draftKeyForMaster(null),
             master: {
                 id: null,
                 status: 'DRAFT',
@@ -32,15 +48,18 @@ const FxDraft = {
 
     load: function (master, transactions) {
         return this.save({
+            draftKey: draftKeyForMaster(master && master.id),
             master: master || {},
             transactions: transactions || []
         });
     },
 
-    get: function () {
-        const draft = storage.get(DRAFT_KEY);
+    get: function (draftKey) {
+        if (!draftKey) return null;
 
-        if (!draft || !draft.master || !Array.isArray(draft.transactions)) {
+        const draft = storage.get(storageKey(draftKey));
+
+        if (!draft || draft.draftKey !== draftKey || !draft.master || !Array.isArray(draft.transactions)) {
             return null;
         }
 
@@ -48,17 +67,21 @@ const FxDraft = {
     },
 
     save: function (draft) {
+        if (!draft || !draft.draftKey) {
+            throw new Error('FX draft key is required.');
+        }
+
         const value = cloneDraft(draft);
-        storage.set(DRAFT_KEY, value);
+        storage.set(storageKey(value.draftKey), value);
         return value;
     },
 
-    clear: function () {
-        storage.remove(DRAFT_KEY);
+    clear: function (draftKey) {
+        if (draftKey) storage.remove(storageKey(draftKey));
     },
 
-    upsertTransaction: function (index, transaction) {
-        const draft = this.get();
+    upsertTransaction: function (draftKey, index, transaction) {
+        const draft = this.get(draftKey);
         if (!draft) return null;
 
         if (Number.isInteger(index) && index >= 0 && index < draft.transactions.length) {
@@ -70,8 +93,8 @@ const FxDraft = {
         return this.save(draft);
     },
 
-    removeTransaction: function (index) {
-        const draft = this.get();
+    removeTransaction: function (draftKey, index) {
+        const draft = this.get(draftKey);
         if (!draft) return null;
 
         if (Number.isInteger(index) && index >= 0 && index < draft.transactions.length) {
