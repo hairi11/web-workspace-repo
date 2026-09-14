@@ -1,11 +1,9 @@
 import Common from '@company/common-js-web';
-import { ReferenceType, TransactionMode } from '../FxConstants.js';
+import { MasterMode, ReferenceType, TransactionMode } from '../FxConstants.js';
 import FxService from '../FxService.js';
-import FxCreateFormAction from './FxCreateFormAction.js';
 
 const {
     DatePicker,
-    DateUtil,
     FormAction,
     FormDataConverter,
     NavigationState,
@@ -95,24 +93,10 @@ class FxTransactionFormAction extends FormAction {
 
         return {
             id: this.options.mode === TransactionMode.EDIT ? Number(this.options.key) : null,
-            ...data,
-            fxCategoryDescription: this.referenceDescription('category', data.fxCategory),
-            fxCodeDescription: this.referenceDescription('code', data.fxCode),
-            fxTypeDescription: this.referenceDescription('type', data.fxType),
-            fxCurrencyDescription: this.referenceDescription('currency', data.fxCurrency)
+            masterId: Number(this.options.masterId),
+            status: this.options.status || 'DRAFT',
+            ...data
         };
-    }
-
-    beforeSubmit(context) {
-        if (this.options.mode === TransactionMode.CREATE || this.options.mode === TransactionMode.EDIT_DRAFT) {
-            const index = this.options.mode === TransactionMode.EDIT_DRAFT ? this.options.key : null;
-            FxCreateFormAction.upsertTransaction(index, context.data);
-            NavigationState.set({ page: 'create', action: 'resume' });
-            window.location.href = './create.html';
-            return false;
-        }
-
-        return undefined;
     }
 
     sendRequest(context) {
@@ -120,16 +104,25 @@ class FxTransactionFormAction extends FormAction {
             return FxService.updateTransaction(this.options.key, context.data);
         }
 
-        return super.sendRequest(context);
+        return FxService.createTransaction(this.options.masterId, context.data);
     }
 
-    async onSuccess() {
-        if (this.options.mode === TransactionMode.EDIT) {
-            Toast.success('FX transaction updated.');
-            window.setTimeout(() => {
-                window.location.href = './enquiry.html';
-            }, 300);
-        }
+    onSuccess() {
+        Toast.success(
+            this.options.mode === TransactionMode.EDIT
+                ? 'FX transaction updated.'
+                : 'FX transaction added.'
+        );
+
+        NavigationState.set({
+            page: 'master',
+            action: MasterMode.EDIT,
+            key: this.options.masterId
+        });
+
+        window.setTimeout(() => {
+            window.location.href = './master.html';
+        }, 300);
     }
 
     populate(values) {
@@ -160,33 +153,8 @@ class FxTransactionFormAction extends FormAction {
         return this;
     }
 
-    beforeRenderView() {
-        this.destroyControls();
-    }
-
-    viewValue(name, value) {
-        if (value === null || value === undefined || String(value).trim() === '') {
-            return '-';
-        }
-
-        switch (name) {
-            case 'fxDate':
-                return DateUtil.formatDate(value);
-            case 'fxCategory':
-                return this.referenceDescription('category', value);
-            case 'fxCode':
-                return this.referenceDescription('code', value);
-            case 'fxType':
-                return this.referenceDescription('type', value);
-            case 'fxCurrency':
-                return this.referenceDescription('currency', value);
-            default:
-                return String(value);
-        }
-    }
-
     shouldTrackDirty() {
-        return this.options.mode !== TransactionMode.VIEW;
+        return true;
     }
 
     onError(error) {
@@ -210,11 +178,6 @@ class FxTransactionFormAction extends FormAction {
         Object.values(this.selects).forEach((select) => select.destroy());
         this.datePicker = null;
         this.selects = {};
-    }
-
-    referenceDescription(type, code) {
-        const item = (this.references[type] || []).find((entry) => entry.code === code);
-        return item ? item.description : code || '';
     }
 }
 
