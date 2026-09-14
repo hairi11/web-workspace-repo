@@ -1,6 +1,6 @@
 import Common from '@company/common-js-web';
 import { TransactionMode } from '../FxConstants.js';
-import FxDraft from '../FxDraft.js';
+import FxRows from '../FxRows.js';
 import FxService from '../FxService.js';
 
 const { DataTableBuilder, NavigationState, Renderers, Toast } = Common;
@@ -71,8 +71,8 @@ function bindCreateButton() {
     if (!button) return;
 
     button.addEventListener('click', () => {
-        const draft = FxDraft.create();
-        openTransaction(TransactionMode.CREATE, null, draft.draftKey);
+        const rows = FxRows.create();
+        openTransaction(TransactionMode.CREATE, null, rows.rowsKey);
     });
 }
 
@@ -86,20 +86,20 @@ async function openExistingTransaction(masterId, transactionId) {
         const index = transactions.findIndex((transaction) => transaction.id === transactionId);
         if (!master || index < 0) throw new Error('FX transaction not found.');
 
-        const draft = FxDraft.load(master, transactions);
-        openTransaction(TransactionMode.EDIT, index, draft.draftKey);
+        const rows = FxRows.load(master, transactions);
+        openTransaction(TransactionMode.EDIT, index, rows.rowsKey);
     } catch (error) {
         Toast.error('Failed to load FX record.');
         console.error(error);
     }
 }
 
-function openTransaction(mode, key, draftKey) {
+function openTransaction(mode, key, rowsKey) {
     NavigationState.set({
         page: 'transaction',
         action: mode,
         key: key,
-        draftKey: draftKey
+        rowsKey: rowsKey
     });
     window.location.href = './transaction.html';
 }
