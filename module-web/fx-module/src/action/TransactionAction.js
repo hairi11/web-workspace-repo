@@ -9,9 +9,10 @@ export async function initTransaction() {
     const navigation = NavigationState.consume();
     const {
         action: mode = TransactionMode.CREATE,
-        key = null
+        key = null,
+        draftKey = null
     } = navigation?.page === 'transaction' ? navigation : {};
-    const draft = FxDraft.get();
+    const draft = FxDraft.get(draftKey);
 
     if (!draft) {
         window.location.href = './enquiry.html';
@@ -21,16 +22,17 @@ export async function initTransaction() {
     try {
         const action = new FxTransactionFormAction('#transactionForm', {
             mode: mode,
-            key: key
+            key: key,
+            draftKey: draftKey
         });
 
         await action.loadReferences();
         action.build();
-        bindCancel();
+        bindCancel(draftKey);
 
         await new Router()
             .route(TransactionMode.CREATE, () => configurePage('Add FX Transaction', 'Add'))
-            .route(TransactionMode.EDIT, () => initEditTransaction(action, key))
+            .route(TransactionMode.EDIT, () => initEditTransaction(action, draft, key))
             .dispatch(mode);
     } catch (error) {
         Toast.error('Failed to load FX transaction data.');
@@ -38,9 +40,8 @@ export async function initTransaction() {
     }
 }
 
-function initEditTransaction(action, index) {
-    const draft = FxDraft.get();
-    const transaction = draft && Number.isInteger(index)
+function initEditTransaction(action, draft, index) {
+    const transaction = Number.isInteger(index)
         ? draft.transactions[index]
         : null;
 
@@ -58,7 +59,7 @@ function configurePage(title, submitLabel) {
     if (submitButton) submitButton.textContent = submitLabel;
 }
 
-function bindCancel() {
+function bindCancel(draftKey) {
     const cancel = document.querySelector('#cancelButton');
     if (!cancel) return;
 
@@ -66,7 +67,8 @@ function bindCancel() {
         event.preventDefault();
         NavigationState.set({
             page: 'master',
-            action: MasterMode.EDIT
+            action: MasterMode.EDIT,
+            draftKey: draftKey
         });
         window.location.href = './master.html';
     });
