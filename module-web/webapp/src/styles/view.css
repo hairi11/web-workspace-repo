@@ -5,3 +5,12 @@
     border-bottom: 1px solid #eee;
     padding: 10px 0;
 }
+
+.view-value {
+    min-height: var(--form-control-height, 40px);
+    display: flex;
+    align-items: center;
+    padding: 9px 0;
+    color: #222;
+    word-break: break-word;
+}
