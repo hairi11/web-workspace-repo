@@ -70,7 +70,11 @@ function configureExistingPage(page) {
     const submitButton = document.querySelector('#transactionForm button[type="submit"]');
     const cancelLink = document.querySelector('#transactionForm .button');
 
-    if (cancelLink) cancelLink.href = './enquiry.html';
+    if (cancelLink) {
+        cancelLink.href = './enquiry.html';
+        if (page.viewMode) cancelLink.textContent = 'Back';
+    }
+
     if (submitButton && page.submitLabel) submitButton.textContent = page.submitLabel;
     if (submitButton && page.viewMode) submitButton.hidden = true;
 }
