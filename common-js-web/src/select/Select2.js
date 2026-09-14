@@ -45,7 +45,9 @@ class Select2 {
 
         this.element.val(value);
 
-        if (triggerChange !== false) {
+        if (triggerChange === true) {
+            this.element.trigger('change');
+        } else {
             this.element.trigger('change.select2');
         }
 
