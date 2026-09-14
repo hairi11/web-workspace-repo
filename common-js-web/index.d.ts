@@ -79,6 +79,19 @@ export class FormAction {
     onComplete(result: {context: FormActionContext | null; error: any; result: any}): any;
 }
 
+export interface FormViewAction {
+    form: HTMLFormElement | null;
+    beforeRenderView?(values: Record<string, any>, form: HTMLFormElement): any;
+    viewValue?(name: string, value: any, field?: HTMLElement, values?: Record<string, any>): any;
+    afterRenderView?(values: Record<string, any>, form: HTMLFormElement): any;
+}
+
+export function renderFormView(
+    action: FormViewAction,
+    values: Record<string, any>,
+    options?: {className?: string; selector?: string}
+): any;
+
 export interface ServerPageConfig {
     pageLength?: number;
     contentProperty?: string;
