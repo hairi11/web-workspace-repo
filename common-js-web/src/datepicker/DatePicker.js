@@ -15,6 +15,7 @@ class DatePicker {
         this.control = null;
         this.toggleButton = null;
         this.clearButton = null;
+        this.changeHandler = () => this.syncClearButton();
     }
 
     option(name, value) {
@@ -77,7 +78,7 @@ class DatePicker {
 
         this.control.appendChild(this.clearButton);
         this.control.appendChild(this.toggleButton);
-        this.element.addEventListener('change', () => this.syncClearButton());
+        this.element.addEventListener('change', this.changeHandler);
     }
 
     createButton(className, label, html) {
@@ -120,6 +121,10 @@ class DatePicker {
     }
 
     destroy() {
+        if (this.element) {
+            this.element.removeEventListener('change', this.changeHandler);
+        }
+
         if (this.instance && typeof this.instance.destroy === 'function') {
             this.instance.destroy();
         }
