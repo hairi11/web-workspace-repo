@@ -1,5 +1,6 @@
 import Common from '@company/common-js-web';
 import { MasterMode, ReferenceType, TransactionMode } from '../FxConstants.js';
+import FxDraft from '../FxDraft.js';
 import FxService from '../FxService.js';
 
 const {
@@ -89,40 +90,37 @@ class FxTransactionFormAction extends FormAction {
     }
 
     buildRequestData(values) {
+        const draft = FxDraft.get();
+        const index = this.options.mode === TransactionMode.EDIT
+            ? this.options.key
+            : null;
+        const existing = draft && Number.isInteger(index)
+            ? draft.transactions[index] || {}
+            : {};
         const data = FormDataConverter.fromForm(values, this.getDataSchema());
 
         return {
-            id: this.options.mode === TransactionMode.EDIT ? Number(this.options.key) : null,
-            masterId: Number(this.options.masterId),
-            status: this.options.status || 'DRAFT',
+            id: existing.id || null,
+            masterId: draft && draft.master ? draft.master.id || null : null,
+            recordNo: existing.recordNo || null,
+            status: draft && draft.master ? draft.master.status || 'DRAFT' : 'DRAFT',
             ...data
         };
     }
 
-    sendRequest(context) {
-        if (this.options.mode === TransactionMode.EDIT) {
-            return FxService.updateTransaction(this.options.key, context.data);
-        }
+    beforeSubmit(context) {
+        const index = this.options.mode === TransactionMode.EDIT
+            ? this.options.key
+            : null;
 
-        return FxService.createTransaction(this.options.masterId, context.data);
-    }
-
-    onSuccess() {
-        Toast.success(
-            this.options.mode === TransactionMode.EDIT
-                ? 'FX transaction updated.'
-                : 'FX transaction added.'
-        );
+        FxDraft.upsertTransaction(index, context.data);
 
         NavigationState.set({
             page: 'master',
-            action: MasterMode.EDIT,
-            key: this.options.masterId
+            action: MasterMode.EDIT
         });
-
-        window.setTimeout(() => {
-            window.location.href = './master.html';
-        }, 300);
+        window.location.href = './master.html';
+        return false;
     }
 
     populate(values) {
@@ -158,7 +156,7 @@ class FxTransactionFormAction extends FormAction {
     }
 
     onError(error) {
-        Toast.error(error && error.message ? error.message : 'Failed to save FX transaction.');
+        Toast.error(error && error.message ? error.message : 'Failed to update FX transaction draft.');
         console.error(error);
     }
 
