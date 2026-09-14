@@ -57,10 +57,20 @@ const FxService = {
         }).then(responseObject);
     },
 
+    createMaster: function (data) {
+        return Ajax.post(FxApi.masters, data || {
+            status: 'DRAFT'
+        }).then(responseObject);
+    },
+
     findTransactionsByMasterId: function (masterId) {
         return Ajax.get(FxApi.transactionsByMasterId(masterId), {
             cache: false
         }).then(responseArray);
+    },
+
+    createTransaction: function (masterId, data) {
+        return Ajax.post(FxApi.transactionsByMasterId(masterId), data);
     },
 
     findTransactionById: function (id) {
