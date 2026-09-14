@@ -42,7 +42,7 @@ function buildTable() {
         .addAction({
             text: 'Edit',
             icon: 'fa fa-pen',
-            onClick: (row) => openMaster(row.masterId, MasterMode.EDIT)
+            onClick: (row) => openTransaction(row.masterId, row.id)
         })
         .addAction({ divider: true })
         .addAction({
@@ -101,6 +101,16 @@ function openMaster(masterId, mode) {
         key: masterId
     });
     window.location.href = './master.html';
+}
+
+function openTransaction(masterId, transactionId) {
+    NavigationState.set({
+        page: 'transaction',
+        action: TransactionMode.EDIT,
+        masterId: masterId,
+        key: transactionId
+    });
+    window.location.href = './transaction.html';
 }
 
 function bindReloadButton() {
