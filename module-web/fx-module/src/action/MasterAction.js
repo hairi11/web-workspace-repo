@@ -14,12 +14,13 @@ export async function initMaster() {
     const navigation = NavigationState.consume();
     const {
         action: mode = MasterMode.VIEW,
-        key: masterId = null
+        key: masterId = null,
+        draftKey = null
     } = navigation?.page === 'master' ? navigation : {};
 
     try {
         const data = mode === MasterMode.EDIT
-            ? loadDraftData()
+            ? loadDraftData(draftKey)
             : await loadViewData(masterId);
 
         if (!data || !data.master) {
@@ -33,13 +34,14 @@ export async function initMaster() {
 
         formAction = new FxMasterFormAction('#fxMasterForm', {
             master: data.master,
-            transactions: transactions
+            transactions: transactions,
+            draftKey: draftKey
         }).build();
 
-        table = buildTable(mode);
+        table = buildTable(mode, draftKey);
 
         if (mode === MasterMode.EDIT) {
-            bindAddTransaction();
+            bindAddTransaction(draftKey);
         }
     } catch (error) {
         Toast.error('Failed to load FX master.');
@@ -47,8 +49,8 @@ export async function initMaster() {
     }
 }
 
-function loadDraftData() {
-    return FxDraft.get();
+function loadDraftData(draftKey) {
+    return FxDraft.get(draftKey);
 }
 
 async function loadViewData(masterId) {
@@ -92,7 +94,7 @@ function configurePage(mode) {
     if (backButton) backButton.hidden = editing;
 }
 
-function buildTable(mode) {
+function buildTable(mode, draftKey) {
     const builder = new DataTableBuilder('#fxMasterTable')
         .data(getRows())
         .option('paging', false)
@@ -112,13 +114,13 @@ function buildTable(mode) {
             .addAction({
                 text: 'Edit',
                 icon: 'fa fa-pen',
-                onClick: (row) => openTransaction(TransactionMode.EDIT, row.rowIndex)
+                onClick: (row) => openTransaction(TransactionMode.EDIT, row.rowIndex, draftKey)
             })
             .addAction({
                 text: 'Remove',
                 icon: 'fa fa-trash',
                 className: 'text-danger',
-                onClick: (row) => removeTransaction(row)
+                onClick: (row) => removeTransaction(row, draftKey)
             });
     }
 
@@ -132,28 +134,29 @@ function getRows() {
     }));
 }
 
-function bindAddTransaction() {
+function bindAddTransaction(draftKey) {
     const button = document.querySelector('#addTransactionButton');
     if (!button) return;
 
     button.addEventListener('click', () => {
-        openTransaction(TransactionMode.CREATE, null);
+        openTransaction(TransactionMode.CREATE, null, draftKey);
     });
 }
 
-function openTransaction(mode, index) {
+function openTransaction(mode, index, draftKey) {
     NavigationState.set({
         page: 'transaction',
         action: mode,
-        key: index
+        key: index,
+        draftKey: draftKey
     });
     window.location.href = './transaction.html';
 }
 
-function removeTransaction(row) {
+function removeTransaction(row, draftKey) {
     if (!window.confirm('Remove this FX transaction?')) return;
 
-    const draft = FxDraft.removeTransaction(row.rowIndex);
+    const draft = FxDraft.removeTransaction(draftKey, row.rowIndex);
     if (!draft) return;
 
     transactions = draft.transactions;
