@@ -1,5 +1,6 @@
 import Common from '@company/common-js-web';
 import { MasterMode, TransactionMode } from '../FxConstants.js';
+import FxDraft from '../FxDraft.js';
 import FxService from '../FxService.js';
 import FxMasterFormAction from './FxMasterFormAction.js';
 
@@ -16,37 +17,52 @@ export async function initMaster() {
         key: masterId = null
     } = navigation?.page === 'master' ? navigation : {};
 
-    if (!masterId) {
-        window.location.href = './enquiry.html';
-        return;
-    }
-
     try {
-        const [master, rows] = await Promise.all([
-            FxService.findMasterById(masterId),
-            FxService.findTransactionsByMasterId(masterId)
-        ]);
+        const data = mode === MasterMode.EDIT
+            ? loadDraftData()
+            : await loadViewData(masterId);
 
-        if (!master) throw new Error('FX master not found.');
+        if (!data || !data.master) {
+            window.location.href = './enquiry.html';
+            return;
+        }
 
-        transactions = rows;
-        renderMasterSummary(master);
+        transactions = data.transactions;
+        renderMasterSummary(data.master);
         configurePage(mode);
 
         formAction = new FxMasterFormAction('#fxMasterForm', {
-            master: master,
+            master: data.master,
             transactions: transactions
         }).build();
 
-        table = buildTable(mode, master.id);
+        table = buildTable(mode);
 
         if (mode === MasterMode.EDIT) {
-            bindAddTransaction(master.id);
+            bindAddTransaction();
         }
     } catch (error) {
         Toast.error('Failed to load FX master.');
         console.error(error);
     }
+}
+
+function loadDraftData() {
+    return FxDraft.get();
+}
+
+async function loadViewData(masterId) {
+    if (!masterId) return null;
+
+    const [master, rows] = await Promise.all([
+        FxService.findMasterById(masterId),
+        FxService.findTransactionsByMasterId(masterId)
+    ]);
+
+    return {
+        master: master,
+        transactions: rows
+    };
 }
 
 function renderMasterSummary(master) {
@@ -76,7 +92,7 @@ function configurePage(mode) {
     if (backButton) backButton.hidden = editing;
 }
 
-function buildTable(mode, masterId) {
+function buildTable(mode) {
     const builder = new DataTableBuilder('#fxMasterTable')
         .data(getRows())
         .option('paging', false)
@@ -96,7 +112,7 @@ function buildTable(mode, masterId) {
             .addAction({
                 text: 'Edit',
                 icon: 'fa fa-pen',
-                onClick: (row) => openTransaction(masterId, TransactionMode.EDIT, row.id)
+                onClick: (row) => openTransaction(TransactionMode.EDIT, row.rowIndex)
             })
             .addAction({
                 text: 'Remove',
@@ -111,40 +127,37 @@ function buildTable(mode, masterId) {
 
 function getRows() {
     return transactions.map((transaction, index) => Object.assign({}, transaction, {
+        rowIndex: index,
         recordNo: transaction.recordNo || index + 1
     }));
 }
 
-function bindAddTransaction(masterId) {
+function bindAddTransaction() {
     const button = document.querySelector('#addTransactionButton');
     if (!button) return;
 
     button.addEventListener('click', () => {
-        openTransaction(masterId, TransactionMode.CREATE, null);
+        openTransaction(TransactionMode.CREATE, null);
     });
 }
 
-function openTransaction(masterId, mode, transactionId) {
+function openTransaction(mode, index) {
     NavigationState.set({
         page: 'transaction',
         action: mode,
-        masterId: masterId,
-        key: transactionId
+        key: index
     });
     window.location.href = './transaction.html';
 }
 
-async function removeTransaction(row) {
+function removeTransaction(row) {
     if (!window.confirm('Remove this FX transaction?')) return;
 
-    try {
-        await FxService.deleteTransaction(row.id);
-        transactions = transactions.filter((transaction) => transaction.id !== row.id);
-        formAction.setTransactions(transactions);
-        table.replaceData(getRows(), false);
-        Toast.success('FX transaction removed.');
-    } catch (error) {
-        Toast.error('Failed to remove FX transaction.');
-        console.error(error);
-    }
+    const draft = FxDraft.removeTransaction(row.rowIndex);
+    if (!draft) return;
+
+    transactions = draft.transactions;
+    formAction.setTransactions(transactions);
+    table.replaceData(getRows(), false);
+    Toast.success('FX transaction removed from draft.');
 }
