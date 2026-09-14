@@ -60,8 +60,14 @@ class FxTransactionFormAction extends FormAction {
             fxCode: Validator.required('Code is required.'),
             fxType: Validator.required('Type is required.'),
             fxCurrency: Validator.required('Currency is required.'),
-            fxAmount: Validator.custom((value) => this.validateDecimal(value, 'Enter a valid FX amount.')),
-            fxRate: Validator.custom((value) => this.validateDecimal(value, 'Enter a valid FX rate.'))
+            fxAmount: [
+                Validator.required('FX Amount is required.'),
+                Validator.decimal('Enter a valid FX amount.')
+            ],
+            fxRate: [
+                Validator.required('FX Rate is required.'),
+                Validator.decimal('Enter a valid FX rate.')
+            ]
         };
     }
 
@@ -196,11 +202,6 @@ class FxTransactionFormAction extends FormAction {
     referenceDescription(type, code) {
         const item = (this.references[type] || []).find((entry) => entry.code === code);
         return item ? item.description : code || '';
-    }
-
-    validateDecimal(value, message) {
-        if (value === null || value === undefined || String(value).trim() === '') return message;
-        return Number.isFinite(Number(value)) ? null : message;
     }
 
     toDecimal(value) {
