@@ -86,11 +86,13 @@ export interface FormViewAction {
     afterRenderView?(values: Record<string, any>, form: HTMLFormElement): any;
 }
 
-export function renderFormView(
-    action: FormViewAction,
-    values: Record<string, any>,
-    options?: {className?: string; selector?: string}
-): any;
+export const FormRenderers: {
+    view(
+        action: FormViewAction,
+        values: Record<string, any>,
+        options?: {className?: string; selector?: string}
+    ): any;
+};
 
 export interface ServerPageConfig {
     pageLength?: number;
