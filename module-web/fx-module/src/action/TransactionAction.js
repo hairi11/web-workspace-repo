@@ -1,6 +1,6 @@
 import Common from '@company/common-js-web';
 import { MasterMode, TransactionMode } from '../FxConstants.js';
-import FxService from '../FxService.js';
+import FxDraft from '../FxDraft.js';
 import FxTransactionFormAction from './FxTransactionFormAction.js';
 
 const { NavigationState, Router, Toast } = Common;
@@ -9,30 +9,24 @@ export async function initTransaction() {
     const navigation = NavigationState.consume();
     const {
         action: mode = TransactionMode.CREATE,
-        masterId = null,
         key = null
     } = navigation?.page === 'transaction' ? navigation : {};
+    const draft = FxDraft.get();
 
-    if (!masterId) {
+    if (!draft) {
         window.location.href = './enquiry.html';
         return;
     }
 
     try {
-        const master = await FxService.findMasterById(masterId);
-
-        if (!master) throw new Error('FX master not found.');
-
         const action = new FxTransactionFormAction('#transactionForm', {
             mode: mode,
-            key: key,
-            masterId: masterId,
-            status: master.status
+            key: key
         });
 
         await action.loadReferences();
         action.build();
-        bindCancel(masterId);
+        bindCancel();
 
         await new Router()
             .route(TransactionMode.CREATE, () => configurePage('Add FX Transaction', 'Add'))
@@ -44,8 +38,11 @@ export async function initTransaction() {
     }
 }
 
-async function initEditTransaction(action, id) {
-    const transaction = await FxService.findTransactionById(id);
+function initEditTransaction(action, index) {
+    const draft = FxDraft.get();
+    const transaction = draft && Number.isInteger(index)
+        ? draft.transactions[index]
+        : null;
 
     if (!transaction) throw new Error('FX transaction not found.');
 
@@ -61,7 +58,7 @@ function configurePage(title, submitLabel) {
     if (submitButton) submitButton.textContent = submitLabel;
 }
 
-function bindCancel(masterId) {
+function bindCancel() {
     const cancel = document.querySelector('#cancelButton');
     if (!cancel) return;
 
@@ -69,8 +66,7 @@ function bindCancel(masterId) {
         event.preventDefault();
         NavigationState.set({
             page: 'master',
-            action: MasterMode.EDIT,
-            key: masterId
+            action: MasterMode.EDIT
         });
         window.location.href = './master.html';
     });
