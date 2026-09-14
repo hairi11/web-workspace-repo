@@ -7,11 +7,14 @@ const {
     DatePicker,
     DateUtil,
     FormAction,
+    FormDataConverter,
     NavigationState,
     Select2,
     Toast,
     Validator
 } = Common;
+
+const FormDataType = FormDataConverter.Types;
 
 class FxTransactionFormAction extends FormAction {
     constructor(selector, options) {
@@ -71,24 +74,32 @@ class FxTransactionFormAction extends FormAction {
         };
     }
 
+    getDataSchema() {
+        return {
+            fxDate: FormDataType.DATE,
+            fxCategory: FormDataType.SELECT,
+            fxCode: FormDataType.SELECT,
+            fxType: FormDataType.SELECT,
+            fxRefno: FormDataType.TEXT,
+            fxParty: FormDataType.TEXT,
+            fxPrincipal: FormDataType.TEXT,
+            fxCurrency: FormDataType.SELECT,
+            fxAmount: FormDataType.DECIMAL,
+            fxRate: FormDataType.DECIMAL,
+            fxDescription: FormDataType.TEXT
+        };
+    }
+
     buildRequestData(values) {
+        const data = FormDataConverter.fromForm(values, this.getDataSchema());
+
         return {
             id: this.options.mode === TransactionMode.EDIT ? Number(this.options.key) : null,
-            fxDate: values.fxDate || '',
-            fxCategory: values.fxCategory || '',
-            fxCategoryDescription: this.referenceDescription('category', values.fxCategory),
-            fxCode: values.fxCode || '',
-            fxCodeDescription: this.referenceDescription('code', values.fxCode),
-            fxType: values.fxType || '',
-            fxTypeDescription: this.referenceDescription('type', values.fxType),
-            fxRefno: values.fxRefno || '',
-            fxParty: values.fxParty || '',
-            fxPrincipal: values.fxPrincipal || '',
-            fxCurrency: values.fxCurrency || '',
-            fxCurrencyDescription: this.referenceDescription('currency', values.fxCurrency),
-            fxAmount: this.toDecimal(values.fxAmount),
-            fxRate: this.toDecimal(values.fxRate),
-            fxDescription: values.fxDescription || ''
+            ...data,
+            fxCategoryDescription: this.referenceDescription('category', data.fxCategory),
+            fxCodeDescription: this.referenceDescription('code', data.fxCode),
+            fxTypeDescription: this.referenceDescription('type', data.fxType),
+            fxCurrencyDescription: this.referenceDescription('currency', data.fxCurrency)
         };
     }
 
@@ -124,11 +135,13 @@ class FxTransactionFormAction extends FormAction {
     populate(values) {
         if (!this.form || !values) return this;
 
-        Object.keys(values).forEach((name) => {
-            const field = this.form.elements[name];
-            if (!field || typeof values[name] === 'object') return;
+        const formValues = FormDataConverter.toForm(values, this.getDataSchema());
 
-            const value = values[name] === null || values[name] === undefined ? '' : values[name];
+        Object.keys(formValues).forEach((name) => {
+            const field = this.form.elements[name];
+            if (!field || typeof formValues[name] === 'object') return;
+
+            const value = formValues[name];
 
             if (name === 'fxDate' && this.datePicker) {
                 this.datePicker.setDate(value, false);
@@ -136,7 +149,7 @@ class FxTransactionFormAction extends FormAction {
             }
 
             if (this.selects[name]) {
-                this.selects[name].setValue(String(value), false);
+                this.selects[name].setValue(value, false);
                 return;
             }
 
@@ -202,12 +215,6 @@ class FxTransactionFormAction extends FormAction {
     referenceDescription(type, code) {
         const item = (this.references[type] || []).find((entry) => entry.code === code);
         return item ? item.description : code || '';
-    }
-
-    toDecimal(value) {
-        return value === null || value === undefined || String(value).trim() === ''
-            ? null
-            : Number(value);
     }
 }
 
