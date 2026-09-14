@@ -5,7 +5,8 @@ export const MasterMode = Object.freeze({
 
 export const TransactionMode = Object.freeze({
     CREATE: 'create',
-    EDIT: 'edit'
+    EDIT: 'edit',
+    VIEW: 'view'
 });
 
 export const ReferenceType = Object.freeze({
