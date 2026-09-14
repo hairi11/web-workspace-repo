@@ -1,8 +1,11 @@
-export const TransactionMode = Object.freeze({
-    CREATE: 'create',
-    EDIT_DRAFT: 'edit-draft',
+export const MasterMode = Object.freeze({
     EDIT: 'edit',
     VIEW: 'view'
+});
+
+export const TransactionMode = Object.freeze({
+    CREATE: 'create',
+    EDIT: 'edit'
 });
 
 export const ReferenceType = Object.freeze({
