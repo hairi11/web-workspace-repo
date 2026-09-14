@@ -1,6 +1,6 @@
 import Common from '@company/common-js-web';
 import { MasterMode, TransactionMode } from '../FxConstants.js';
-import FxDraft from '../FxDraft.js';
+import FxRows from '../FxRows.js';
 import FxService from '../FxService.js';
 import FxMasterFormAction from './FxMasterFormAction.js';
 
@@ -15,12 +15,12 @@ export async function initMaster() {
     const {
         action: mode = MasterMode.VIEW,
         key: masterId = null,
-        draftKey = null
+        rowsKey = null
     } = navigation?.page === 'master' ? navigation : {};
 
     try {
         const data = mode === MasterMode.EDIT
-            ? loadDraftData(draftKey)
+            ? FxRows.get(rowsKey)
             : await loadViewData(masterId);
 
         if (!data || !data.master) {
@@ -35,22 +35,16 @@ export async function initMaster() {
         formAction = new FxMasterFormAction('#fxMasterForm', {
             master: data.master,
             transactions: transactions,
-            draftKey: draftKey
+            rowsKey: rowsKey
         }).build();
 
-        table = buildTable(mode, draftKey);
+        table = buildTable(mode, rowsKey);
 
-        if (mode === MasterMode.EDIT) {
-            bindAddTransaction(draftKey);
-        }
+        if (mode === MasterMode.EDIT) bindAddTransaction(rowsKey);
     } catch (error) {
         Toast.error('Failed to load FX master.');
         console.error(error);
     }
-}
-
-function loadDraftData(draftKey) {
-    return FxDraft.get(draftKey);
 }
 
 async function loadViewData(masterId) {
@@ -61,10 +55,7 @@ async function loadViewData(masterId) {
         FxService.findTransactionsByMasterId(masterId)
     ]);
 
-    return {
-        master: master,
-        transactions: rows
-    };
+    return { master: master, transactions: rows };
 }
 
 function renderMasterSummary(master) {
@@ -73,9 +64,7 @@ function renderMasterSummary(master) {
 
     if (status) status.textContent = master.status || '-';
     if (reportDate) {
-        reportDate.textContent = master.reportDate
-            ? DateUtil.formatDate(master.reportDate)
-            : '-';
+        reportDate.textContent = master.reportDate ? DateUtil.formatDate(master.reportDate) : '-';
     }
 }
 
@@ -94,7 +83,7 @@ function configurePage(mode) {
     if (backButton) backButton.hidden = editing;
 }
 
-function buildTable(mode, draftKey) {
+function buildTable(mode, rowsKey) {
     const builder = new DataTableBuilder('#fxMasterTable')
         .data(getRows())
         .option('paging', false)
@@ -114,13 +103,13 @@ function buildTable(mode, draftKey) {
             .addAction({
                 text: 'Edit',
                 icon: 'fa fa-pen',
-                onClick: (row) => openTransaction(TransactionMode.EDIT, row.rowIndex, draftKey)
+                onClick: (row) => openTransaction(TransactionMode.EDIT, row.rowIndex, rowsKey)
             })
             .addAction({
                 text: 'Remove',
                 icon: 'fa fa-trash',
                 className: 'text-danger',
-                onClick: (row) => removeTransaction(row, draftKey)
+                onClick: (row) => removeTransaction(row, rowsKey)
             });
     }
 
@@ -134,33 +123,33 @@ function getRows() {
     }));
 }
 
-function bindAddTransaction(draftKey) {
+function bindAddTransaction(rowsKey) {
     const button = document.querySelector('#addTransactionButton');
     if (!button) return;
 
     button.addEventListener('click', () => {
-        openTransaction(TransactionMode.CREATE, null, draftKey);
+        openTransaction(TransactionMode.CREATE, null, rowsKey);
     });
 }
 
-function openTransaction(mode, index, draftKey) {
+function openTransaction(mode, index, rowsKey) {
     NavigationState.set({
         page: 'transaction',
         action: mode,
         key: index,
-        draftKey: draftKey
+        rowsKey: rowsKey
     });
     window.location.href = './transaction.html';
 }
 
-function removeTransaction(row, draftKey) {
+function removeTransaction(row, rowsKey) {
     if (!window.confirm('Remove this FX transaction?')) return;
 
-    const draft = FxDraft.removeTransaction(draftKey, row.rowIndex);
-    if (!draft) return;
+    const rows = FxRows.removeTransaction(rowsKey, row.rowIndex);
+    if (!rows) return;
 
-    transactions = draft.transactions;
+    transactions = rows.transactions;
     formAction.setTransactions(transactions);
     table.replaceData(getRows(), false);
-    Toast.success('FX transaction removed from draft.');
+    Toast.success('FX transaction removed.');
 }
