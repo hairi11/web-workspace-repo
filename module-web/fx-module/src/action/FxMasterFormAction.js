@@ -74,7 +74,7 @@ class FxMasterFormAction extends FormAction {
                 : 'FX draft saved successfully.'
         );
 
-        FxDraft.clear();
+        FxDraft.clear(this.options.draftKey);
 
         NavigationState.set({
             page: 'master',
