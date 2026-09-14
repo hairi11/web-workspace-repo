@@ -1,5 +1,6 @@
 import Common from '@company/common-js-web';
 import { MasterMode, TransactionMode } from '../FxConstants.js';
+import FxDraft from '../FxDraft.js';
 import FxService from '../FxService.js';
 
 const { DataTableBuilder, NavigationState, Renderers, Toast } = Common;
@@ -42,7 +43,7 @@ function buildTable() {
         .addAction({
             text: 'Edit',
             icon: 'fa fa-pen',
-            onClick: (row) => openTransaction(row.masterId, row.id)
+            onClick: (row) => openExistingTransaction(row.masterId, row.id)
         })
         .addAction({ divider: true })
         .addAction({
@@ -69,29 +70,28 @@ function bindCreateButton() {
     const button = document.querySelector('#createFxButton');
     if (!button) return;
 
-    button.addEventListener('click', async () => {
-        button.disabled = true;
-
-        try {
-            const master = await FxService.createMaster();
-
-            if (!master || !master.id) {
-                throw new Error('FX master was not created.');
-            }
-
-            NavigationState.set({
-                page: 'transaction',
-                action: TransactionMode.CREATE,
-                masterId: master.id,
-                key: null
-            });
-            window.location.href = './transaction.html';
-        } catch (error) {
-            button.disabled = false;
-            Toast.error('Failed to create FX draft.');
-            console.error(error);
-        }
+    button.addEventListener('click', () => {
+        FxDraft.create();
+        openTransaction(TransactionMode.CREATE, null);
     });
+}
+
+async function openExistingTransaction(masterId, transactionId) {
+    try {
+        const [master, transactions] = await Promise.all([
+            FxService.findMasterById(masterId),
+            FxService.findTransactionsByMasterId(masterId)
+        ]);
+
+        const index = transactions.findIndex((transaction) => transaction.id === transactionId);
+        if (!master || index < 0) throw new Error('FX transaction not found.');
+
+        FxDraft.load(master, transactions);
+        openTransaction(TransactionMode.EDIT, index);
+    } catch (error) {
+        Toast.error('Failed to load FX record.');
+        console.error(error);
+    }
 }
 
 function openMaster(masterId, mode) {
@@ -103,12 +103,11 @@ function openMaster(masterId, mode) {
     window.location.href = './master.html';
 }
 
-function openTransaction(masterId, transactionId) {
+function openTransaction(mode, index) {
     NavigationState.set({
         page: 'transaction',
-        action: TransactionMode.EDIT,
-        masterId: masterId,
-        key: transactionId
+        action: mode,
+        key: index
     });
     window.location.href = './transaction.html';
 }
