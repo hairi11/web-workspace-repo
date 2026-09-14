@@ -1,34 +1,42 @@
 import Common from '@company/common-js-web';
-import { TransactionMode } from '../FxConstants.js';
+import { MasterMode, TransactionMode } from '../FxConstants.js';
 import FxService from '../FxService.js';
-import FxCreateFormAction from './FxCreateFormAction.js';
 import FxTransactionFormAction from './FxTransactionFormAction.js';
 
-const { FormRenderers, NavigationState, Router, Toast } = Common;
+const { NavigationState, Router, Toast } = Common;
 
 export async function initTransaction() {
     const navigation = NavigationState.consume();
     const {
         action: mode = TransactionMode.CREATE,
+        masterId = null,
         key = null
     } = navigation?.page === 'transaction' ? navigation : {};
-    const action = new FxTransactionFormAction('#transactionForm', { mode, key });
+
+    if (!masterId) {
+        window.location.href = './enquiry.html';
+        return;
+    }
 
     try {
+        const master = await FxService.findMasterById(masterId);
+
+        if (!master) throw new Error('FX master not found.');
+
+        const action = new FxTransactionFormAction('#transactionForm', {
+            mode: mode,
+            key: key,
+            masterId: masterId,
+            status: master.status
+        });
+
         await action.loadReferences();
         action.build();
+        bindCancel(masterId);
 
         await new Router()
-            .route(TransactionMode.CREATE, () => undefined)
-            .route(TransactionMode.EDIT_DRAFT, () => initDraftTransaction(action, key))
-            .route(TransactionMode.EDIT, () => initExistingTransaction(action, key, {
-                title: 'Edit FX Transaction',
-                submitLabel: 'Save Changes'
-            }))
-            .route(TransactionMode.VIEW, () => initExistingTransaction(action, key, {
-                title: 'View FX Transaction',
-                viewMode: true
-            }))
+            .route(TransactionMode.CREATE, () => configurePage('Add FX Transaction', 'Add'))
+            .route(TransactionMode.EDIT, () => initEditTransaction(action, key))
             .dispatch(mode);
     } catch (error) {
         Toast.error('Failed to load FX transaction data.');
@@ -36,50 +44,34 @@ export async function initTransaction() {
     }
 }
 
-function initDraftTransaction(action, index) {
-    const transaction = FxCreateFormAction.getDraft().transactions[index];
-
-    if (!transaction) {
-        Toast.error('FX transaction not found.');
-        NavigationState.set({ page: 'create', action: 'resume' });
-        window.location.href = './create.html';
-        return;
-    }
-
-    setPageTitle('Edit FX Transaction');
-    action.populate(transaction);
-}
-
-async function initExistingTransaction(action, id, page) {
+async function initEditTransaction(action, id) {
     const transaction = await FxService.findTransactionById(id);
 
     if (!transaction) throw new Error('FX transaction not found.');
 
     action.populate(transaction);
-
-    if (page.viewMode) {
-        FormRenderers.view(action, transaction);
-    }
-
-    configureExistingPage(page);
+    configurePage('Update FX Transaction', 'Update');
 }
 
-function configureExistingPage(page) {
-    setPageTitle(page.title);
-
-    const submitButton = document.querySelector('#transactionForm button[type="submit"]');
-    const cancelLink = document.querySelector('#transactionForm .button');
-
-    if (cancelLink) {
-        cancelLink.href = './enquiry.html';
-        if (page.viewMode) cancelLink.textContent = 'Back';
-    }
-
-    if (submitButton && page.submitLabel) submitButton.textContent = page.submitLabel;
-    if (submitButton && page.viewMode) submitButton.hidden = true;
-}
-
-function setPageTitle(title) {
+function configurePage(title, submitLabel) {
     const heading = document.querySelector('h1');
+    const submitButton = document.querySelector('#transactionForm button[type="submit"]');
+
     if (heading) heading.textContent = title;
+    if (submitButton) submitButton.textContent = submitLabel;
+}
+
+function bindCancel(masterId) {
+    const cancel = document.querySelector('#cancelButton');
+    if (!cancel) return;
+
+    cancel.addEventListener('click', (event) => {
+        event.preventDefault();
+        NavigationState.set({
+            page: 'master',
+            action: MasterMode.EDIT,
+            key: masterId
+        });
+        window.location.href = './master.html';
+    });
 }
