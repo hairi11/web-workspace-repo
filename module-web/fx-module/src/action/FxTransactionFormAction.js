@@ -5,6 +5,7 @@ import FxCreateFormAction from './FxCreateFormAction.js';
 
 const {
     DatePicker,
+    DateUtil,
     FormAction,
     NavigationState,
     Select2,
@@ -143,21 +144,46 @@ class FxTransactionFormAction extends FormAction {
         return this;
     }
 
-    setReadOnly(readOnly) {
-        if (!this.form) return this;
+    renderView(values) {
+        if (!this.form || !values) return this;
 
-        if (this.selects.fxCategory) this.selects.fxCategory.disable();
-        if (this.selects.fxCode) this.selects.fxCode.disable();
-        if (this.selects.fxCurrency) this.selects.fxCurrency.disable();
-        if (this.selects.fxType) this.selects.fxType.disable();
+        if (this.datePicker) {
+            this.datePicker.destroy();
+            this.datePicker = null;
+        }
 
-        this.form.querySelectorAll('input, textarea').forEach((element) => {
-            element.disabled = Boolean(readOnly);
+        Object.values(this.selects).forEach((select) => select.destroy());
+        this.selects = {};
+
+        this.form.querySelectorAll('input, select, textarea').forEach((field) => {
+            const display = document.createElement('div');
+            display.className = 'view-value';
+            display.textContent = this.viewValue(field.name, values[field.name]);
+            field.replaceWith(display);
         });
 
-        const submitButton = this.form.querySelector('button[type="submit"]');
-        if (submitButton) submitButton.hidden = Boolean(readOnly);
         return this;
+    }
+
+    viewValue(name, value) {
+        if (value === null || value === undefined || String(value).trim() === '') {
+            return '-';
+        }
+
+        switch (name) {
+            case 'fxDate':
+                return DateUtil.formatDate(value);
+            case 'fxCategory':
+                return this.referenceDescription('category', value);
+            case 'fxCode':
+                return this.referenceDescription('code', value);
+            case 'fxType':
+                return this.referenceDescription('type', value);
+            case 'fxCurrency':
+                return this.referenceDescription('currency', value);
+            default:
+                return String(value);
+        }
     }
 
     shouldTrackDirty() {
