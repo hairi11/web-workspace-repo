@@ -29,6 +29,7 @@ export interface FormActionContext {
     method: 'GET' | 'POST' | string;
     url: string;
     form: HTMLFormElement | null;
+    submitter?: HTMLElement | null;
     formValues: Record<string, any>;
     data: any;
     requestOptions: any;
@@ -38,14 +39,14 @@ export class FormAction {
     constructor(selector: string);
     build(): this;
     destroy(): this;
-    execute(): Promise<any>;
+    execute(submitter?: HTMLElement | null): Promise<any>;
     reset(): this;
     isDirty(): boolean;
 
     serializeForm(): Record<string, any>;
     validateForm(formValues: Record<string, any>): Promise<FormValidationResult>;
     confirmSubmission(formValues: Record<string, any>): Promise<boolean>;
-    createContext(formValues: Record<string, any>): Promise<FormActionContext>;
+    createContext(formValues: Record<string, any>, submitter?: HTMLElement | null): Promise<FormActionContext>;
     sendRequest(context: FormActionContext): Promise<any>;
     showValidationErrors(errors: Record<string, string>): void;
     clearValidationErrors(): void;
@@ -77,6 +78,26 @@ export class FormAction {
     onSuccess(data: any, context: FormActionContext, response: any): any;
     onError(error: any, context: FormActionContext | null): any;
     onComplete(result: {context: FormActionContext | null; error: any; result: any}): any;
+}
+
+export type FormDataType = 'text' | 'decimal' | 'date' | 'select';
+
+export interface FormDataFieldConverter {
+    fromForm?(value: any, values?: Record<string, any>, name?: string): any;
+    toForm?(value: any, values?: Record<string, any>, name?: string): any;
+}
+
+export type FormDataSchema = Record<string, FormDataType | FormDataFieldConverter>;
+
+export class FormDataConverter {
+    static Types: {
+        readonly TEXT: 'text';
+        readonly DECIMAL: 'decimal';
+        readonly DATE: 'date';
+        readonly SELECT: 'select';
+    };
+    static fromForm(values: Record<string, any>, schema?: FormDataSchema): Record<string, any>;
+    static toForm(values: Record<string, any>, schema?: FormDataSchema): Record<string, any>;
 }
 
 export interface FormViewAction {
@@ -184,6 +205,7 @@ export const Actions: any;
 export const Renderers: {
     text(fallback?: string): Function;
     boolean(trueText?: string, falseText?: string): Function;
+    property(property: string, options?: {fallbackToValue?: boolean}): Function;
     date(pattern?: string): Function;
     number(options?: Intl.NumberFormatOptions & {locale?: string}): Function;
     amount(options?: Intl.NumberFormatOptions & {locale?: string}): Function;
