@@ -50,10 +50,7 @@ class FxTransactionFormAction extends FormAction {
     }
 
     onDestroy() {
-        if (this.datePicker) this.datePicker.destroy();
-        Object.values(this.selects).forEach((select) => select.destroy());
-        this.datePicker = null;
-        this.selects = {};
+        this.destroyControls();
     }
 
     getValidationRules() {
@@ -144,6 +141,10 @@ class FxTransactionFormAction extends FormAction {
         return this;
     }
 
+    beforeRenderView() {
+        this.destroyControls();
+    }
+
     viewValue(name, value) {
         if (value === null || value === undefined || String(value).trim() === '') {
             return '-';
@@ -183,6 +184,13 @@ class FxTransactionFormAction extends FormAction {
                 text: item.description
             }))
         }).build();
+    }
+
+    destroyControls() {
+        if (this.datePicker) this.datePicker.destroy();
+        Object.values(this.selects).forEach((select) => select.destroy());
+        this.datePicker = null;
+        this.selects = {};
     }
 
     referenceDescription(type, code) {
