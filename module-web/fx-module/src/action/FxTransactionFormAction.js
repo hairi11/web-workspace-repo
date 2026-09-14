@@ -144,27 +144,6 @@ class FxTransactionFormAction extends FormAction {
         return this;
     }
 
-    renderView(values) {
-        if (!this.form || !values) return this;
-
-        if (this.datePicker) {
-            this.datePicker.destroy();
-            this.datePicker = null;
-        }
-
-        Object.values(this.selects).forEach((select) => select.destroy());
-        this.selects = {};
-
-        this.form.querySelectorAll('input, select, textarea').forEach((field) => {
-            const display = document.createElement('div');
-            display.className = 'view-value';
-            display.textContent = this.viewValue(field.name, values[field.name]);
-            field.replaceWith(display);
-        });
-
-        return this;
-    }
-
     viewValue(name, value) {
         if (value === null || value === undefined || String(value).trim() === '') {
             return '-';
