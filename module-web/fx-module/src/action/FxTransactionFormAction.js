@@ -5,6 +5,7 @@ import FxService from '../FxService.js';
 
 const {
     DatePicker,
+    DateUtil,
     FormAction,
     FormDataConverter,
     NavigationState,
@@ -109,6 +110,8 @@ class FxTransactionFormAction extends FormAction {
     }
 
     beforeSubmit(context) {
+        if (this.options.mode === TransactionMode.VIEW) return false;
+
         const index = this.options.mode === TransactionMode.EDIT
             ? this.options.key
             : null;
@@ -160,8 +163,33 @@ class FxTransactionFormAction extends FormAction {
         return this;
     }
 
+    beforeRenderView() {
+        this.destroyControls();
+    }
+
+    viewValue(name, value) {
+        if (value === null || value === undefined || String(value).trim() === '') {
+            return '-';
+        }
+
+        switch (name) {
+            case 'fxDate':
+                return DateUtil.formatDate(value);
+            case 'fxCategory':
+                return this.referenceDescription('category', value);
+            case 'fxCode':
+                return this.referenceDescription('code', value);
+            case 'fxType':
+                return this.referenceDescription('type', value);
+            case 'fxCurrency':
+                return this.referenceDescription('currency', value);
+            default:
+                return String(value);
+        }
+    }
+
     shouldTrackDirty() {
-        return true;
+        return this.options.mode !== TransactionMode.VIEW;
     }
 
     onError(error) {
@@ -185,6 +213,11 @@ class FxTransactionFormAction extends FormAction {
         Object.values(this.selects).forEach((select) => select.destroy());
         this.datePicker = null;
         this.selects = {};
+    }
+
+    referenceDescription(type, code) {
+        const item = (this.references[type] || []).find((entry) => entry.code === code);
+        return item ? item.description : code || '';
     }
 }
 
