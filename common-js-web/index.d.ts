@@ -146,6 +146,12 @@ export class Storage {
     clear(): this;
 }
 
+export const CaseInterceptor: {
+    beforeRequest(config: any): any;
+    afterResponse(response: any): any;
+    onError(error: any): any;
+};
+
 export const CaseUtil: {
     toCamelCase(value: any): string;
     toSnakeCase(value: any): string;
