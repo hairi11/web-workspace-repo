@@ -1,10 +1,10 @@
 import Common from '@company/common-js-web';
 import FxApi from './FxApi.js';
 
-const { Ajax, CaseUtil } = Common;
+const { Ajax } = Common;
 
 function responseData(response) {
-    return response ? CaseUtil.toCamelKeys(response.data) : null;
+    return response ? response.data : null;
 }
 
 function responseObject(response) {
@@ -15,13 +15,6 @@ function responseObject(response) {
 function responseArray(response) {
     const data = responseData(response);
     return Array.isArray(data) ? data : [];
-}
-
-function post(url, data) {
-    return Ajax.post(url, CaseUtil.toSnakeKeys(data)).then((response) => {
-        if (response) response.data = CaseUtil.toCamelKeys(response.data);
-        return response;
-    });
 }
 
 const FxService = {
@@ -77,19 +70,19 @@ const FxService = {
     },
 
     updateTransaction: function (id, data) {
-        return post(FxApi.transactionById(id), data);
+        return Ajax.post(FxApi.transactionById(id), data);
     },
 
     deleteTransaction: function (id) {
-        return post(FxApi.transactionById(id) + '/delete', {});
+        return Ajax.post(FxApi.transactionById(id) + '/delete', {});
     },
 
     save: function (data) {
-        return post(FxApi.save, data);
+        return Ajax.post(FxApi.save, data);
     },
 
     submit: function (data) {
-        return post(FxApi.submit, data);
+        return Ajax.post(FxApi.submit, data);
     }
 };
 
