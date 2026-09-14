@@ -137,7 +137,12 @@ function openTransaction(mode, index, rowsKey) {
         page: 'transaction',
         action: mode,
         key: index,
-        rowsKey: rowsKey
+        rowsKey: rowsKey,
+        returnTo: {
+            page: 'master',
+            action: MasterMode.EDIT,
+            rowsKey: rowsKey
+        }
     });
     window.location.href = './transaction.html';
 }
