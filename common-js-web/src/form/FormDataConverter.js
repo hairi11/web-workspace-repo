@@ -45,7 +45,7 @@ const converters = {
 };
 
 function resolveConverter(type) {
-    if (!type) return converters.text;
+    if (!type) return null;
 
     if (typeof type === 'string') {
         if (!converters[type]) {
