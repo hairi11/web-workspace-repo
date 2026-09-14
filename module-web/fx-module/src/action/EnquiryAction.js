@@ -73,7 +73,7 @@ function bindCreateButton() {
         button.disabled = true;
 
         try {
-            const master = await FxService.createMaster({ status: 'DRAFT' });
+            const master = await FxService.createMaster();
 
             if (!master || !master.id) {
                 throw new Error('FX master was not created.');
