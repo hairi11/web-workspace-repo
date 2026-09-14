@@ -11,6 +11,12 @@ class Validator {
             return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value)) ? null : (message || 'Please enter a valid email address.');
         };
     }
+    static decimal(message) {
+        return function (value) {
+            if (value === null || value === undefined || String(value).trim() === '') return null;
+            return Number.isFinite(Number(value)) ? null : (message || 'Please enter a valid decimal value.');
+        };
+    }
     static minLength(length, message) {
         return function (value) {
             if (!value) return null;
