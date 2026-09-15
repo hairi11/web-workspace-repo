@@ -6,7 +6,7 @@ const ROWS_KEY_PREFIX = 'fx.rows.';
 const storage = new Storage(window.sessionStorage);
 
 function newRowsKey() {
-    return 'new-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+    return 'new-' + crypto.randomUUID();
 }
 
 function rowsKeyForMaster(masterId) {
