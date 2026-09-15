@@ -6,7 +6,19 @@ export const MasterMode = Object.freeze({
 export const TransactionMode = Object.freeze({
     CREATE: 'create',
     EDIT: 'edit',
-    VIEW: 'view'
+    VIEW: 'view',
+
+    isCreate: function (mode) {
+        return mode === this.CREATE;
+    },
+
+    isEdit: function (mode) {
+        return mode === this.EDIT;
+    },
+
+    isView: function (mode) {
+        return mode === this.VIEW;
+    }
 });
 
 export const ReferenceType = Object.freeze({
