@@ -221,6 +221,4 @@ class FxTransactionFormAction extends FormAction {
     }
 }
 
-FxTransactionFormAction.Mode = TransactionMode;
-
 export default FxTransactionFormAction;
