@@ -15,7 +15,7 @@ export async function initTransaction() {
         returnTo = { page: 'enquiry' }
     } = navigation?.page === 'transaction' ? navigation : {};
 
-    const isView = mode === TransactionMode.VIEW;
+    const isView = TransactionMode.isView(mode);
 
     try {
         // LOAD
