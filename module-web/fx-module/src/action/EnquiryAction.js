@@ -8,7 +8,10 @@ const { DataTableBuilder, NavigationState, Renderers, Toast } = Common;
 let table = null;
 
 export async function initEnquiry() {
+    // BUILD - DataTable handles remote LOAD through serverPage().
     table = buildTable();
+
+    // BIND
     bindCreateButton();
     bindReloadButton();
 }
