@@ -44,21 +44,10 @@ const FxService = {
         }).then(responseArray);
     },
 
-    findAllMasters: function () {
-        return Ajax.get(FxApi.masters, {
-            cache: false,
-            dedupe: true
-        }).then(responseArray);
-    },
-
     findMasterById: function (id) {
         return Ajax.get(FxApi.masterById(id), {
             cache: false
         }).then(responseObject);
-    },
-
-    createMaster: function () {
-        return Ajax.post(FxApi.masters, {}).then(responseObject);
     },
 
     findTransactionsByMasterId: function (masterId) {
@@ -67,18 +56,10 @@ const FxService = {
         }).then(responseArray);
     },
 
-    createTransaction: function (masterId, data) {
-        return Ajax.post(FxApi.transactionsByMasterId(masterId), data);
-    },
-
     findTransactionById: function (id) {
         return Ajax.get(FxApi.transactionById(id), {
             cache: false
         }).then(responseObject);
-    },
-
-    updateTransaction: function (id, data) {
-        return Ajax.post(FxApi.transactionById(id), data);
     },
 
     deleteTransaction: function (id) {
