@@ -19,6 +19,7 @@ export async function initMaster() {
     } = navigation?.page === 'master' ? navigation : {};
 
     try {
+        // LOAD
         const data = mode === MasterMode.EDIT
             ? FxRows.get(rowsKey)
             : await loadViewData(masterId);
@@ -29,9 +30,8 @@ export async function initMaster() {
         }
 
         transactions = data.transactions;
-        renderMasterSummary(data.master);
-        configurePage(mode);
 
+        // BUILD
         formAction = new FxMasterFormAction('#fxMasterForm', {
             master: data.master,
             transactions: transactions,
@@ -40,6 +40,13 @@ export async function initMaster() {
 
         table = buildTable(mode, rowsKey);
 
+        // POPULATE
+        renderMasterSummary(data.master);
+
+        // CONFIGURE
+        configurePage(mode);
+
+        // BIND
         if (mode === MasterMode.EDIT) bindAddTransaction(rowsKey);
     } catch (error) {
         Toast.error('Failed to load FX master.');
