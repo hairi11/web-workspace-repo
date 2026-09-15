@@ -15,12 +15,54 @@ export async function initTransaction() {
         returnTo = { page: 'enquiry' }
     } = navigation?.page === 'transaction' ? navigation : {};
 
-    if (mode !== TransactionMode.VIEW && !FxRows.get(rowsKey)) {
-        window.location.href = './enquiry.html';
-        return;
-    }
-
     try {
+        // LOAD
+        const rows = mode !== TransactionMode.VIEW
+            ? FxRows.get(rowsKey)
+            : null;
+
+        if (mode !== TransactionMode.VIEW && !rows) {
+            window.location.href = './enquiry.html';
+            return;
+        }
+
+        let transaction = null;
+        let pageConfig = null;
+
+        await new Router()
+            .route(TransactionMode.CREATE, () => {
+                pageConfig = {
+                    title: 'Add FX Transaction',
+                    submitLabel: 'Add',
+                    viewMode: false
+                };
+            })
+            .route(TransactionMode.EDIT, () => {
+                transaction = Number.isInteger(key)
+                    ? rows.transactions[key]
+                    : null;
+
+                if (!transaction) throw new Error('FX transaction not found.');
+
+                pageConfig = {
+                    title: 'Update FX Transaction',
+                    submitLabel: 'Update',
+                    viewMode: false
+                };
+            })
+            .route(TransactionMode.VIEW, async () => {
+                transaction = await FxService.findTransactionById(key);
+
+                if (!transaction) throw new Error('FX transaction not found.');
+
+                pageConfig = {
+                    title: 'View FX Transaction',
+                    submitLabel: null,
+                    viewMode: true
+                };
+            })
+            .dispatch(mode);
+
         const action = new FxTransactionFormAction('#transactionForm', {
             mode: mode,
             key: key,
@@ -28,45 +70,30 @@ export async function initTransaction() {
         });
 
         await action.loadReferences();
+
+        // BUILD
         action.build();
 
-        await new Router()
-            .route(TransactionMode.CREATE, () => {
-                configurePage('Add FX Transaction', 'Add', false);
-                bindReturnButton(returnTo);
-            })
-            .route(TransactionMode.EDIT, () => {
-                initEditTransaction(action, FxRows.get(rowsKey), key);
-                bindReturnButton(returnTo);
-            })
-            .route(TransactionMode.VIEW, () => initViewTransaction(action, key, returnTo))
-            .dispatch(mode);
+        // POPULATE
+        if (transaction) action.populate(transaction);
+
+        // CONFIGURE
+        if (pageConfig.viewMode) {
+            FormRenderers.view(action, transaction);
+        }
+
+        configurePage(
+            pageConfig.title,
+            pageConfig.submitLabel,
+            pageConfig.viewMode
+        );
+
+        // BIND
+        bindReturnButton(returnTo);
     } catch (error) {
         Toast.error('Failed to load FX transaction data.');
         console.error(error);
     }
-}
-
-function initEditTransaction(action, rows, index) {
-    const transaction = rows && Number.isInteger(index)
-        ? rows.transactions[index]
-        : null;
-
-    if (!transaction) throw new Error('FX transaction not found.');
-
-    action.populate(transaction);
-    configurePage('Update FX Transaction', 'Update', false);
-}
-
-async function initViewTransaction(action, transactionId, returnTo) {
-    const transaction = await FxService.findTransactionById(transactionId);
-
-    if (!transaction) throw new Error('FX transaction not found.');
-
-    action.populate(transaction);
-    FormRenderers.view(action, transaction);
-    configurePage('View FX Transaction', null, true);
-    bindReturnButton(returnTo);
 }
 
 function configurePage(title, submitLabel, viewMode) {
