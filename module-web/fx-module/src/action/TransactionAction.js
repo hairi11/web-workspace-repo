@@ -4,7 +4,7 @@ import FxRows from '../FxRows.js';
 import FxService from '../FxService.js';
 import FxTransactionFormAction from './FxTransactionFormAction.js';
 
-const { FormRenderers, NavigationState, Router, Toast } = Common;
+const { ConditionUtil, FormRenderers, NavigationState, Router, Toast } = Common;
 
 export async function initTransaction() {
     const navigation = NavigationState.consume();
@@ -17,9 +17,11 @@ export async function initTransaction() {
 
     try {
         // LOAD
-        const rows = mode !== TransactionMode.VIEW
-            ? FxRows.get(rowsKey)
-            : null;
+        const rows = ConditionUtil.choose(
+            mode !== TransactionMode.VIEW,
+            () => FxRows.get(rowsKey),
+            null
+        );
 
         if (mode !== TransactionMode.VIEW && !rows) {
             window.location.href = './enquiry.html';
