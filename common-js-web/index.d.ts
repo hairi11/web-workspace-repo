@@ -195,12 +195,6 @@ export const CaseUtil: {
     toSnakeKeys<T = any>(value: T): T;
 };
 
-export type ConditionalValue<T> = T | (() => T);
-
-export const ConditionUtil: {
-    choose<T>(condition: any, whenTrue: ConditionalValue<T>, whenFalse: ConditionalValue<T>): T;
-};
-
 export const DateUtil: {
     formatDate(value: any, pattern?: string): string;
     toApiDate(value: any): string;
