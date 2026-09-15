@@ -6,7 +6,6 @@ module.exports = {
     AjaxResponse: require('./ajax/AjaxResponse'),
     CaseInterceptor: require('./ajax/CaseInterceptor'),
     CaseUtil: require('./util/CaseUtil'),
-    ConditionUtil: require('./util/ConditionUtil'),
     ConfirmDialog: require('./form/dialog/ConfirmDialog'),
     DatePicker: require('./datepicker/DatePicker'),
     DateUtil: require('./date/DateUtil'),
