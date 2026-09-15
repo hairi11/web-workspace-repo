@@ -7,7 +7,7 @@ const { DataTableBuilder, NavigationState, Renderers, Toast } = Common;
 
 let table = null;
 
-export async function initEnquiry() {
+export function initEnquiry() {
     // BUILD - DataTable handles remote LOAD through serverPage().
     table = buildTable();
 
@@ -125,6 +125,7 @@ function openTransaction(mode, key, rowsKey, returnTo) {
 
 function bindReloadButton() {
     const reload = document.querySelector('#reloadButton');
+    if (!reload) return;
 
     reload.addEventListener('click', () => {
         reload.disabled = true;
