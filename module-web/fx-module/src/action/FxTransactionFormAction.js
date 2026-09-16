@@ -60,7 +60,14 @@ class FxTransactionFormAction extends FormAction {
         return {
             fxDate: [
                 Validator.required('FX Date is required.'),
-                Validator.maxDaysFromToday(14, 'FX Date cannot be more than 14 days from today.')
+                Validator.custom(async (value) => {
+                    if (!value) return null;
+
+                    const result = await FxService.validateFxDate(value);
+                    return result && result.valid
+                        ? null
+                        : (result && result.message ? result.message : 'FX Date is invalid.');
+                })
             ],
             fxCategory: Validator.required('Category is required.'),
             fxCode: Validator.required('Code is required.'),
