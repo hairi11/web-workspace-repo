@@ -44,6 +44,15 @@ const FxService = {
         }).then(responseArray);
     },
 
+    validateFxDate: function (date) {
+        return Ajax.get(FxApi.validateDate, {
+            cache: false,
+            query: {
+                date: date
+            }
+        }).then(responseObject);
+    },
+
     findMasterById: function (id) {
         return Ajax.get(FxApi.masterById(id), {
             cache: false
