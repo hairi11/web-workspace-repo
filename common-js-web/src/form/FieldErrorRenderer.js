@@ -12,7 +12,10 @@ class FieldErrorRenderer {
         var old = form.querySelectorAll('.' + this.errorClass);
         Array.prototype.forEach.call(old, function (node) { node.remove(); });
         var invalid = form.querySelectorAll('.' + this.invalidClass);
-        Array.prototype.forEach.call(invalid, function (node) { node.classList.remove(this.invalidClass); }, this);
+        Array.prototype.forEach.call(invalid, function (node) {
+            node.classList.remove(this.invalidClass);
+            node.removeAttribute('aria-invalid');
+        }, this);
     }
 
     render(form, errors) {
@@ -23,14 +26,33 @@ class FieldErrorRenderer {
             var input = this._findField(form, field);
             if (!input) return;
 
+            var visibleInput = this._visibleInput(input);
+            var messageTarget = this._messageTarget(input, visibleInput);
+
             input.classList.add(this.invalidClass);
             input.setAttribute('aria-invalid', 'true');
+
+            if (visibleInput !== input) {
+                visibleInput.classList.add(this.invalidClass);
+                visibleInput.setAttribute('aria-invalid', 'true');
+            }
 
             var message = document.createElement('div');
             message.className = this.errorClass + ' ' + this.messageClass;
             message.textContent = SecurityUtil.sanitizeErrorMessage(errors[field], 'Invalid value.');
-            input.insertAdjacentElement('afterend', message);
+            messageTarget.insertAdjacentElement('afterend', message);
         }, this);
+    }
+
+    _visibleInput(input) {
+        return input._flatpickr && input._flatpickr.altInput
+            ? input._flatpickr.altInput
+            : input;
+    }
+
+    _messageTarget(input, visibleInput) {
+        var datePickerControl = input.closest('.date-picker-control');
+        return datePickerControl || visibleInput;
     }
 
     _findField(form, fieldName) {
