@@ -22,6 +22,8 @@ class FieldErrorRenderer {
         if (!form) return;
         this.clear(form);
 
+        var firstInvalid = null;
+
         Object.keys(errors || {}).forEach(function (field) {
             var input = this._findField(form, field);
             if (!input) return;
@@ -37,11 +39,21 @@ class FieldErrorRenderer {
                 visibleInput.setAttribute('aria-invalid', 'true');
             }
 
+            if (messageTarget !== input && messageTarget !== visibleInput) {
+                messageTarget.classList.add(this.invalidClass);
+            }
+
             var message = document.createElement('div');
             message.className = this.errorClass + ' ' + this.messageClass;
             message.textContent = SecurityUtil.sanitizeErrorMessage(errors[field], 'Invalid value.');
             messageTarget.insertAdjacentElement('afterend', message);
+
+            if (!firstInvalid) {
+                firstInvalid = visibleInput;
+            }
         }, this);
+
+        this._navigateTo(firstInvalid);
     }
 
     _visibleInput(input) {
@@ -53,6 +65,22 @@ class FieldErrorRenderer {
     _messageTarget(input, visibleInput) {
         var datePickerControl = input.closest('.date-picker-control');
         return datePickerControl || visibleInput;
+    }
+
+    _navigateTo(input) {
+        if (!input) return;
+
+        if (typeof input.scrollIntoView === 'function') {
+            input.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+                inline: 'nearest'
+            });
+        }
+
+        if (!input.disabled && typeof input.focus === 'function') {
+            input.focus({preventScroll: true});
+        }
     }
 
     _findField(form, fieldName) {
