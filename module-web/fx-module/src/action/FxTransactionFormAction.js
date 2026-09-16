@@ -58,7 +58,10 @@ class FxTransactionFormAction extends FormAction {
 
     getValidationRules() {
         return {
-            fxDate: Validator.required('FX Date is required.'),
+            fxDate: [
+                Validator.required('FX Date is required.'),
+                Validator.maxDaysFromToday(14, 'FX Date cannot be more than 14 days from today.')
+            ],
             fxCategory: Validator.required('Category is required.'),
             fxCode: Validator.required('Code is required.'),
             fxType: Validator.required('Type is required.'),
