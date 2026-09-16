@@ -1,3 +1,5 @@
+const { differenceInCalendarDays, isValid, parseISO } = require('date-fns');
+
 class Validator {
     static required(message) {
         return function (value) {
@@ -37,6 +39,21 @@ class Validator {
     }
     static sameAs(fieldName, message) {
         return function (value, values) { return value === values[fieldName] ? null : (message || 'Fields do not match.'); };
+    }
+    static maxDaysFromToday(days, message) {
+        return function (value) {
+            if (!value) return null;
+
+            var date = typeof value === 'string' ? parseISO(value) : value;
+            if (!isValid(date)) {
+                return message || 'Please enter a valid date.';
+            }
+
+            var difference = differenceInCalendarDays(date, new Date());
+            return difference <= days
+                ? null
+                : (message || 'Date cannot be more than ' + days + ' days from today.');
+        };
     }
     static custom(handler) { return handler; }
 }
