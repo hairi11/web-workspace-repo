@@ -53,7 +53,7 @@ class FieldErrorRenderer {
             }
         }, this);
 
-        this._navigateTo(firstInvalid);
+        this._scrollTo(firstInvalid);
     }
 
     _visibleInput(input) {
@@ -67,20 +67,14 @@ class FieldErrorRenderer {
         return datePickerControl || visibleInput;
     }
 
-    _navigateTo(input) {
-        if (!input) return;
+    _scrollTo(input) {
+        if (!input || typeof input.scrollIntoView !== 'function') return;
 
-        if (typeof input.scrollIntoView === 'function') {
-            input.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center',
-                inline: 'nearest'
-            });
-        }
-
-        if (!input.disabled && typeof input.focus === 'function') {
-            input.focus({preventScroll: true});
-        }
+        input.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+            inline: 'nearest'
+        });
     }
 
     _findField(form, fieldName) {
