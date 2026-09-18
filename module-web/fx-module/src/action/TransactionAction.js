@@ -91,9 +91,11 @@ export async function initTransaction() {
             pageConfig.submitLabel,
             pageConfig.viewMode
         );
+        configureRowNavigation(mode, key, rows);
 
         // BIND
         bindReturnButton(returnTo);
+        bindRowNavigation(action, mode, key, rowsKey, rows, returnTo);
     } catch (error) {
         Toast.error('Failed to load FX transaction data.');
         console.error(error);
@@ -109,6 +111,73 @@ function configurePage(title, submitLabel, viewMode) {
     if (submitButton && submitLabel) submitButton.textContent = submitLabel;
     if (submitButton) submitButton.hidden = Boolean(viewMode);
     if (cancelButton) cancelButton.textContent = viewMode ? 'Back' : 'Cancel';
+}
+
+function configureRowNavigation(mode, key, rows) {
+    const previousButton = document.querySelector('#previousButton');
+    const nextButton = document.querySelector('#nextButton');
+    const viewMode = TransactionMode.isView(mode);
+
+    if (previousButton) previousButton.hidden = viewMode;
+    if (nextButton) nextButton.hidden = viewMode;
+
+    if (viewMode || !rows) return;
+
+    const currentIndex = TransactionMode.isCreate(mode)
+        ? rows.transactions.length
+        : key;
+    const lastIndex = rows.transactions.length;
+
+    if (previousButton) {
+        previousButton.disabled = !Number.isInteger(currentIndex) || currentIndex <= 0;
+    }
+
+    if (nextButton) {
+        nextButton.disabled = !Number.isInteger(currentIndex) || currentIndex >= lastIndex;
+    }
+}
+
+function bindRowNavigation(action, mode, key, rowsKey, rows, returnTo) {
+    if (TransactionMode.isView(mode) || !rows) return;
+
+    const previousButton = document.querySelector('#previousButton');
+    const nextButton = document.querySelector('#nextButton');
+    const currentIndex = TransactionMode.isCreate(mode)
+        ? rows.transactions.length
+        : key;
+
+    if (previousButton) {
+        previousButton.addEventListener('click', () => {
+            navigateToRow(action, currentIndex - 1, rows, rowsKey, returnTo);
+        });
+    }
+
+    if (nextButton) {
+        nextButton.addEventListener('click', () => {
+            navigateToRow(action, currentIndex + 1, rows, rowsKey, returnTo);
+        });
+    }
+}
+
+function navigateToRow(action, targetIndex, rows, rowsKey, returnTo) {
+    if (!Number.isInteger(targetIndex) || targetIndex < 0 || targetIndex > rows.transactions.length) {
+        return;
+    }
+
+    if (action.isDirty() && !window.confirm('Discard unsaved changes and move to another transaction?')) {
+        return;
+    }
+
+    const createMode = targetIndex === rows.transactions.length;
+
+    NavigationState.set({
+        page: 'transaction',
+        action: createMode ? TransactionMode.CREATE : TransactionMode.EDIT,
+        key: createMode ? null : targetIndex,
+        rowsKey: rowsKey,
+        returnTo: returnTo
+    });
+    window.location.href = './transaction.html';
 }
 
 function bindReturnButton(returnTo) {
