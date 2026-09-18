@@ -1,12 +1,30 @@
 import Common from '@company/common-js-web';
 import { traceObject } from './Trace.js';
 
-const { FormAction, Toast } = Common;
+const { ButtonBar, FormAction, Toast } = Common;
 
 class UserFormAction extends FormAction {
     constructor(selector, options) {
         super(selector);
         this.options = traceObject(options || {}, 'UserFormAction.options');
+        this.buttonBar = null;
+    }
+
+    onBuild() {
+        this.buttonBar = new ButtonBar('#userButtonBar')
+            .primary({ target: '#submitButton' })
+            .secondary({
+                target: '#cancelButton',
+                placement: ButtonBar.Placement.END
+            })
+            .build();
+    }
+
+    onDestroy() {
+        if (this.buttonBar) {
+            this.buttonBar.destroy();
+            this.buttonBar = null;
+        }
     }
 
     getValidationRules() {
