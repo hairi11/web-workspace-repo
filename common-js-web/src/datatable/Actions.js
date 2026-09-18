@@ -6,7 +6,7 @@ class Actions {
         return Object.assign({text: 'Edit', icon: 'fa fa-edit', onClick: onClick}, config || {});
     }
     static delete(onClick, config) {
-        return Object.assign({text: 'Delete', icon: 'fa fa-trash', className: 'text-danger', onClick: onClick}, config || {});
+        return Object.assign({text: 'Delete', icon: 'fa fa-trash', onClick: onClick}, config || {});
     }
     static divider() { return {divider: true}; }
     static custom(text, onClick, config) {
