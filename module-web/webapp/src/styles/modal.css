@@ -94,6 +94,8 @@
 }
 
 .common-dialog-actions .button {
-    min-width: 100px;
+    min-width: 120px;
+    min-height: 40px;
+    padding: 9px 16px;
 }
 
