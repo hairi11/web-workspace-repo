@@ -10,6 +10,59 @@ export class Ajax {
     static clearCache(): typeof Ajax;
 }
 
+export interface ButtonOptions {
+    text?: string;
+    variant?: 'primary' | 'secondary';
+    hidden?: boolean;
+    disabled?: boolean;
+    onClick?: (event: Event) => void;
+}
+
+export class Button {
+    static Variant: {
+        readonly PRIMARY: 'primary';
+        readonly SECONDARY: 'secondary';
+    };
+    constructor(target: string | HTMLElement, options?: ButtonOptions);
+    build(): this;
+    destroy(): this;
+    setText(text: string): this;
+    setHidden(hidden: boolean): this;
+    setDisabled(disabled: boolean): this;
+}
+
+export interface NavigatorOptions {
+    previous: string | HTMLElement;
+    next: string | HTMLElement;
+    index?: number;
+    count?: number;
+    hidden?: boolean;
+    beforeNavigate?: (targetIndex: number) => boolean | Promise<boolean>;
+    onNavigate?: (targetIndex: number) => any;
+    onError?: (error: any) => void;
+}
+
+export class Navigator {
+    constructor(options: NavigatorOptions);
+    build(): this;
+    destroy(): this;
+    update(index: number, count?: number): this;
+    setHidden(hidden: boolean): this;
+    refresh(): this;
+    hasPrevious(): boolean;
+    hasNext(): boolean;
+    navigate(targetIndex: number): Promise<boolean>;
+}
+
+export class ButtonBar {
+    constructor(target: string | HTMLElement);
+    primary(config: any | any[]): this;
+    secondary(config: any | any[]): this;
+    navigation(config: NavigatorOptions): this;
+    build(): this;
+    destroy(): this;
+}
+
 export interface AjaxSecurityOptions {
     allowedProtocols?: string[];
     allowCrossOriginCredentials?: boolean;
