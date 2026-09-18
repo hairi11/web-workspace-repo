@@ -59,6 +59,7 @@ a.button.is-disabled {
     z-index: 20;
     width: 100%;
     min-width: 100%;
+    box-sizing: border-box;
     padding: 6px;
     border: 1px solid #ddd;
     border-radius: 6px;
@@ -90,12 +91,14 @@ a.button.is-disabled {
     align-items: stretch;
 }
 
-.button-dropdown-split > .button:first-child {
-    flex: 1 1 auto;
-    min-width: 0;
+.button-dropdown-split > .button {
+    box-sizing: border-box;
+    justify-content: center;
 }
 
 .button-dropdown-split > .button:first-child {
+    flex: 1 1 auto;
+    min-width: 0;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
 }
