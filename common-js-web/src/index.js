@@ -6,6 +6,7 @@ module.exports = {
     AjaxResponse: require('./ajax/AjaxResponse'),
     CaseInterceptor: require('./ajax/CaseInterceptor'),
     CaseUtil: require('./util/CaseUtil'),
+    ChoiceInput: require('./select/ChoiceInput'),
     Button: require('./button/Button'),
     ButtonDropdown: require('./button/ButtonDropdown'),
     ButtonBar: require('./button/ButtonBar'),
