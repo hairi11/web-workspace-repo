@@ -98,28 +98,12 @@ class Button {
                 return;
             }
 
-            try {
-                var result = this.options.onClick(event);
-
-                if (result && typeof result.catch === 'function') {
-                    result.catch((error) => this.handleError(error));
-                }
-            } catch (error) {
-                this.handleError(error);
-            }
+            this.options.onClick(event);
         };
 
         this.element.addEventListener('click', this.clickHandler);
     }
 
-    handleError(error) {
-        if (typeof this.options.onError === 'function') {
-            this.options.onError(error);
-            return;
-        }
-
-        console.error(error);
-    }
 }
 
 Button.Variant = Object.freeze({
