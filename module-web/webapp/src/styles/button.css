@@ -1,0 +1,42 @@
+.button-primary {
+    border-color: #444;
+    background: #222;
+    color: #fff;
+}
+
+.button-primary:hover {
+    background: #444;
+}
+
+.button-secondary {
+    background: #fff;
+    color: #222;
+}
+
+.button.is-disabled,
+a.button.is-disabled {
+    pointer-events: none;
+    cursor: default;
+    opacity: .55;
+}
+
+.navigator-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 32px;
+    padding: 0 8px;
+    color: #444;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.navigator-link:hover {
+    background: #f0f0f0;
+}
+
+.navigator-link.is-disabled {
+    color: #aaa;
+    pointer-events: none;
+    cursor: default;
+}
