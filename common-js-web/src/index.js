@@ -22,6 +22,7 @@ module.exports = {
     MemoryCache: require('./cache/MemoryCache'),
     Modal: require('./modal/Modal'),
     NavigationState: require('./navigation/NavigationState'),
+    OkDialog: require('./form/dialog/OkDialog'),
     PageRouter: require('./router/PageRouter'),
     Router: require('./router/Router'),
     Renderers: require('./datatable/Renderers'),
