@@ -2,7 +2,10 @@ import Common from '@company/common-js-web';
 import TodoService from '../TodoService.js';
 import { asText, clearDraft, getDraft } from './todoActionBase.js';
 
-const { NavigationState, Toast } = Common;
+const { ButtonBar, Logger, NavigationState, Toast } = Common;
+
+const logger = new Logger('TodoViewAction');
+let buttonBar = null;
 
 function renderTodo(todo) {
     const container = document.querySelector('#todoView');
@@ -37,6 +40,27 @@ function configureUpdateLink(updateLink, id) {
         : null;
 }
 
+function configureButtons(saveVisible, updateVisible) {
+    if (buttonBar) buttonBar.destroy();
+
+    buttonBar = new ButtonBar('#todoViewButtonBar')
+        .primary({
+            target: '#saveButton',
+            hidden: !saveVisible
+        })
+        .secondary([
+            {
+                target: '#updateLink',
+                hidden: !updateVisible
+            },
+            {
+                target: '#backLink',
+                placement: ButtonBar.Placement.END
+            }
+        ])
+        .build();
+}
+
 export async function initView() {
     const navigation = NavigationState.consume();
     const saveButton = document.querySelector('#saveButton');
@@ -68,6 +92,8 @@ export async function initView() {
             backLink.onclick = null;
         }
 
+        configureButtons(true, false);
+
         saveButton.addEventListener('click', async () => {
             saveButton.disabled = true;
 
@@ -89,6 +115,7 @@ export async function initView() {
                 configureUpdateLink(updateLink, saved.id);
                 backLink.href = './enquiry.html';
                 backLink.onclick = null;
+                configureButtons(false, Boolean(saved.id));
 
                 Toast.success(
                     draft.mode === 'update'
@@ -97,7 +124,7 @@ export async function initView() {
                 );
             } catch (error) {
                 Toast.error(error && error.message ? error.message : 'Save failed.');
-                console.error(error);
+                logger.error(error);
             } finally {
                 saveButton.disabled = false;
             }
@@ -121,4 +148,5 @@ export async function initView() {
     configureUpdateLink(updateLink, todo.id);
     backLink.href = './enquiry.html';
     backLink.onclick = null;
+    configureButtons(false, Boolean(todo.id));
 }
