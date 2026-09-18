@@ -21,9 +21,8 @@ class ButtonDropdown {
             throw new Error('ButtonDropdown trigger and menu are required.');
         }
 
-        this.trigger.setAttribute('aria-haspopup', 'menu');
+        this.trigger.setAttribute('aria-haspopup', 'true');
         this.trigger.setAttribute('aria-expanded', 'false');
-        this.menu.setAttribute('role', 'menu');
         this.menu.hidden = true;
 
         this.triggerButton = new Button(this.trigger, {
@@ -97,7 +96,7 @@ class ButtonDropdown {
         this.menu.hidden = false;
         this.trigger.setAttribute('aria-expanded', 'true');
 
-        var firstItem = this.menu.querySelector('[role="menuitem"]:not([hidden])');
+        var firstItem = this.menu.querySelector('button:not([hidden]), a:not([hidden])');
         if (firstItem && typeof firstItem.focus === 'function') {
             firstItem.focus();
         }
@@ -158,8 +157,6 @@ class ButtonDropdown {
             if (!element) {
                 throw new Error('ButtonDropdown item element not found.');
             }
-
-            element.setAttribute('role', 'menuitem');
 
             return new Button(
                 element,
