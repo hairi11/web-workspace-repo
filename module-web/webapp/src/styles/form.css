@@ -157,3 +157,37 @@ textarea:disabled {
         grid-template-columns: 1fr;
     }
 }
+
+
+.choice-input-radio-group {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    min-height: var(--form-control-height);
+    padding: 6px 0;
+}
+
+.choice-input-radio {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    font-weight: 400;
+    cursor: pointer;
+}
+
+.choice-input-radio > input[type="radio"] {
+    margin: 0;
+}
+
+.choice-input-radio:has(input:disabled) {
+    cursor: default;
+    opacity: .65;
+}
+
+.choice-input-radio-group.is-invalid {
+    outline: 1px solid #a40000;
+    outline-offset: 3px;
+    border-radius: 4px;
+}
