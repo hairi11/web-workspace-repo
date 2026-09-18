@@ -69,8 +69,10 @@ class ButtonBar {
     }
 
     buildSecondaryControls() {
-        var visibleConfigs = this.secondaryConfigs.filter(
-            (config) => config.options.hidden !== true
+        var visibleConfigs = this.orderSecondaryConfigs(
+            this.secondaryConfigs.filter(
+                (config) => config.options.hidden !== true
+            )
         );
         var hiddenConfigs = this.secondaryConfigs.filter(
             (config) => config.options.hidden === true
@@ -84,6 +86,17 @@ class ButtonBar {
         }
 
         this.buildSecondaryDropdown(visibleConfigs);
+    }
+
+    orderSecondaryConfigs(configs) {
+        var regular = configs.filter(
+            (config) => config.options.placement !== ButtonBar.Placement.END
+        );
+        var terminal = configs.filter(
+            (config) => config.options.placement === ButtonBar.Placement.END
+        );
+
+        return regular.concat(terminal);
     }
 
     shouldGroupSecondaries(visibleSecondaryConfigs) {
@@ -221,5 +234,9 @@ class ButtonBar {
         return target || null;
     }
 }
+
+ButtonBar.Placement = Object.freeze({
+    END: 'end'
+});
 
 module.exports = ButtonBar;
