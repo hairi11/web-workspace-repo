@@ -75,6 +75,10 @@ const FxService = {
         return Ajax.post(FxApi.transactionById(id) + '/delete', {});
     },
 
+    deleteMaster: function (id) {
+        return Ajax.post(FxApi.masterById(id) + '/delete', {});
+    },
+
     save: function (data) {
         return Ajax.post(FxApi.save, data);
     },
