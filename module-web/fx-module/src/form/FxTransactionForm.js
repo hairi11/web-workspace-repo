@@ -56,8 +56,7 @@ class FxTransactionForm extends FormAction {
         }).build();
         this.rateInput = new CurrencyInput('#fxRate', {
             precision: 14,
-            decimalScale: 6,
-            useGrouping: false
+            decimalScale: 6
         }).build();
 
         this.choices.fxCategory = this.buildChoice('#fxCategory', this.references.category);
