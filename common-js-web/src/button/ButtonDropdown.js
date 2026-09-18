@@ -158,6 +158,8 @@ class ButtonDropdown {
                 throw new Error('ButtonDropdown item element not found.');
             }
 
+            element.classList.add('button-dropdown-item');
+
             return new Button(
                 element,
                 this.createButtonOptions(item)
