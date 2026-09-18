@@ -53,7 +53,6 @@ class FxMasterForm extends FormAction {
             return false;
         }
 
-        return undefined;
     }
 
     sendRequest(context) {
@@ -66,7 +65,7 @@ class FxMasterForm extends FormAction {
         const submitted = this.getSubmitAction(context) === 'submit';
         const masterId = response && response.master && response.master.id
             ? response.master.id
-            : this.master.id;
+            : (this.master ? this.master.id : null);
 
         Toast.success(
             submitted
