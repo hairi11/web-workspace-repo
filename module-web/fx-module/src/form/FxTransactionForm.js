@@ -86,11 +86,11 @@ class FxTransactionForm extends FormAction {
             fxCurrency: Validator.required('Currency is required.'),
             fxAmount: [
                 Validator.required('FX Amount is required.'),
-                Validator.decimal('Enter a valid FX amount.')
+                Validator.decimal(20, 4, 'FX Amount supports up to 16 integer digits and 4 decimal places.')
             ],
             fxRate: [
                 Validator.required('FX Rate is required.'),
-                Validator.decimal('Enter a valid FX rate.')
+                Validator.decimal(19, 8, 'FX Rate supports up to 11 integer digits and 8 decimal places.')
             ]
         };
     }
