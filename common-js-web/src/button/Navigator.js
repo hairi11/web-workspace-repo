@@ -113,6 +113,12 @@ class Navigator {
             this.index = targetIndex;
             this.refresh();
             return true;
+        } catch (error) {
+            if (typeof this.options.onError === 'function') {
+                this.options.onError(error);
+            }
+
+            return false;
         } finally {
             this.navigating = false;
         }
@@ -124,14 +130,7 @@ class Navigator {
         var element = offset < 0 ? this.previousElement : this.nextElement;
         if (!element || element.getAttribute('aria-disabled') === 'true') return;
 
-        this.navigate(this.index + offset).catch((error) => {
-            if (typeof this.options.onError === 'function') {
-                this.options.onError(error);
-                return;
-            }
-
-            console.error(error);
-        });
+        this.navigate(this.index + offset);
     }
 
     isValidTarget(index) {
