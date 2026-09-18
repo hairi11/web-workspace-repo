@@ -15,8 +15,15 @@ class Button {
 
         this.applyVariant();
         this.setText(this.options.text);
-        this.setHidden(this.options.hidden === true);
-        this.setDisabled(this.options.disabled === true);
+
+        if (this.options.hidden !== undefined) {
+            this.setHidden(this.options.hidden);
+        }
+
+        if (this.options.disabled !== undefined) {
+            this.setDisabled(this.options.disabled);
+        }
+
         this.bindClick();
 
         return this;
@@ -91,10 +98,27 @@ class Button {
                 return;
             }
 
-            this.options.onClick(event);
+            try {
+                var result = this.options.onClick(event);
+
+                if (result && typeof result.catch === 'function') {
+                    result.catch((error) => this.handleError(error));
+                }
+            } catch (error) {
+                this.handleError(error);
+            }
         };
 
         this.element.addEventListener('click', this.clickHandler);
+    }
+
+    handleError(error) {
+        if (typeof this.options.onError === 'function') {
+            this.options.onError(error);
+            return;
+        }
+
+        console.error(error);
     }
 }
 
