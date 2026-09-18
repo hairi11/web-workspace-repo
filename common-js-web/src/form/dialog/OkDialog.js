@@ -84,28 +84,28 @@ class OkDialog {
     }
 
     static info(message, config) {
-        return this.show(Object.assign({}, config || {}, {
+        return OkDialog.show(Object.assign({}, config || {}, {
             level: LEVELS.INFO,
             message: message
         }));
     }
 
     static success(message, config) {
-        return this.show(Object.assign({}, config || {}, {
+        return OkDialog.show(Object.assign({}, config || {}, {
             level: LEVELS.SUCCESS,
             message: message
         }));
     }
 
     static warning(message, config) {
-        return this.show(Object.assign({}, config || {}, {
+        return OkDialog.show(Object.assign({}, config || {}, {
             level: LEVELS.WARNING,
             message: message
         }));
     }
 
     static error(message, config) {
-        return this.show(Object.assign({}, config || {}, {
+        return OkDialog.show(Object.assign({}, config || {}, {
             level: LEVELS.ERROR,
             message: message
         }));
