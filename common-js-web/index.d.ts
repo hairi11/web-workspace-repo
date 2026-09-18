@@ -10,6 +10,35 @@ export class Ajax {
     static clearCache(): typeof Ajax;
 }
 
+export interface ChoiceInputItem {
+    id: string | number;
+    text: string;
+}
+
+export interface ChoiceInputOptions {
+    threshold?: number;
+    data?: ChoiceInputItem[];
+    [key: string]: any;
+}
+
+export class ChoiceInput {
+    static DEFAULT_THRESHOLD: number;
+    static Mode: {
+        readonly RADIO: 'radio';
+        readonly SELECT: 'select';
+    };
+    constructor(target: string | HTMLSelectElement, options?: ChoiceInputOptions);
+    build(): this;
+    destroy(): this;
+    value(): any;
+    setValue(value: any, triggerChange?: boolean): this;
+    clear(triggerChange?: boolean): this;
+    enable(): this;
+    disable(): this;
+    setDisabled(disabled: boolean): this;
+    getMode(): 'radio' | 'select' | null;
+}
+
 export interface ButtonOptions {
     text?: string;
     variant?: 'primary' | 'secondary';
