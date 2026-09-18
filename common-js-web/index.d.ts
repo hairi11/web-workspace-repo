@@ -79,9 +79,13 @@ export class ButtonDropdown {
 
 export interface ButtonBarButtonConfig extends ButtonOptions {
     target: string | HTMLElement;
+    placement?: 'end';
 }
 
 export class ButtonBar {
+    static Placement: {
+        readonly END: 'end';
+    };
     constructor(target: string | HTMLElement);
     primary(config: ButtonBarButtonConfig | ButtonBarButtonConfig[]): this;
     secondary(config: ButtonBarButtonConfig | ButtonBarButtonConfig[]): this;
