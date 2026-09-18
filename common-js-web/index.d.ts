@@ -55,11 +55,15 @@ export class Navigator {
     navigate(targetIndex: number): Promise<boolean>;
 }
 
+export interface ButtonBarButtonConfig extends ButtonOptions {
+    target: string | HTMLElement;
+}
+
 export class ButtonBar {
     constructor(target: string | HTMLElement);
-    primary(config: any | any[]): this;
-    secondary(config: any | any[]): this;
-    navigation(config: NavigatorOptions): this;
+    primary(config: ButtonBarButtonConfig | ButtonBarButtonConfig[]): this;
+    secondary(config: ButtonBarButtonConfig | ButtonBarButtonConfig[]): this;
+    navigator(config: NavigatorOptions): this;
     build(): this;
     destroy(): this;
 }
