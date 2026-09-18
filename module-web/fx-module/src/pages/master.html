@@ -54,20 +54,21 @@
         <div id="masterButtonBar" class="button-bar fx-create-actions">
             <button id="submitButton" type="submit" name="action" value="submit">Submit</button>
 
-            <div id="masterSecondaryActions" class="button-dropdown">
+            <div id="masterSecondaryActions" class="button-dropdown button-dropdown-split">
+                <button id="saveButton" type="submit" name="action" value="save">
+                    Save Draft
+                </button>
                 <button
                     id="masterSecondaryButton"
                     type="button"
+                    aria-label="More secondary actions"
                     aria-controls="masterSecondaryMenu"
+                    title="More secondary actions"
                 >
-                    <span>More</span>
                     <i class="fa fa-chevron-down" aria-hidden="true"></i>
                 </button>
 
                 <div id="masterSecondaryMenu" class="button-dropdown-menu" hidden>
-                    <button id="saveButton" type="submit" name="action" value="save">
-                        Save Draft
-                    </button>
                     <button id="cancelButton" type="button">Cancel</button>
                 </div>
             </div>
