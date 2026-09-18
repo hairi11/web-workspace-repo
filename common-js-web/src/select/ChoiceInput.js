@@ -182,22 +182,24 @@ class ChoiceInput {
         this.labels = this.getLabels();
 
         items.forEach((item, index) => {
-            var option = document.createElement('label');
+            var option = document.createElement('div');
             var input = document.createElement('input');
-            var text = document.createElement('span');
+            var label = document.createElement('label');
 
             input.type = 'radio';
             input.name = name;
             input.value = item.id;
             input.id = baseId + '-option-' + String(index + 1);
             input.disabled = this.element.disabled;
+            input.className = 'form-check-input';
 
-            option.className = 'choice-input-radio';
-            option.htmlFor = input.id;
-            text.textContent = item.text;
+            option.className = 'form-check form-check-inline';
+            label.className = 'form-check-label';
+            label.htmlFor = input.id;
+            label.textContent = item.text;
 
             option.appendChild(input);
-            option.appendChild(text);
+            option.appendChild(label);
             group.appendChild(option);
             this.radioInputs.push(input);
         });
