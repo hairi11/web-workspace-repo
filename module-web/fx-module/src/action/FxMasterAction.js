@@ -57,6 +57,7 @@ class FxMasterAction {
                 {
                     target: '#cancelButton',
                     hidden: !editing,
+                    placement: ButtonBar.Placement.END,
                     onClick: () => this.cancel()
                 },
                 {
@@ -66,7 +67,8 @@ class FxMasterAction {
                 },
                 {
                     target: '#backButton',
-                    hidden: editing
+                    hidden: editing,
+                    placement: ButtonBar.Placement.END
                 }
             ])
             .build();
