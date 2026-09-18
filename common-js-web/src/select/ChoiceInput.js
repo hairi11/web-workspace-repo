@@ -54,6 +54,9 @@ class ChoiceInput {
         }
 
         var normalized = value === null || value === undefined ? '' : String(value);
+        var previousInput = this.radioInputs.find(function (input) {
+            return input.checked;
+        });
         var changedInput = null;
 
         this.radioInputs.forEach(function (input) {
@@ -62,8 +65,9 @@ class ChoiceInput {
             if (checked) changedInput = input;
         });
 
-        if (triggerChange === true && changedInput) {
-            changedInput.dispatchEvent(new Event('change', {bubbles: true}));
+        var eventTarget = changedInput || previousInput;
+        if (triggerChange === true && eventTarget) {
+            eventTarget.dispatchEvent(new Event('change', {bubbles: true}));
         }
 
         return this;
@@ -258,8 +262,9 @@ ChoiceInput.DEFAULT_THRESHOLD = DEFAULT_THRESHOLD;
 
 ChoiceInput.resolveMode = function (optionCount, threshold) {
     var count = Math.max(0, Number(optionCount) || 0);
-    var limit = Number.isInteger(Number(threshold)) && Number(threshold) > 0
-        ? Number(threshold)
+    var numericThreshold = Number(threshold);
+    var limit = Number.isInteger(numericThreshold) && numericThreshold > 0
+        ? numericThreshold
         : DEFAULT_THRESHOLD;
 
     return count < limit
