@@ -41,8 +41,10 @@ export class ChoiceInput {
 }
 
 export interface CurrencyInputOptions {
+    precision?: number | null;
     decimalScale?: number;
     allowNegative?: boolean;
+    useGrouping?: boolean;
 }
 
 export class CurrencyInput {
