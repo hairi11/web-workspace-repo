@@ -36,3 +36,26 @@
     pointer-events: none;
     cursor: default;
 }
+
+
+.button-primary {
+    border-color: #444;
+    background: #222;
+    color: #fff;
+}
+
+.button-primary:hover {
+    background: #444;
+}
+
+.button-secondary {
+    background: #fff;
+    color: #222;
+}
+
+.button.is-disabled,
+a.button.is-disabled {
+    pointer-events: none;
+    cursor: default;
+    opacity: .55;
+}
