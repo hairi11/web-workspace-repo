@@ -40,6 +40,25 @@ export class ChoiceInput {
     getMode(): 'radio' | 'select' | null;
 }
 
+export interface CurrencyInputOptions {
+    decimalScale?: number;
+    allowNegative?: boolean;
+}
+
+export class CurrencyInput {
+    static DEFAULT_OPTIONS: CurrencyInputOptions;
+    static format(value: any, options?: CurrencyInputOptions): string;
+    static countSignificant(value: any): number;
+    static findCaret(formatted: string, significantCount: number): number;
+    constructor(target: string | HTMLInputElement, options?: CurrencyInputOptions);
+    build(): this;
+    destroy(): this;
+    value(): string;
+    setValue(value: any, triggerChange?: boolean): this;
+    clear(triggerChange?: boolean): this;
+    formatCurrentValue(): this;
+}
+
 export interface ButtonOptions {
     text?: string;
     variant?: 'primary' | 'secondary';
@@ -256,6 +275,7 @@ export class DataTableBuilder {
 }
 
 export class DatePicker {
+    static maskDateInput(value: any): string;
     constructor(selector: string | HTMLElement, options?: any);
     option(name: string, value: any): this;
     optionsConfig(config?: any): this;
@@ -310,6 +330,10 @@ export const CaseUtil: {
     toSnakeKeys<T = any>(value: T): T;
 };
 
+export const NumberUtil: {
+    normalizeFormatted(value: any): string;
+    parseFormatted(value: any): number | null;
+};
 export const DateUtil: {
     formatDate(value: any, pattern?: string): string;
     toApiDate(value: any): string;
