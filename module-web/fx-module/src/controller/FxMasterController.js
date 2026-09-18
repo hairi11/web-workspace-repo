@@ -31,6 +31,7 @@ class FxMasterController {
             const action = new FxMasterAction({
                 form: form,
                 mode: context.mode,
+                master: data.master,
                 rowsKey: context.rowsKey,
                 transactions: data.transactions
             }).build();
