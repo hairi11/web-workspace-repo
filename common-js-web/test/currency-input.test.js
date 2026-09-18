@@ -38,3 +38,16 @@ test('CurrencyInput can limit decimals without grouping', function () {
         '12345678.123456'
     );
 });
+
+
+test('CurrencyInput enforces DECIMAL(14,6) rate limits', function () {
+    const options = {
+        precision: 14,
+        decimalScale: 6,
+        useGrouping: false
+    };
+
+    assert.equal(CurrencyInput.isWithinLimit('99999999.999999', options), true);
+    assert.equal(CurrencyInput.isWithinLimit('999999999.999999', options), false);
+    assert.equal(CurrencyInput.isWithinLimit('99999999.9999999', options), false);
+});
