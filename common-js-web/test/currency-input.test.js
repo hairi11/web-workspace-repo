@@ -16,3 +16,25 @@ test('NumberUtil parses grouped formatted values', function () {
     assert.equal(NumberUtil.parseFormatted('1,234.56'), 1234.56);
     assert.equal(NumberUtil.parseFormatted(''), null);
 });
+
+
+test('CurrencyInput limits integer digits from precision and scale', function () {
+    assert.equal(
+        CurrencyInput.format('12345678901234567.12345', {
+            precision: 20,
+            decimalScale: 4
+        }),
+        '1,234,567,890,123,456.1234'
+    );
+});
+
+test('CurrencyInput can limit decimals without grouping', function () {
+    assert.equal(
+        CurrencyInput.format('123456789012.123456789', {
+            precision: 19,
+            decimalScale: 8,
+            useGrouping: false
+        }),
+        '12345678901.12345678'
+    );
+});
