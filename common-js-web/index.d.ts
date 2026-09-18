@@ -63,6 +63,7 @@ export interface ButtonDropdownOptions {
     menu: string | HTMLElement;
     variant?: 'primary' | 'secondary';
     hidden?: boolean;
+    action?: ButtonDropdownItemConfig;
     items: ButtonDropdownItemConfig[];
 }
 
