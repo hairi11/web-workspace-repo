@@ -45,6 +45,110 @@ function normalizeLevel(level) {
     return LEVEL_CONFIG[value] ? value : LEVELS.INFO;
 }
 
+function createContent(level, messageText) {
+    var content = document.createElement('div');
+    content.className = 'common-dialog-content common-dialog-' + level;
+
+    var icon = document.createElement('i');
+    icon.className = 'common-dialog-icon ' + LEVEL_CONFIG[level].icon;
+    icon.setAttribute('aria-hidden', 'true');
+
+    var message = document.createElement('div');
+    message.className = 'common-dialog-message';
+    message.textContent = messageText || '';
+
+    content.appendChild(icon);
+    content.appendChild(message);
+    return content;
+}
+
+function createButton(label, className) {
+    var button = document.createElement('button');
+    button.type = 'button';
+    button.className = className;
+    button.textContent = label;
+    return button;
+}
+
+function createActions() {
+    var actions = document.createElement('div');
+    actions.className = 'common-dialog-actions';
+    return actions;
+}
+
+function openModal(config, title, content, actions, onClose) {
+    return Modal.open({
+        title: title,
+        content: content,
+        footer: actions,
+        size: config.size || 'sm',
+        closable: config.closable,
+        escapeClose: config.escapeClose,
+        onClose: onClose
+    });
+}
+
+function showConfirm(config, level, content, resolve) {
+    var actions = createActions();
+    var noButton = createButton(
+        config.noLabel || 'No',
+        'common-dialog-secondary'
+    );
+    var yesButton = createButton(
+        config.yesLabel || 'Yes',
+        'common-dialog-primary common-dialog-primary-' + level
+    );
+
+    actions.appendChild(noButton);
+    actions.appendChild(yesButton);
+
+    var modal = openModal(
+        config,
+        config.title || 'Confirm',
+        content,
+        actions,
+        function (reason) {
+            resolve(reason === 'yes');
+        }
+    );
+
+    noButton.addEventListener('click', function () {
+        modal.close('no');
+    });
+
+    yesButton.addEventListener('click', function () {
+        modal.close('yes');
+    });
+
+    noButton.focus();
+}
+
+function showOk(config, level, content, resolve) {
+    var actions = createActions();
+    var okButton = createButton(
+        config.okLabel || 'OK',
+        'common-dialog-primary common-dialog-primary-' + level
+    );
+
+    actions.appendChild(okButton);
+
+    var modal = openModal(
+        config,
+        config.title || LEVEL_CONFIG[level].title,
+        content,
+        actions,
+        function (reason) {
+            resolve(reason === 'ok');
+        }
+    );
+
+    okButton.addEventListener('click', function () {
+        modal.close('ok');
+    });
+
+    okButton.focus();
+}
+
 class Dialog {
     static show(config) {
         config = normalizeConfig(config);
@@ -53,89 +157,15 @@ class Dialog {
             ? MODES.CONFIRM
             : MODES.OK;
         var level = normalizeLevel(config.level);
-        var levelConfig = LEVEL_CONFIG[level];
+        var content = createContent(level, config.message);
 
         return new Promise(function (resolve) {
-            var content = document.createElement('div');
-            content.className = 'common-dialog-content common-dialog-' + level;
-
-            var icon = document.createElement('i');
-            icon.className = 'common-dialog-icon ' + levelConfig.icon;
-            icon.setAttribute('aria-hidden', 'true');
-
-            var message = document.createElement('div');
-            message.className = 'common-dialog-message';
-            message.textContent = config.message || '';
-
-            content.appendChild(icon);
-            content.appendChild(message);
-
-            var actions = document.createElement('div');
-            actions.className = 'common-dialog-actions';
-
-            var modal;
-
             if (mode === MODES.CONFIRM) {
-                var noButton = document.createElement('button');
-                noButton.type = 'button';
-                noButton.className = 'common-dialog-secondary';
-                noButton.textContent = config.noLabel || 'No';
-
-                var yesButton = document.createElement('button');
-                yesButton.type = 'button';
-                yesButton.className = 'common-dialog-primary common-dialog-primary-' + level;
-                yesButton.textContent = config.yesLabel || 'Yes';
-
-                actions.appendChild(noButton);
-                actions.appendChild(yesButton);
-
-                modal = Modal.open({
-                    title: config.title || 'Confirm',
-                    content: content,
-                    footer: actions,
-                    size: config.size || 'sm',
-                    closable: config.closable,
-                    escapeClose: config.escapeClose,
-                    onClose: function (reason) {
-                        resolve(reason === 'yes');
-                    }
-                });
-
-                noButton.addEventListener('click', function () {
-                    modal.close('no');
-                });
-
-                yesButton.addEventListener('click', function () {
-                    modal.close('yes');
-                });
-
-                noButton.focus();
+                showConfirm(config, level, content, resolve);
                 return;
             }
 
-            var okButton = document.createElement('button');
-            okButton.type = 'button';
-            okButton.className = 'common-dialog-primary common-dialog-primary-' + level;
-            okButton.textContent = config.okLabel || 'OK';
-            actions.appendChild(okButton);
-
-            modal = Modal.open({
-                title: config.title || levelConfig.title,
-                content: content,
-                footer: actions,
-                size: config.size || 'sm',
-                closable: config.closable,
-                escapeClose: config.escapeClose,
-                onClose: function (reason) {
-                    resolve(reason === 'ok');
-                }
-            });
-
-            okButton.addEventListener('click', function () {
-                modal.close('ok');
-            });
-
-            okButton.focus();
+            showOk(config, level, content, resolve);
         });
     }
 
