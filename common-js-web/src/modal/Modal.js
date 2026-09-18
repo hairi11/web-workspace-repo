@@ -7,6 +7,8 @@ class Modal {
     static open(config) {
         config = config || {};
 
+        var previousActiveElement = document.activeElement;
+
         var overlay = document.createElement('div');
         overlay.className = 'common-modal-overlay';
 
@@ -72,6 +74,12 @@ class Modal {
 
                 if (overlay.parentNode) {
                     overlay.parentNode.removeChild(overlay);
+                }
+
+                if (previousActiveElement
+                    && typeof previousActiveElement.focus === 'function'
+                    && document.contains(previousActiveElement)) {
+                    previousActiveElement.focus();
                 }
 
                 if (typeof config.onClose === 'function') {
