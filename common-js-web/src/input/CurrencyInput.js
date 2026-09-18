@@ -13,6 +13,8 @@ class CurrencyInput {
         this.options = Object.assign({}, DEFAULT_OPTIONS, options || {});
         this.element = null;
         this.inputHandler = null;
+        this.beforeInputHandler = null;
+        this.pasteHandler = null;
         this.blurHandler = null;
     }
 
@@ -28,6 +30,23 @@ class CurrencyInput {
         this.element.autocomplete = 'off';
         this.applyMaxLength();
 
+        this.beforeInputHandler = (event) => {
+            if (!event.inputType || !event.inputType.startsWith('insert')) return;
+            if (event.data === null || event.data === undefined) return;
+
+            if (!this.canInsert(event.data)) {
+                event.preventDefault();
+            }
+        };
+        this.pasteHandler = (event) => {
+            var text = event.clipboardData
+                ? event.clipboardData.getData('text')
+                : '';
+
+            if (text && !this.canInsert(text)) {
+                event.preventDefault();
+            }
+        };
         this.inputHandler = () => {
             this.formatCurrentValue();
         };
@@ -35,6 +54,8 @@ class CurrencyInput {
             this.formatCurrentValue();
         };
 
+        this.element.addEventListener('beforeinput', this.beforeInputHandler);
+        this.element.addEventListener('paste', this.pasteHandler);
         this.element.addEventListener('input', this.inputHandler);
         this.element.addEventListener('blur', this.blurHandler);
 
@@ -46,6 +67,14 @@ class CurrencyInput {
     }
 
     destroy() {
+        if (this.element && this.beforeInputHandler) {
+            this.element.removeEventListener('beforeinput', this.beforeInputHandler);
+        }
+
+        if (this.element && this.pasteHandler) {
+            this.element.removeEventListener('paste', this.pasteHandler);
+        }
+
         if (this.element && this.inputHandler) {
             this.element.removeEventListener('input', this.inputHandler);
         }
@@ -54,6 +83,8 @@ class CurrencyInput {
             this.element.removeEventListener('blur', this.blurHandler);
         }
 
+        this.beforeInputHandler = null;
+        this.pasteHandler = null;
         this.inputHandler = null;
         this.blurHandler = null;
         this.element = null;
@@ -122,6 +153,22 @@ class CurrencyInput {
             + separators
             + decimalCharacters
             + signCharacters;
+    }
+
+    canInsert(text) {
+        if (!this.element) return false;
+
+        var start = this.element.selectionStart === null
+            ? this.element.value.length
+            : this.element.selectionStart;
+        var end = this.element.selectionEnd === null
+            ? start
+            : this.element.selectionEnd;
+        var proposed = this.element.value.slice(0, start)
+            + String(text)
+            + this.element.value.slice(end);
+
+        return CurrencyInput.isWithinLimit(proposed, this.options);
     }
 
     formatCurrentValue() {
@@ -196,6 +243,45 @@ CurrencyInput.format = function (value, options) {
     }
 
     return result;
+};
+
+CurrencyInput.isWithinLimit = function (value, options) {
+    options = Object.assign({}, DEFAULT_OPTIONS, options || {});
+
+    var normalized = NumberUtil.normalizeFormatted(value);
+
+    if (normalized === '' || normalized === '-' || normalized === '.' || normalized === '-.') {
+        return true;
+    }
+
+    if (!/^-?\d*(?:\.\d*)?$/.test(normalized)) {
+        return false;
+    }
+
+    if (!options.allowNegative && normalized.charAt(0) === '-') {
+        return false;
+    }
+
+    var unsigned = normalized.charAt(0) === '-'
+        ? normalized.slice(1)
+        : normalized;
+    var parts = unsigned.split('.');
+    var integerPart = parts[0].replace(/^0+/, '');
+    var fractionPart = parts.length > 1 ? parts[1] : '';
+    var scale = Math.max(0, Number(options.decimalScale) || 0);
+
+    if (fractionPart.length > scale) {
+        return false;
+    }
+
+    if (options.precision === null || options.precision === undefined) {
+        return true;
+    }
+
+    var precision = Number(options.precision);
+    var maxIntegerDigits = Math.max(0, precision - scale);
+
+    return integerPart.length <= maxIntegerDigits;
 };
 
 CurrencyInput.countSignificant = function (value) {
