@@ -41,7 +41,6 @@ a.button.is-disabled {
     cursor: default;
 }
 
-
 .button-dropdown {
     position: relative;
 }
@@ -85,7 +84,6 @@ a.button.is-disabled {
     background: #f0f0f0;
 }
 
-
 .button-dropdown-split {
     display: inline-flex;
     align-items: stretch;
@@ -109,4 +107,35 @@ a.button.is-disabled {
     padding-inline: 8px;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
+}
+
+.button-bar {
+    --button-bar-action-width: 140px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #ddd;
+}
+
+.button-bar-nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-right: auto;
+}
+
+.button-bar > .button,
+.button-bar > .button-dropdown {
+    width: var(--button-bar-action-width);
+    box-sizing: border-box;
+}
+
+.button-bar > .button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
 }
