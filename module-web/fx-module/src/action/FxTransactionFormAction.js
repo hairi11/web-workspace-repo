@@ -122,19 +122,8 @@ class FxTransactionFormAction extends FormAction {
     beforeSubmit(context) {
         if (this.options.mode === TransactionMode.VIEW) return false;
 
-        const index = this.options.mode === TransactionMode.EDIT
-            ? this.options.key
-            : null;
-        const rows = FxRows.upsertTransaction(
-            this.options.rowsKey,
-            index,
-            context.data
-        );
-
-        if (!rows) {
-            Toast.error('FX working rows not found.');
-            return false;
-        }
+        const rows = this.saveWorkingRow(context.data);
+        if (!rows) return false;
 
         NavigationState.set({
             page: 'master',
@@ -143,6 +132,51 @@ class FxTransactionFormAction extends FormAction {
         });
         window.location.href = './master.html';
         return false;
+    }
+
+    saveWorkingRow(data) {
+        if (this.options.mode === TransactionMode.VIEW) return null;
+
+        const index = this.options.mode === TransactionMode.EDIT
+            ? this.options.key
+            : null;
+        const rows = FxRows.upsertTransaction(
+            this.options.rowsKey,
+            index,
+            data
+        );
+
+        if (!rows) {
+            Toast.error('FX working rows not found.');
+            return null;
+        }
+
+        if (this.formState) {
+            this.formState.resetBaseline();
+        }
+
+        return rows;
+    }
+
+    async saveDirtyRow() {
+        const formValues = this.serializeForm();
+
+        await this.beforeValidate(formValues, this.form);
+
+        const validation = await this.validateForm(formValues);
+
+        await this.afterValidate(validation, formValues, this.form);
+
+        if (!validation.valid) {
+            this.showValidationErrors(validation.errors);
+            await this.onValidationError(validation.errors, formValues, this.form);
+            return false;
+        }
+
+        this.clearValidationErrors();
+
+        const data = await this.buildRequestData(formValues, this.form);
+        return Boolean(this.saveWorkingRow(data));
     }
 
     populate(values) {
