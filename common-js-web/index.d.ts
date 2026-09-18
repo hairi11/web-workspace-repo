@@ -85,7 +85,6 @@ export class ButtonBar {
     constructor(target: string | HTMLElement);
     primary(config: ButtonBarButtonConfig | ButtonBarButtonConfig[]): this;
     secondary(config: ButtonBarButtonConfig | ButtonBarButtonConfig[]): this;
-    secondaryDropdown(config: ButtonDropdownOptions): this;
     navigator(config: NavigatorOptions): this;
     build(): this;
     destroy(): this;
