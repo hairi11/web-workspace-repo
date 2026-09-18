@@ -2,14 +2,15 @@ import Common from '@company/common-js-web';
 import TodoService from './TodoService.js';
 import { saveDraft } from './action/todoActionBase.js';
 
-const { FormAction, NavigationState, Select2, Validator, Toast } = Common;
+const { ButtonBar, ChoiceInput, FormAction, NavigationState, Validator, Toast } = Common;
 
 class TodoFormAction extends FormAction {
     constructor(selector, options) {
         super(selector);
         this.options = options || {};
         this.statusOptions = [];
-        this.statusSelect = null;
+        this.statusChoice = null;
+        this.buttonBar = null;
     }
 
     async loadStatusOptions() {
@@ -19,19 +20,31 @@ class TodoFormAction extends FormAction {
     }
 
     onBuild(form) {
-        if (!form.elements.completed) return;
+        if (form.elements.completed) {
+            this.statusChoice = new ChoiceInput(form.elements.completed, {
+                width: '100%',
+                data: this.statusOptions
+            }).build();
+        }
 
-        this.statusSelect = new Select2(form.elements.completed, {
-            width: '100%',
-            minimumResultsForSearch: Infinity,
-            data: this.statusOptions
-        }).build();
+        this.buttonBar = new ButtonBar('#todoButtonBar')
+            .primary({ target: '#submitButton' })
+            .secondary({
+                target: '#cancelButton',
+                placement: ButtonBar.Placement.END
+            })
+            .build();
     }
 
     onDestroy() {
-        if (this.statusSelect) {
-            this.statusSelect.destroy();
-            this.statusSelect = null;
+        if (this.statusChoice) {
+            this.statusChoice.destroy();
+            this.statusChoice = null;
+        }
+
+        if (this.buttonBar) {
+            this.buttonBar.destroy();
+            this.buttonBar = null;
         }
     }
 
@@ -73,8 +86,8 @@ class TodoFormAction extends FormAction {
         if (this.form.elements.completed) {
             const value = values.completed ? 'true' : 'false';
 
-            if (this.statusSelect) {
-                this.statusSelect.setValue(value);
+            if (this.statusChoice) {
+                this.statusChoice.setValue(value);
             } else {
                 this.form.elements.completed.value = value;
             }
