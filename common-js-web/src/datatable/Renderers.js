@@ -1,4 +1,5 @@
 const DateUtil = require('../date/DateUtil');
+const NumberUtil = require('../util/NumberUtil');
 
 class Renderers {
     static text(fallback) {
@@ -63,10 +64,38 @@ class Renderers {
     }
 
     static amount(options) {
-        return Renderers.number(Object.assign({
+        options = Object.assign({
             minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        }, options || {}));
+            maximumFractionDigits: 2,
+            locale: 'en-US'
+        }, options || {});
+
+        var localeFormatter = new Intl.NumberFormat(options.locale);
+        var localeParts = localeFormatter.formatToParts(1000.1);
+        var groupPart = localeParts.find(function (part) {
+            return part.type === 'group';
+        });
+        var decimalPart = localeParts.find(function (part) {
+            return part.type === 'decimal';
+        });
+
+        return function (value, type) {
+            if (value === null || value === undefined || value === '') return '';
+
+            var normalized = NumberUtil.normalizeFormatted(value);
+
+            if (type && type !== 'display' && type !== 'filter') {
+                return normalized;
+            }
+
+            return NumberUtil.formatDecimal(normalized, {
+                minimumFractionDigits: options.minimumFractionDigits,
+                maximumFractionDigits: options.maximumFractionDigits,
+                useGrouping: options.useGrouping,
+                groupSeparator: groupPart ? groupPart.value : ',',
+                decimalSeparator: decimalPart ? decimalPart.value : '.'
+            });
+        };
     }
 }
 
