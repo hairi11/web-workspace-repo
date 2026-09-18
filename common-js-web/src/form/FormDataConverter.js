@@ -1,4 +1,5 @@
 const DateUtil = require('../date/DateUtil');
+const NumberUtil = require('../util/NumberUtil');
 
 const TYPES = Object.freeze({
     TEXT: 'text',
@@ -18,9 +19,7 @@ const converters = {
     },
     decimal: {
         fromForm: function (value) {
-            return value === null || value === undefined || String(value).trim() === ''
-                ? null
-                : Number(value);
+            return NumberUtil.parseFormatted(value);
         },
         toForm: function (value) {
             return value === null || value === undefined ? '' : String(value);
