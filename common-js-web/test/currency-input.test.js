@@ -28,14 +28,13 @@ test('CurrencyInput limits integer digits from precision and scale', function ()
     );
 });
 
-test('CurrencyInput can limit decimals without grouping', function () {
+test('CurrencyInput masks DECIMAL(14,6) rate with grouping', function () {
     assert.equal(
         CurrencyInput.format('123456789.1234567', {
             precision: 14,
-            decimalScale: 6,
-            useGrouping: false
+            decimalScale: 6
         }),
-        '12345678.123456'
+        '12,345,678.123456'
     );
 });
 
