@@ -128,13 +128,22 @@ function configureRowNavigation(mode, key, rows) {
         : key;
     const lastIndex = rows.transactions.length;
 
-    if (previousButton) {
-        previousButton.disabled = !Number.isInteger(currentIndex) || currentIndex <= 0;
-    }
+    setNavigationDisabled(
+        previousButton,
+        !Number.isInteger(currentIndex) || currentIndex <= 0
+    );
+    setNavigationDisabled(
+        nextButton,
+        !Number.isInteger(currentIndex) || currentIndex >= lastIndex
+    );
+}
 
-    if (nextButton) {
-        nextButton.disabled = !Number.isInteger(currentIndex) || currentIndex >= lastIndex;
-    }
+function setNavigationDisabled(link, disabled) {
+    if (!link) return;
+
+    link.classList.toggle('is-disabled', disabled);
+    link.setAttribute('aria-disabled', String(disabled));
+    link.tabIndex = disabled ? -1 : 0;
 }
 
 function bindRowNavigation(action, mode, key, rowsKey, rows, returnTo) {
@@ -147,13 +156,19 @@ function bindRowNavigation(action, mode, key, rowsKey, rows, returnTo) {
         : key;
 
     if (previousButton) {
-        previousButton.addEventListener('click', () => {
+        previousButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            if (previousButton.getAttribute('aria-disabled') === 'true') return;
+
             navigateToRow(action, currentIndex - 1, rows, rowsKey, returnTo);
         });
     }
 
     if (nextButton) {
-        nextButton.addEventListener('click', () => {
+        nextButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            if (nextButton.getAttribute('aria-disabled') === 'true') return;
+
             navigateToRow(action, currentIndex + 1, rows, rowsKey, returnTo);
         });
     }
