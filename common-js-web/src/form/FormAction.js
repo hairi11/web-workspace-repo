@@ -1,6 +1,6 @@
 const Ajax = require('../ajax/Ajax');
 const FormSerializer = require('./FormSerializer');
-const ConfirmDialog = require('./dialog/ConfirmDialog');
+const Dialog = require('./dialog/Dialog');
 const ConfigUtil = require('../util/ConfigUtil');
 const FieldErrorRenderer = require('./FieldErrorRenderer');
 const FormState = require('../state/FormState');
@@ -292,7 +292,7 @@ class FormAction {
     }
 
     getConfirmationHandler() {
-        return ConfirmDialog.show;
+        return Dialog.confirm;
     }
 
     buildRequestData(formValues) {
