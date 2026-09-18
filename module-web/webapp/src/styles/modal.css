@@ -93,3 +93,7 @@
     gap: 8px;
 }
 
+.common-dialog-actions .button {
+    min-width: 100px;
+}
+
