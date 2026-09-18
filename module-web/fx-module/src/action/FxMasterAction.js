@@ -44,24 +44,21 @@ class FxMasterAction {
                 target: '#submitButton',
                 hidden: !editing
             })
-            .secondary({
-                target: '#backButton',
-                hidden: editing
-            })
-            .secondaryDropdown({
-                trigger: '#masterSecondaryButton',
-                menu: '#masterSecondaryMenu',
-                hidden: !editing,
-                action: {
-                    target: '#saveButton'
+            .secondary([
+                {
+                    target: '#saveButton',
+                    hidden: !editing
                 },
-                items: [
-                    {
-                        target: '#cancelButton',
-                        onClick: () => this.cancel()
-                    }
-                ]
-            })
+                {
+                    target: '#cancelButton',
+                    hidden: !editing,
+                    onClick: () => this.cancel()
+                },
+                {
+                    target: '#backButton',
+                    hidden: editing
+                }
+            ])
             .build();
 
         return this;
