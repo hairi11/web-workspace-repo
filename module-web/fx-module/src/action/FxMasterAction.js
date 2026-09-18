@@ -1,6 +1,7 @@
 import Common from '@company/common-js-web';
 import { MasterMode, TransactionMode } from '../FxConstants.js';
 import FxRows from '../FxRows.js';
+import FxService from '../FxService.js';
 
 const {
     Button,
@@ -8,15 +9,19 @@ const {
     DataTableBuilder,
     DateUtil,
     Dialog,
+    Logger,
     NavigationState,
     Renderers,
     Toast
 } = Common;
 
+const logger = new Logger('FxMasterAction');
+
 class FxMasterAction {
     constructor(options) {
         this.form = options.form;
         this.mode = options.mode;
+        this.master = options.master || null;
         this.rowsKey = options.rowsKey;
         this.transactions = Array.isArray(options.transactions)
             ? options.transactions
@@ -53,6 +58,11 @@ class FxMasterAction {
                     target: '#cancelButton',
                     hidden: !editing,
                     onClick: () => this.cancel()
+                },
+                {
+                    target: '#deleteButton',
+                    hidden: !this.hasPersistedMaster(),
+                    onClick: () => this.deleteMaster()
                 },
                 {
                     target: '#backButton',
@@ -150,6 +160,32 @@ class FxMasterAction {
 
     cancel() {
         window.location.href = './enquiry.html';
+    }
+
+    hasPersistedMaster() {
+        return Boolean(this.master && this.master.id);
+    }
+
+    async deleteMaster() {
+        if (!this.hasPersistedMaster()) return;
+
+        const confirmed = await Dialog.confirm({
+            title: 'Delete FX Master',
+            message: 'Delete this FX master and all of its transactions?',
+            yesLabel: 'Delete',
+            noLabel: 'Cancel'
+        });
+        if (!confirmed) return;
+
+        try {
+            await FxService.deleteMaster(this.master.id);
+            FxRows.clear(this.rowsKey);
+            Toast.success('FX master deleted.');
+            window.location.href = './enquiry.html';
+        } catch (error) {
+            Toast.error('Failed to delete FX master.');
+            logger.error(error);
+        }
     }
 
     openTransaction(mode, index) {
