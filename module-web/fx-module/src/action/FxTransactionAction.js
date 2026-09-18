@@ -51,22 +51,15 @@ class FxTransactionAction {
 
         if (viewMode || !this.rows) return;
 
-        const currentIndex = TransactionMode.isCreate(this.mode)
-            ? this.rows.transactions.length
-            : this.key;
-        const lastIndex = this.rows.transactions.length - 1;
+        const currentIndex = this.getCurrentIndex();
 
         this.setNavigationDisabled(
             previousButton,
-            this.rows.transactions.length === 0
-                || !Number.isInteger(currentIndex)
-                || currentIndex <= 0
+            !this.hasPreviousRow(currentIndex)
         );
         this.setNavigationDisabled(
             nextButton,
-            TransactionMode.isCreate(this.mode)
-                || !Number.isInteger(currentIndex)
-                || currentIndex >= lastIndex
+            !this.hasNextRow(currentIndex)
         );
     }
 
@@ -83,9 +76,7 @@ class FxTransactionAction {
 
         const previousButton = document.querySelector('#previousButton');
         const nextButton = document.querySelector('#nextButton');
-        const currentIndex = TransactionMode.isCreate(this.mode)
-            ? this.rows.transactions.length
-            : this.key;
+        const currentIndex = this.getCurrentIndex();
 
         if (previousButton) {
             previousButton.addEventListener('click', (event) => {
@@ -104,6 +95,24 @@ class FxTransactionAction {
                 this.navigateToRow(currentIndex + 1);
             });
         }
+    }
+
+    getCurrentIndex() {
+        return TransactionMode.isCreate(this.mode)
+            ? this.rows.transactions.length
+            : this.key;
+    }
+
+    hasPreviousRow(currentIndex) {
+        return this.rows.transactions.length > 0
+            && Number.isInteger(currentIndex)
+            && currentIndex > 0;
+    }
+
+    hasNextRow(currentIndex) {
+        return !TransactionMode.isCreate(this.mode)
+            && Number.isInteger(currentIndex)
+            && currentIndex < this.rows.transactions.length - 1;
     }
 
     async navigateToRow(targetIndex) {
