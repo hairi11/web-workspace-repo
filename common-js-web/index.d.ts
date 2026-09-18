@@ -83,6 +83,7 @@ export interface ButtonBarButtonConfig extends ButtonOptions {
 }
 
 export class ButtonBar {
+    static DEFAULT_DROPDOWN_LABEL: 'More actions';
     static Placement: {
         readonly END: 'end';
     };
