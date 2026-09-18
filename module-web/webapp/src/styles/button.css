@@ -73,18 +73,24 @@ a.button.is-disabled {
     display: none;
 }
 
-.button-dropdown-menu .button {
-    display: block;
+.button-dropdown-menu .button-dropdown-item {
+    display: flex;
+    align-items: center;
     width: 100%;
+    min-height: 34px;
     padding: 8px 10px;
     border: 0;
+    border-radius: 4px;
     background: transparent;
+    color: #222;
+    font: inherit;
     text-align: left;
 }
 
-.button-dropdown-menu .button:hover,
-.button-dropdown-menu .button:focus {
+.button-dropdown-menu .button-dropdown-item:hover,
+.button-dropdown-menu .button-dropdown-item:focus {
     background: #f0f0f0;
+    color: #222;
 }
 
 
