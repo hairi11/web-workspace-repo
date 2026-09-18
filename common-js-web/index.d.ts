@@ -214,6 +214,25 @@ export const SafeDom: any;
 export const SecurityUtil: any;
 export const Repository: any;
 export const ConfirmDialog: any;
+export const OkDialog: {
+    Level: {
+        readonly INFO: 'info';
+        readonly SUCCESS: 'success';
+        readonly WARNING: 'warning';
+        readonly ERROR: 'error';
+    };
+    show(config: string | {
+        level?: 'info' | 'success' | 'warning' | 'error';
+        title?: string;
+        message?: string;
+        okLabel?: string;
+        size?: string;
+    }): Promise<boolean>;
+    info(message: string, config?: any): Promise<boolean>;
+    success(message: string, config?: any): Promise<boolean>;
+    warning(message: string, config?: any): Promise<boolean>;
+    error(message: string, config?: any): Promise<boolean>;
+};
 export const Modal: any;
 export const Toast: any;
 export const EventBus: any;
