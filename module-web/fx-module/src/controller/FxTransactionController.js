@@ -34,7 +34,7 @@ class FxTransactionController {
                 rows: data.rows,
                 returnTo: context.returnTo,
                 pageConfig: data.pageConfig
-            });
+            }).build();
 
             // POPULATE
             if (data.transaction) {
@@ -47,9 +47,6 @@ class FxTransactionController {
 
             // CONFIGURE
             action.configure();
-
-            // BIND
-            action.bind();
         } catch (error) {
             Toast.error('Failed to load FX transaction data.');
             console.error(error);
