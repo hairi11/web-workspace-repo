@@ -57,7 +57,6 @@ function buildTable() {
         .addAction({
             text: 'Delete Transaction',
             icon: 'fa fa-trash',
-            className: 'text-danger',
             onClick: async (row) => {
                 if (!window.confirm('Delete this FX transaction?')) return;
 
