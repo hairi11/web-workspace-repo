@@ -87,30 +87,6 @@ a.button.is-disabled {
     background: #f0f0f0;
 }
 
-.button-dropdown-split {
-    display: inline-flex;
-    align-items: stretch;
-}
-
-.button-dropdown-split > .button {
-    box-sizing: border-box;
-    justify-content: center;
-}
-
-.button-dropdown-split > .button:first-child {
-    flex: 1 1 auto;
-    min-width: 0;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
-.button-dropdown-split > .button:nth-child(2) {
-    flex: 0 0 34px;
-    margin-left: -1px;
-    padding-inline: 8px;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-}
 
 .button-bar {
     --button-bar-action-width: 140px;
