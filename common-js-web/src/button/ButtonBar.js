@@ -1,4 +1,5 @@
 const Button = require('./Button');
+const ButtonDropdown = require('./ButtonDropdown');
 const Navigator = require('./Navigator');
 
 class ButtonBar {
@@ -8,8 +9,10 @@ class ButtonBar {
         this.primaryConfigs = [];
         this.secondaryConfigs = [];
         this.navigatorConfig = null;
+        this.secondaryDropdownConfig = null;
         this.buttons = [];
         this.navigatorComponent = null;
+        this.secondaryDropdownComponent = null;
     }
 
     primary(config) {
@@ -24,6 +27,11 @@ class ButtonBar {
 
     navigator(config) {
         this.navigatorConfig = config || null;
+        return this;
+    }
+
+    secondaryDropdown(config) {
+        this.secondaryDropdownConfig = config || null;
         return this;
     }
 
@@ -44,6 +52,12 @@ class ButtonBar {
             this.navigatorComponent = new Navigator(this.navigatorConfig).build();
         }
 
+        if (this.secondaryDropdownConfig) {
+            this.secondaryDropdownComponent = new ButtonDropdown(
+                this.secondaryDropdownConfig
+            ).build();
+        }
+
         return this;
     }
 
@@ -54,6 +68,11 @@ class ButtonBar {
         if (this.navigatorComponent) {
             this.navigatorComponent.destroy();
             this.navigatorComponent = null;
+        }
+
+        if (this.secondaryDropdownComponent) {
+            this.secondaryDropdownComponent.destroy();
+            this.secondaryDropdownComponent = null;
         }
 
         this.element = null;
