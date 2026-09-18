@@ -66,7 +66,9 @@ class Modal {
                 if (closed) return;
                 closed = true;
 
-                document.removeEventListener('keydown', keydownHandler);
+                if (config.escapeClose !== false) {
+                    document.removeEventListener('keydown', keydownHandler);
+                }
 
                 if (overlay.parentNode) {
                     overlay.parentNode.removeChild(overlay);
@@ -78,10 +80,17 @@ class Modal {
             }
         };
 
-        closeButton.addEventListener('click', function () {
-            api.close('close');
-        });
-        document.addEventListener('keydown', keydownHandler);
+        if (config.closable === false) {
+            closeButton.hidden = true;
+        } else {
+            closeButton.addEventListener('click', function () {
+                api.close('close');
+            });
+        }
+
+        if (config.escapeClose !== false) {
+            document.addEventListener('keydown', keydownHandler);
+        }
 
         return api;
     }
