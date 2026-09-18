@@ -190,7 +190,9 @@ async function navigateToRow(action, targetIndex, rows, rowsKey, returnTo) {
             title: 'Unsaved Changes',
             message: 'Update the current transaction before moving?',
             yesLabel: 'OK',
-            noLabel: 'No'
+            noLabel: 'No',
+            closable: false,
+            escapeClose: false
         });
 
         if (shouldUpdate) {
