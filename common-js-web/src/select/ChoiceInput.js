@@ -267,7 +267,7 @@ ChoiceInput.resolveMode = function (optionCount, threshold) {
         ? numericThreshold
         : DEFAULT_THRESHOLD;
 
-    return count < limit
+    return count <= limit
         ? ChoiceInput.Mode.RADIO
         : ChoiceInput.Mode.SELECT;
 };
