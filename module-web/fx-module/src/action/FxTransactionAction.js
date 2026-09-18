@@ -23,7 +23,7 @@ class FxTransactionAction {
             : 0;
 
         this.buttonBar = new ButtonBar('#transactionButtonBar')
-            .navigation({
+            .navigator({
                 previous: '#previousButton',
                 next: '#nextButton',
                 index: index,
