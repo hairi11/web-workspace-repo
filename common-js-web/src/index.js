@@ -7,6 +7,7 @@ module.exports = {
     CaseInterceptor: require('./ajax/CaseInterceptor'),
     CaseUtil: require('./util/CaseUtil'),
     Button: require('./button/Button'),
+    ButtonDropdown: require('./button/ButtonDropdown'),
     ButtonBar: require('./button/ButtonBar'),
     DatePicker: require('./datepicker/DatePicker'),
     DateUtil: require('./date/DateUtil'),
