@@ -4,7 +4,7 @@ import FxRows from '../FxRows.js';
 import FxService from '../FxService.js';
 import FxTransactionFormAction from './FxTransactionFormAction.js';
 
-const { FormRenderers, NavigationState, Router, Toast } = Common;
+const { ConfirmDialog, FormRenderers, NavigationState, Router, Toast } = Common;
 
 export async function initTransaction() {
     const navigation = NavigationState.consume();
@@ -178,15 +178,22 @@ function bindRowNavigation(action, mode, key, rowsKey, rows, returnTo) {
     }
 }
 
-function navigateToRow(action, targetIndex, rows, rowsKey, returnTo) {
+async function navigateToRow(action, targetIndex, rows, rowsKey, returnTo) {
     if (!Number.isInteger(targetIndex)
         || targetIndex < 0
         || targetIndex >= rows.transactions.length) {
         return;
     }
 
-    if (action.isDirty() && !window.confirm('Discard unsaved changes and move to another transaction?')) {
-        return;
+    if (action.isDirty()) {
+        const confirmed = await ConfirmDialog.show({
+            title: 'Discard Changes',
+            message: 'Discard unsaved changes and move to another transaction?',
+            yesLabel: 'Yes',
+            noLabel: 'No'
+        });
+
+        if (!confirmed) return;
     }
 
     NavigationState.set({
