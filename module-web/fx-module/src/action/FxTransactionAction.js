@@ -38,6 +38,7 @@ class FxTransactionAction {
             .secondary({
                 target: '#cancelButton',
                 text: viewMode ? 'Back' : 'Cancel',
+                placement: ButtonBar.Placement.END,
                 onClick: (event) => {
                     event.preventDefault();
                     this.navigateTo(this.returnTo);
