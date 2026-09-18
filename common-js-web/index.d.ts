@@ -52,6 +52,7 @@ export class CurrencyInput {
     static format(value: any, options?: CurrencyInputOptions): string;
     static countSignificant(value: any): number;
     static findCaret(formatted: string, significantCount: number): number;
+    static isWithinLimit(value: any, options?: CurrencyInputOptions): boolean;
     constructor(target: string | HTMLInputElement, options?: CurrencyInputOptions);
     build(): this;
     destroy(): this;
@@ -335,6 +336,13 @@ export const CaseUtil: {
 export const NumberUtil: {
     normalizeFormatted(value: any): string;
     parseFormatted(value: any): number | null;
+    formatDecimal(value: any, options?: {
+        minimumFractionDigits?: number;
+        maximumFractionDigits?: number;
+        useGrouping?: boolean;
+        groupSeparator?: string;
+        decimalSeparator?: string;
+    }): string;
 };
 export const DateUtil: {
     formatDate(value: any, pattern?: string): string;
