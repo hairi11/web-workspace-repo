@@ -4,7 +4,7 @@ import FxRows from '../FxRows.js';
 import FxService from '../FxService.js';
 import FxMasterFormAction from './FxMasterFormAction.js';
 
-const { DataTableBuilder, DateUtil, NavigationState, Renderers, Toast } = Common;
+const { ConfirmDialog, DataTableBuilder, DateUtil, NavigationState, Renderers, Toast } = Common;
 
 let table = null;
 let formAction = null;
@@ -154,8 +154,14 @@ function openTransaction(mode, index, rowsKey) {
     window.location.href = './transaction.html';
 }
 
-function removeTransaction(row, rowsKey) {
-    if (!window.confirm('Remove this FX transaction?')) return;
+async function removeTransaction(row, rowsKey) {
+    const confirmed = await ConfirmDialog.show({
+        title: 'Remove Transaction',
+        message: 'Remove this FX transaction?',
+        yesLabel: 'Yes',
+        noLabel: 'No'
+    });
+    if (!confirmed) return;
 
     const rows = FxRows.removeTransaction(rowsKey, row.rowIndex);
     if (!rows) return;
