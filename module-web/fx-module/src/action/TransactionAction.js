@@ -186,14 +186,17 @@ async function navigateToRow(action, targetIndex, rows, rowsKey, returnTo) {
     }
 
     if (action.isDirty()) {
-        const confirmed = await Dialog.confirm({
-            title: 'Discard Changes',
-            message: 'Discard unsaved changes and move to another transaction?',
-            yesLabel: 'Yes',
+        const shouldUpdate = await Dialog.confirm({
+            title: 'Unsaved Changes',
+            message: 'Update the current transaction before moving?',
+            yesLabel: 'OK',
             noLabel: 'No'
         });
 
-        if (!confirmed) return;
+        if (shouldUpdate) {
+            const saved = await action.saveDirtyRow();
+            if (!saved) return;
+        }
     }
 
     NavigationState.set({
