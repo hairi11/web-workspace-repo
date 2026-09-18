@@ -24,12 +24,12 @@ class ChoiceInput {
         var items = this.getItems();
         var threshold = this.getThreshold();
 
-        if (items.length < threshold) {
+        this.mode = ChoiceInput.resolveMode(items.length, threshold);
+
+        if (this.mode === ChoiceInput.Mode.RADIO) {
             this.buildRadios(items);
-            this.mode = ChoiceInput.Mode.RADIO;
         } else {
             this.select = new Select2(this.element, this.getSelectOptions(items)).build();
-            this.mode = ChoiceInput.Mode.SELECT;
         }
 
         return this;
@@ -255,6 +255,17 @@ class ChoiceInput {
 }
 
 ChoiceInput.DEFAULT_THRESHOLD = DEFAULT_THRESHOLD;
+
+ChoiceInput.resolveMode = function (optionCount, threshold) {
+    var count = Math.max(0, Number(optionCount) || 0);
+    var limit = Number.isInteger(Number(threshold)) && Number(threshold) > 0
+        ? Number(threshold)
+        : DEFAULT_THRESHOLD;
+
+    return count < limit
+        ? ChoiceInput.Mode.RADIO
+        : ChoiceInput.Mode.SELECT;
+};
 
 ChoiceInput.Mode = Object.freeze({
     RADIO: 'radio',
