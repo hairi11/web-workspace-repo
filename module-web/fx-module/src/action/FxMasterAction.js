@@ -143,7 +143,6 @@ class FxMasterAction {
                 .addAction({
                     text: 'Remove',
                     icon: 'fa fa-trash',
-                    className: 'text-danger',
                     onClick: (row) => {
                         this.removeTransaction(row);
                     }
