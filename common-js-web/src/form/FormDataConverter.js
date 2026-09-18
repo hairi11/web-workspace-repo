@@ -19,7 +19,8 @@ const converters = {
     },
     decimal: {
         fromForm: function (value) {
-            return NumberUtil.parseFormatted(value);
+            var normalized = NumberUtil.normalizeFormatted(value);
+            return normalized === '' ? null : normalized;
         },
         toForm: function (value) {
             return value === null || value === undefined ? '' : String(value);
