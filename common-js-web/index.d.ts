@@ -233,6 +233,8 @@ export const Dialog: {
         yesLabel?: string;
         noLabel?: string;
         size?: string;
+        closable?: boolean;
+        escapeClose?: boolean;
     }): Promise<boolean>;
     confirm(config: string | {
         level?: 'info' | 'success' | 'warning' | 'error';
@@ -241,6 +243,8 @@ export const Dialog: {
         yesLabel?: string;
         noLabel?: string;
         size?: string;
+        closable?: boolean;
+        escapeClose?: boolean;
     }): Promise<boolean>;
     info(message: string, config?: any): Promise<boolean>;
     success(message: string, config?: any): Promise<boolean>;
