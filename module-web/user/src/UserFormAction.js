@@ -1,7 +1,9 @@
 import Common from '@company/common-js-web';
 import { traceObject } from './Trace.js';
 
-const { ButtonBar, FormAction, Toast } = Common;
+const { ButtonBar, FormAction, Logger, Toast } = Common;
+
+const logger = new Logger('UserFormAction');
 
 class UserFormAction extends FormAction {
     constructor(selector, options) {
@@ -82,7 +84,7 @@ class UserFormAction extends FormAction {
 
     onError(error) {
         Toast.error(error && error.message ? error.message : 'Request failed.');
-        console.error(error);
+        logger.error(error);
     }
 }
 
