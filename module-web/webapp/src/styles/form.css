@@ -159,6 +159,10 @@ textarea:disabled {
 }
 
 
+.choice-input-radio-group .form-check-label {
+    font-weight: 400;
+}
+
 .choice-input-radio-group {
     display: flex;
     align-items: center;
