@@ -5,7 +5,9 @@ import FxService from '../FxService.js';
 import FxTransactionAction from '../action/FxTransactionAction.js';
 import FxTransactionForm from '../form/FxTransactionForm.js';
 
-const { FormRenderers, NavigationState, Router, Toast } = Common;
+const { FormRenderers, Logger, NavigationState, Router, Toast } = Common;
+
+const logger = new Logger('FxTransactionController');
 
 class FxTransactionController {
     async init() {
@@ -49,7 +51,7 @@ class FxTransactionController {
             action.configure();
         } catch (error) {
             Toast.error('Failed to load FX transaction data.');
-            console.error(error);
+            logger.error(error);
         }
     }
 
