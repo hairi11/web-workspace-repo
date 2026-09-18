@@ -54,6 +54,28 @@ export class Navigator {
     navigate(targetIndex: number): Promise<boolean>;
 }
 
+export interface ButtonDropdownItemConfig extends ButtonOptions {
+    target: string | HTMLElement;
+}
+
+export interface ButtonDropdownOptions {
+    trigger: string | HTMLElement;
+    menu: string | HTMLElement;
+    variant?: 'primary' | 'secondary';
+    hidden?: boolean;
+    items: ButtonDropdownItemConfig[];
+}
+
+export class ButtonDropdown {
+    constructor(options: ButtonDropdownOptions);
+    build(): this;
+    destroy(): this;
+    open(): this;
+    close(): this;
+    toggle(): this;
+    setHidden(hidden: boolean): this;
+}
+
 export interface ButtonBarButtonConfig extends ButtonOptions {
     target: string | HTMLElement;
 }
@@ -62,6 +84,7 @@ export class ButtonBar {
     constructor(target: string | HTMLElement);
     primary(config: ButtonBarButtonConfig | ButtonBarButtonConfig[]): this;
     secondary(config: ButtonBarButtonConfig | ButtonBarButtonConfig[]): this;
+    secondaryDropdown(config: ButtonDropdownOptions): this;
     navigator(config: NavigatorOptions): this;
     build(): this;
     destroy(): this;
