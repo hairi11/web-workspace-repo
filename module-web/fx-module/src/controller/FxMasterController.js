@@ -38,9 +38,6 @@ class FxMasterController {
 
             // CONFIGURE
             action.configure();
-
-            // BIND
-            action.bind();
         } catch (error) {
             Toast.error('Failed to load FX master.');
             console.error(error);
