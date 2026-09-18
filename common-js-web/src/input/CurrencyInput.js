@@ -1,8 +1,10 @@
 const NumberUtil = require('../util/NumberUtil');
 
 const DEFAULT_OPTIONS = {
+    precision: null,
     decimalScale: 2,
-    allowNegative: true
+    allowNegative: true,
+    useGrouping: true
 };
 
 class CurrencyInput {
@@ -21,8 +23,10 @@ class CurrencyInput {
             throw new Error('CurrencyInput element not found.');
         }
 
+        this.validateOptions();
         this.element.inputMode = 'decimal';
         this.element.autocomplete = 'off';
+        this.applyMaxLength();
 
         this.inputHandler = () => {
             this.formatCurrentValue();
@@ -79,6 +83,47 @@ class CurrencyInput {
         return this.setValue('', triggerChange);
     }
 
+    validateOptions() {
+        var precision = this.options.precision;
+        var scale = Number(this.options.decimalScale);
+
+        if (precision !== null && precision !== undefined) {
+            precision = Number(precision);
+
+            if (!Number.isInteger(precision) || precision <= 0) {
+                throw new Error('CurrencyInput precision must be a positive integer.');
+            }
+
+            if (!Number.isInteger(scale) || scale < 0 || scale > precision) {
+                throw new Error('CurrencyInput decimalScale must be between 0 and precision.');
+            }
+
+            this.options.precision = precision;
+        }
+
+        this.options.decimalScale = Number.isInteger(scale) && scale >= 0
+            ? scale
+            : DEFAULT_OPTIONS.decimalScale;
+    }
+
+    applyMaxLength() {
+        if (!this.element || this.options.precision === null) return;
+
+        var integerDigits = this.options.precision - this.options.decimalScale;
+        var separators = this.options.useGrouping
+            ? Math.max(0, Math.ceil(integerDigits / 3) - 1)
+            : 0;
+        var decimalCharacters = this.options.decimalScale > 0
+            ? this.options.decimalScale + 1
+            : 0;
+        var signCharacters = this.options.allowNegative ? 1 : 0;
+
+        this.element.maxLength = integerDigits
+            + separators
+            + decimalCharacters
+            + signCharacters;
+    }
+
     formatCurrentValue() {
         if (!this.element) return this;
 
@@ -127,10 +172,24 @@ CurrencyInput.format = function (value, options) {
     integerPart = integerPart.replace(/^0+(?=\d)/, '') || '0';
 
     var scale = Math.max(0, Number(options.decimalScale) || 0);
+    var precision = options.precision === null || options.precision === undefined
+        ? null
+        : Number(options.precision);
+    var maxIntegerDigits = precision === null
+        ? null
+        : Math.max(0, precision - scale);
+
+    if (maxIntegerDigits !== null) {
+        integerPart = integerPart.slice(0, maxIntegerDigits);
+        if (integerPart === '') integerPart = '0';
+    }
+
     decimalPart = decimalPart.slice(0, scale);
 
-    var grouped = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    var result = (negative ? '-' : '') + grouped;
+    var formattedInteger = options.useGrouping === false
+        ? integerPart
+        : integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    var result = (negative ? '-' : '') + formattedInteger;
 
     if (firstDot >= 0 && scale > 0) {
         result += '.' + decimalPart;
