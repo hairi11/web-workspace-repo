@@ -52,10 +52,10 @@ class FxMasterAction {
                 trigger: '#masterSecondaryButton',
                 menu: '#masterSecondaryMenu',
                 hidden: !editing,
+                action: {
+                    target: '#saveButton'
+                },
                 items: [
-                    {
-                        target: '#saveButton'
-                    },
                     {
                         target: '#cancelButton',
                         onClick: () => this.cancel()
