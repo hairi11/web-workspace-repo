@@ -55,8 +55,8 @@ class FxTransactionForm extends FormAction {
             decimalScale: 4
         }).build();
         this.rateInput = new CurrencyInput('#fxRate', {
-            precision: 19,
-            decimalScale: 8,
+            precision: 14,
+            decimalScale: 6,
             useGrouping: false
         }).build();
 
@@ -97,7 +97,7 @@ class FxTransactionForm extends FormAction {
             ],
             fxRate: [
                 Validator.required('FX Rate is required.'),
-                Validator.decimal(19, 8, 'FX Rate supports up to 11 integer digits and 8 decimal places.')
+                Validator.decimal(14, 6, 'FX Rate supports up to 8 integer digits and 6 decimal places.')
             ]
         };
     }
