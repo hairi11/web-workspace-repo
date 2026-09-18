@@ -6,6 +6,7 @@ class ButtonDropdown {
         this.trigger = null;
         this.menu = null;
         this.triggerButton = null;
+        this.actionButton = null;
         this.itemButtons = [];
         this.triggerHandler = null;
         this.documentHandler = null;
@@ -29,6 +30,7 @@ class ButtonDropdown {
             variant: this.options.variant || Button.Variant.SECONDARY
         }).build();
 
+        this.actionButton = this.buildAction(this.options.action);
         this.itemButtons = this.buildItems(this.options.items);
 
         this.triggerHandler = (event) => {
@@ -70,6 +72,11 @@ class ButtonDropdown {
         if (this.triggerButton) {
             this.triggerButton.destroy();
             this.triggerButton = null;
+        }
+
+        if (this.actionButton) {
+            this.actionButton.destroy();
+            this.actionButton = null;
         }
 
         this.itemButtons.forEach((button) => button.destroy());
@@ -116,6 +123,7 @@ class ButtonDropdown {
         var value = Boolean(hidden);
 
         if (this.trigger) this.trigger.hidden = value;
+        if (this.actionButton) this.actionButton.setHidden(value);
         if (this.menu) this.menu.hidden = true;
 
         if (value && this.trigger) {
@@ -123,6 +131,21 @@ class ButtonDropdown {
         }
 
         return this;
+    }
+
+    buildAction(config) {
+        if (!config) return null;
+
+        var target = config.target || config;
+        var element = this.resolveElement(target);
+
+        if (!element) {
+            throw new Error('ButtonDropdown action element not found.');
+        }
+
+        return new Button(element, Object.assign({}, config, {
+            variant: Button.Variant.SECONDARY
+        })).build();
     }
 
     buildItems(config) {
