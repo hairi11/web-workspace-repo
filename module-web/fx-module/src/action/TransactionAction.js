@@ -4,7 +4,7 @@ import FxRows from '../FxRows.js';
 import FxService from '../FxService.js';
 import FxTransactionFormAction from './FxTransactionFormAction.js';
 
-const { ConfirmDialog, FormRenderers, NavigationState, Router, Toast } = Common;
+const { Dialog, FormRenderers, NavigationState, Router, Toast } = Common;
 
 export async function initTransaction() {
     const navigation = NavigationState.consume();
@@ -186,7 +186,7 @@ async function navigateToRow(action, targetIndex, rows, rowsKey, returnTo) {
     }
 
     if (action.isDirty()) {
-        const confirmed = await ConfirmDialog.show({
+        const confirmed = await Dialog.confirm({
             title: 'Discard Changes',
             message: 'Discard unsaved changes and move to another transaction?',
             yesLabel: 'Yes',
