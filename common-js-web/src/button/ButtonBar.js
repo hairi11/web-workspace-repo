@@ -9,7 +9,7 @@ class ButtonBar {
         this.secondaryConfigs = [];
         this.navigatorConfig = null;
         this.buttons = [];
-        this.navigator = null;
+        this.navigatorComponent = null;
     }
 
     primary(config) {
@@ -22,7 +22,7 @@ class ButtonBar {
         return this;
     }
 
-    navigation(config) {
+    navigator(config) {
         this.navigatorConfig = config || null;
         return this;
     }
@@ -41,7 +41,7 @@ class ButtonBar {
             .map((config) => new Button(config.target, config.options).build());
 
         if (this.navigatorConfig) {
-            this.navigator = new Navigator(this.navigatorConfig).build();
+            this.navigatorComponent = new Navigator(this.navigatorConfig).build();
         }
 
         return this;
@@ -51,9 +51,9 @@ class ButtonBar {
         this.buttons.forEach((button) => button.destroy());
         this.buttons = [];
 
-        if (this.navigator) {
-            this.navigator.destroy();
-            this.navigator = null;
+        if (this.navigatorComponent) {
+            this.navigatorComponent.destroy();
+            this.navigatorComponent = null;
         }
 
         this.element = null;
