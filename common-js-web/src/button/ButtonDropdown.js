@@ -143,9 +143,10 @@ class ButtonDropdown {
             throw new Error('ButtonDropdown action element not found.');
         }
 
-        return new Button(element, Object.assign({}, config, {
-            variant: Button.Variant.SECONDARY
-        })).build();
+        return new Button(
+            element,
+            this.createButtonOptions(config)
+        ).build();
     }
 
     buildItems(config) {
@@ -160,16 +161,23 @@ class ButtonDropdown {
 
             element.setAttribute('role', 'menuitem');
 
-            return new Button(element, Object.assign({}, item, {
-                variant: Button.Variant.SECONDARY,
-                onClick: (event) => {
-                    this.close();
+            return new Button(
+                element,
+                this.createButtonOptions(item)
+            ).build();
+        });
+    }
 
-                    if (typeof item.onClick === 'function') {
-                        item.onClick(event);
-                    }
+    createButtonOptions(config) {
+        return Object.assign({}, config, {
+            variant: Button.Variant.SECONDARY,
+            onClick: (event) => {
+                this.close();
+
+                if (typeof config.onClick === 'function') {
+                    config.onClick(event);
                 }
-            })).build();
+            }
         });
     }
 
