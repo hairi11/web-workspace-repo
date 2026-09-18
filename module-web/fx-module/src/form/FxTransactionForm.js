@@ -4,13 +4,13 @@ import FxRows from '../FxRows.js';
 import FxService from '../FxService.js';
 
 const {
+    ChoiceInput,
     DatePicker,
     DateUtil,
     FormAction,
     FormDataConverter,
     Logger,
     NavigationState,
-    Select2,
     Toast,
     Validator
 } = Common;
@@ -24,7 +24,7 @@ class FxTransactionForm extends FormAction {
         this.options = options || {};
         this.references = null;
         this.datePicker = null;
-        this.selects = {};
+        this.choices = {};
     }
 
     async loadReferences() {
@@ -48,10 +48,14 @@ class FxTransactionForm extends FormAction {
     onBuild() {
         this.datePicker = new DatePicker('#fxDate').build();
 
-        this.selects.fxCategory = this.buildSelect('#fxCategory', this.references.category);
-        this.selects.fxCode = this.buildSelect('#fxCode', this.references.code);
-        this.selects.fxCurrency = this.buildSelect('#fxCurrency', this.references.currency);
-        this.selects.fxType = this.buildSelect('#fxType', this.references.type);
+        this.choices.fxCategory = this.buildChoice('#fxCategory', this.references.category);
+        this.choices.fxCode = this.buildChoice('#fxCode', this.references.code);
+        this.choices.fxCurrency = this.buildChoice('#fxCurrency', this.references.currency);
+        this.choices.fxType = this.buildChoice('#fxType', this.references.type);
+
+        if (this.formState) {
+            this.formState.resetBaseline();
+        }
     }
 
     onDestroy() {
@@ -202,8 +206,8 @@ class FxTransactionForm extends FormAction {
                 return;
             }
 
-            if (this.selects[name]) {
-                this.selects[name].setValue(value, false);
+            if (this.choices[name]) {
+                this.choices[name].setValue(value, false);
                 return;
             }
 
@@ -248,8 +252,8 @@ class FxTransactionForm extends FormAction {
         logger.error(error);
     }
 
-    buildSelect(selector, items) {
-        return new Select2(selector, {
+    buildChoice(selector, items) {
+        return new ChoiceInput(selector, {
             width: '100%',
             placeholder: 'Select...',
             data: items.map((item) => ({
@@ -261,9 +265,9 @@ class FxTransactionForm extends FormAction {
 
     destroyControls() {
         if (this.datePicker) this.datePicker.destroy();
-        Object.values(this.selects).forEach((select) => select.destroy());
+        Object.values(this.choices).forEach((choice) => choice.destroy());
         this.datePicker = null;
-        this.selects = {};
+        this.choices = {};
     }
 
     referenceDescription(type, code) {
