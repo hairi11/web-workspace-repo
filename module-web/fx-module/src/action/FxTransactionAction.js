@@ -1,7 +1,7 @@
 import Common from '@company/common-js-web';
 import { TransactionMode } from '../FxConstants.js';
 
-const { Dialog, NavigationState } = Common;
+const { ButtonBar, Dialog, NavigationState } = Common;
 
 class FxTransactionAction {
     constructor(options) {
@@ -12,132 +12,80 @@ class FxTransactionAction {
         this.rows = options.rows;
         this.returnTo = options.returnTo;
         this.pageConfig = options.pageConfig;
+        this.buttonBar = null;
+    }
+
+    build() {
+        const viewMode = TransactionMode.isView(this.mode);
+        const count = this.rows ? this.rows.transactions.length : 0;
+        const index = this.rows
+            ? (TransactionMode.isCreate(this.mode) ? count : this.key)
+            : 0;
+
+        this.buttonBar = new ButtonBar('#transactionButtonBar')
+            .navigation({
+                previous: '#previousButton',
+                next: '#nextButton',
+                index: index,
+                count: count,
+                hidden: viewMode,
+                beforeNavigate: () => this.beforeNavigate(),
+                onNavigate: (targetIndex) => this.openRow(targetIndex)
+            })
+            .primary({
+                target: '#transactionSubmitButton',
+                text: this.pageConfig.submitLabel,
+                hidden: viewMode
+            })
+            .secondary({
+                target: '#cancelButton',
+                text: viewMode ? 'Back' : 'Cancel',
+                onClick: (event) => {
+                    event.preventDefault();
+                    this.navigateTo(this.returnTo);
+                }
+            })
+            .build();
+
+        return this;
     }
 
     configure() {
-        this.configurePage();
-        this.configureRowNavigation();
-        return this;
-    }
-
-    bind() {
-        this.bindReturnButton();
-        this.bindRowNavigation();
-        return this;
-    }
-
-    configurePage() {
         const heading = document.querySelector('h1');
-        const submitButton = document.querySelector('#transactionForm button[type="submit"]');
-        const cancelButton = document.querySelector('#cancelButton');
 
-        if (heading) heading.textContent = this.pageConfig.title;
-        if (submitButton && this.pageConfig.submitLabel) {
-            submitButton.textContent = this.pageConfig.submitLabel;
-        }
-        if (submitButton) submitButton.hidden = Boolean(this.pageConfig.viewMode);
-        if (cancelButton) {
-            cancelButton.textContent = this.pageConfig.viewMode ? 'Back' : 'Cancel';
-        }
-    }
-
-    configureRowNavigation() {
-        const previousButton = document.querySelector('#previousButton');
-        const nextButton = document.querySelector('#nextButton');
-        const viewMode = TransactionMode.isView(this.mode);
-
-        if (previousButton) previousButton.hidden = viewMode;
-        if (nextButton) nextButton.hidden = viewMode;
-
-        if (viewMode || !this.rows) return;
-
-        const currentIndex = this.getCurrentIndex();
-
-        this.setNavigationDisabled(
-            previousButton,
-            !this.hasPreviousRow(currentIndex)
-        );
-        this.setNavigationDisabled(
-            nextButton,
-            !this.hasNextRow(currentIndex)
-        );
-    }
-
-    setNavigationDisabled(link, disabled) {
-        if (!link) return;
-
-        link.classList.toggle('is-disabled', disabled);
-        link.setAttribute('aria-disabled', String(disabled));
-        link.tabIndex = disabled ? -1 : 0;
-    }
-
-    bindRowNavigation() {
-        if (TransactionMode.isView(this.mode) || !this.rows) return;
-
-        const previousButton = document.querySelector('#previousButton');
-        const nextButton = document.querySelector('#nextButton');
-        const currentIndex = this.getCurrentIndex();
-
-        if (previousButton) {
-            previousButton.addEventListener('click', (event) => {
-                event.preventDefault();
-                if (previousButton.getAttribute('aria-disabled') === 'true') return;
-
-                this.navigateToRow(currentIndex - 1);
-            });
+        if (heading) {
+            heading.textContent = this.pageConfig.title;
         }
 
-        if (nextButton) {
-            nextButton.addEventListener('click', (event) => {
-                event.preventDefault();
-                if (nextButton.getAttribute('aria-disabled') === 'true') return;
-
-                this.navigateToRow(currentIndex + 1);
-            });
-        }
+        return this;
     }
 
-    getCurrentIndex() {
-        return TransactionMode.isCreate(this.mode)
-            ? this.rows.transactions.length
-            : this.key;
-    }
-
-    hasPreviousRow(currentIndex) {
-        return this.rows.transactions.length > 0
-            && Number.isInteger(currentIndex)
-            && currentIndex > 0;
-    }
-
-    hasNextRow(currentIndex) {
-        return !TransactionMode.isCreate(this.mode)
-            && Number.isInteger(currentIndex)
-            && currentIndex < this.rows.transactions.length - 1;
-    }
-
-    async navigateToRow(targetIndex) {
-        if (!Number.isInteger(targetIndex)
-            || targetIndex < 0
-            || targetIndex >= this.rows.transactions.length) {
-            return;
+    destroy() {
+        if (this.buttonBar) {
+            this.buttonBar.destroy();
+            this.buttonBar = null;
         }
 
-        if (this.form.isDirty()) {
-            const shouldUpdate = await Dialog.confirm({
-                title: 'Unsaved Changes',
-                message: 'Update the current transaction before moving?',
-                yesLabel: 'OK',
-                noLabel: 'No',
-                closable: false,
-                escapeClose: false
-            });
+        return this;
+    }
 
-            if (shouldUpdate) {
-                const saved = await this.form.saveDirtyRow();
-                if (!saved) return;
-            }
-        }
+    async beforeNavigate() {
+        if (!this.form.isDirty()) return true;
 
+        const shouldUpdate = await Dialog.confirm({
+            title: 'Unsaved Changes',
+            message: 'Update the current transaction before moving?',
+            yesLabel: 'OK',
+            noLabel: 'No',
+            closable: false,
+            escapeClose: false
+        });
+
+        if (!shouldUpdate) return true;
+        return this.form.saveDirtyRow();
+    }
+
+    openRow(targetIndex) {
         NavigationState.set({
             page: 'transaction',
             action: TransactionMode.EDIT,
@@ -146,16 +94,6 @@ class FxTransactionAction {
             returnTo: this.returnTo
         });
         window.location.href = './transaction.html';
-    }
-
-    bindReturnButton() {
-        const button = document.querySelector('#cancelButton');
-        if (!button) return;
-
-        button.addEventListener('click', (event) => {
-            event.preventDefault();
-            this.navigateTo(this.returnTo);
-        });
     }
 
     navigateTo(target) {
