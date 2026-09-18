@@ -78,12 +78,22 @@ class ButtonBar {
 
         this.buttons = this.buttons.concat(this.buildButtons(hiddenConfigs));
 
-        if (visibleConfigs.length <= 1) {
+        if (!this.shouldGroupSecondaries(visibleConfigs)) {
             this.buttons = this.buttons.concat(this.buildButtons(visibleConfigs));
             return;
         }
 
         this.buildSecondaryDropdown(visibleConfigs);
+    }
+
+    shouldGroupSecondaries(visibleSecondaryConfigs) {
+        var visiblePrimaryCount = this.primaryConfigs.filter(
+            (config) => config.options.hidden !== true
+        ).length;
+        var totalVisibleButtons = visiblePrimaryCount + visibleSecondaryConfigs.length;
+
+        return totalVisibleButtons > 2
+            && visibleSecondaryConfigs.length > 1;
     }
 
     buildSecondaryDropdown(configs) {
