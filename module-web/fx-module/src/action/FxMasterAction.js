@@ -40,20 +40,20 @@ class FxMasterAction {
         }).build();
 
         this.buttonBar = new ButtonBar('#masterButtonBar')
-            .primary([
+            .primary({
+                target: '#submitButton',
+                hidden: !editing
+            })
+            .secondary([
                 {
                     target: '#saveButton',
                     hidden: !editing
                 },
                 {
-                    target: '#submitButton',
-                    hidden: !editing
+                    target: '#backButton',
+                    hidden: editing
                 }
             ])
-            .secondary({
-                target: '#backButton',
-                hidden: editing
-            })
             .build();
 
         return this;
