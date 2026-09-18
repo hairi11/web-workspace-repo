@@ -1,7 +1,9 @@
 import Common from '@company/common-js-web';
 import TodoService from '../TodoService.js';
 
-const { Actions, DataTableBuilder, NavigationState, Toast } = Common;
+const { Actions, DataTableBuilder, Dialog, Logger, NavigationState, Toast } = Common;
+
+const logger = new Logger('TodoEnquiryAction');
 
 let table = null;
 
@@ -12,7 +14,7 @@ export async function initEnquiry() {
         records = await loadTodos();
     } catch (error) {
         Toast.error('Failed to load todos.');
-        console.error(error);
+        logger.error(error);
     }
 
     table = buildTable(records);
@@ -42,7 +44,13 @@ function buildTable(records) {
             window.location.href = './update.html';
         }, { text: 'Update' }))
         .addAction(Actions.delete(async (todo, row) => {
-            if (!window.confirm('Delete todo #' + todo.id + '?')) return;
+            const confirmed = await Dialog.confirm({
+                title: 'Delete Todo',
+                message: 'Delete todo #' + todo.id + '?',
+                yesLabel: 'Delete',
+                noLabel: 'Cancel'
+            });
+            if (!confirmed) return;
 
             try {
                 await TodoService.delete(todo.id);
@@ -50,7 +58,7 @@ function buildTable(records) {
                 Toast.success('Delete action posted successfully.');
             } catch (error) {
                 Toast.error('Delete action failed.');
-                console.error(error);
+                logger.error(error);
             }
         }))
         .build();
@@ -67,7 +75,7 @@ function bindReloadButton() {
             Toast.success('Todos reloaded.');
         } catch (error) {
             Toast.error('Failed to reload todos.');
-            console.error(error);
+            logger.error(error);
         } finally {
             reload.disabled = false;
         }
