@@ -16,6 +16,8 @@ test('decimal validates finite numeric values and leaves required handling separ
     assert.equal(Validator.decimal()(''), null);
     assert.equal(Validator.decimal()('123.45'), null);
     assert.equal(Validator.decimal()('-0.25'), null);
+    assert.equal(Validator.decimal()('.5'), null);
+    assert.equal(Validator.decimal()('1.'), null);
     assert.equal(Validator.decimal()('abc'), 'Please enter a valid decimal value.');
     assert.equal(Validator.decimal()('Infinity'), 'Please enter a valid decimal value.');
 });
