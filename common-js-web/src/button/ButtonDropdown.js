@@ -96,11 +96,6 @@ class ButtonDropdown {
         this.menu.hidden = false;
         this.trigger.setAttribute('aria-expanded', 'true');
 
-        var firstItem = this.menu.querySelector('button:not([hidden]), a:not([hidden])');
-        if (firstItem && typeof firstItem.focus === 'function') {
-            firstItem.focus();
-        }
-
         return this;
     }
 
