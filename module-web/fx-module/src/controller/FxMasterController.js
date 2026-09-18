@@ -5,7 +5,9 @@ import FxService from '../FxService.js';
 import FxMasterAction from '../action/FxMasterAction.js';
 import FxMasterForm from '../form/FxMasterForm.js';
 
-const { NavigationState, Toast } = Common;
+const { Logger, NavigationState, Toast } = Common;
+
+const logger = new Logger('FxMasterController');
 
 class FxMasterController {
     async init() {
@@ -40,7 +42,7 @@ class FxMasterController {
             action.configure();
         } catch (error) {
             Toast.error('Failed to load FX master.');
-            console.error(error);
+            logger.error(error);
         }
     }
 
