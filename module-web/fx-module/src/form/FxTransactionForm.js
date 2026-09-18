@@ -8,6 +8,7 @@ const {
     DateUtil,
     FormAction,
     FormDataConverter,
+    Logger,
     NavigationState,
     Select2,
     Toast,
@@ -15,6 +16,7 @@ const {
 } = Common;
 
 const FormDataType = FormDataConverter.Types;
+const logger = new Logger('FxTransactionForm');
 
 class FxTransactionForm extends FormAction {
     constructor(selector, options) {
@@ -243,7 +245,7 @@ class FxTransactionForm extends FormAction {
 
     onError(error) {
         Toast.error(error && error.message ? error.message : 'Failed to update FX transaction.');
-        console.error(error);
+        logger.error(error);
     }
 
     buildSelect(selector, items) {
