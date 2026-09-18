@@ -159,24 +159,29 @@ class FxTransactionForm extends FormAction {
     }
 
     async saveDirtyRow() {
-        const formValues = this.serializeForm();
+        try {
+            const formValues = this.serializeForm();
 
-        await this.beforeValidate(formValues, this.form);
+            await this.beforeValidate(formValues, this.form);
 
-        const validation = await this.validateForm(formValues);
+            const validation = await this.validateForm(formValues);
 
-        await this.afterValidate(validation, formValues, this.form);
+            await this.afterValidate(validation, formValues, this.form);
 
-        if (!validation.valid) {
-            this.showValidationErrors(validation.errors);
-            await this.onValidationError(validation.errors, formValues, this.form);
+            if (!validation.valid) {
+                this.showValidationErrors(validation.errors);
+                await this.onValidationError(validation.errors, formValues, this.form);
+                return false;
+            }
+
+            this.clearValidationErrors();
+
+            const data = await this.buildRequestData(formValues, this.form);
+            return Boolean(this.saveWorkingRow(data));
+        } catch (error) {
+            this.onError(error);
             return false;
         }
-
-        this.clearValidationErrors();
-
-        const data = await this.buildRequestData(formValues, this.form);
-        return Boolean(this.saveWorkingRow(data));
     }
 
     populate(values) {
