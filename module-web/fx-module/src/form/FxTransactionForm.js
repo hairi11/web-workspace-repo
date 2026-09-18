@@ -26,6 +26,7 @@ class FxTransactionForm extends FormAction {
         this.references = null;
         this.datePicker = null;
         this.amountInput = null;
+        this.rateInput = null;
         this.choices = {};
     }
 
@@ -50,7 +51,13 @@ class FxTransactionForm extends FormAction {
     onBuild() {
         this.datePicker = new DatePicker('#fxDate').build();
         this.amountInput = new CurrencyInput('#fxAmount', {
+            precision: 20,
             decimalScale: 4
+        }).build();
+        this.rateInput = new CurrencyInput('#fxRate', {
+            precision: 19,
+            decimalScale: 8,
+            useGrouping: false
         }).build();
 
         this.choices.fxCategory = this.buildChoice('#fxCategory', this.references.category);
@@ -221,6 +228,11 @@ class FxTransactionForm extends FormAction {
                 return;
             }
 
+            if (name === 'fxRate' && this.rateInput) {
+                this.rateInput.setValue(value, false);
+                return;
+            }
+
             field.value = value;
         });
 
@@ -276,9 +288,11 @@ class FxTransactionForm extends FormAction {
     destroyControls() {
         if (this.datePicker) this.datePicker.destroy();
         if (this.amountInput) this.amountInput.destroy();
+        if (this.rateInput) this.rateInput.destroy();
         Object.values(this.choices).forEach((choice) => choice.destroy());
         this.datePicker = null;
         this.amountInput = null;
+        this.rateInput = null;
         this.choices = {};
     }
 
