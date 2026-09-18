@@ -3,7 +3,9 @@ import { MasterMode } from '../FxConstants.js';
 import FxRows from '../FxRows.js';
 import FxService from '../FxService.js';
 
-const { FormAction, NavigationState, Toast } = Common;
+const { FormAction, Logger, NavigationState, Toast } = Common;
+
+const logger = new Logger('FxMasterForm');
 
 class FxMasterForm extends FormAction {
     constructor(selector, options) {
@@ -94,7 +96,7 @@ class FxMasterForm extends FormAction {
                 ? 'Failed to submit FX record.'
                 : 'Failed to save FX draft.'
         );
-        console.error(error);
+        logger.error(error);
     }
 
     getSubmitAction(context) {
