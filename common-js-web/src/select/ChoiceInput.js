@@ -105,6 +105,10 @@ class ChoiceInput {
         }
 
         if (this.radioGroup && this.radioGroup.parentNode) {
+            this.element.value = this.value() || '';
+            if (this.radioInputs.length) {
+                this.element.disabled = this.radioInputs[0].disabled;
+            }
             this.radioGroup.parentNode.insertBefore(this.element, this.radioGroup);
             this.radioGroup.remove();
         }
@@ -155,10 +159,12 @@ class ChoiceInput {
     }
 
     getSelectOptions(items) {
-        return Object.assign({}, this.options, {
-            data: items,
-            threshold: undefined
+        var options = Object.assign({}, this.options, {
+            data: items
         });
+
+        delete options.threshold;
+        return options;
     }
 
     buildRadios(items) {
@@ -234,7 +240,7 @@ class ChoiceInput {
 
             if (label.dataset.choiceInputGeneratedId === 'true') {
                 label.removeAttribute('id');
-                delete label.dataset.choiceInputGeneratedId;
+                label.removeAttribute('data-choice-input-generated-id');
             }
         });
     }
