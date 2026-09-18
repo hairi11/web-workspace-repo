@@ -12,6 +12,7 @@ const {
     FormDataConverter,
     Logger,
     NavigationState,
+    NumberUtil,
     Toast,
     Validator
 } = Common;
@@ -259,6 +260,14 @@ class FxTransactionForm extends FormAction {
                 return this.referenceDescription('type', value);
             case 'fxCurrency':
                 return this.referenceDescription('currency', value);
+            case 'fxAmount':
+                return NumberUtil.formatDecimal(value, {
+                    maximumFractionDigits: 4
+                });
+            case 'fxRate':
+                return NumberUtil.formatDecimal(value, {
+                    maximumFractionDigits: 6
+                });
             default:
                 return String(value);
         }
