@@ -24,7 +24,7 @@ test('FormDataConverter converts form values to typed data', function () {
     }, schema);
 
     assert.equal(result.name, 'FX Deal');
-    assert.equal(result.amount, 1234.5);
+    assert.equal(result.amount, '1234.50');
     assert.equal(result.rate, null);
     assert.equal(result.date, '2026-09-14');
     assert.equal(result.category, '10');
@@ -60,4 +60,15 @@ test('FormDataConverter supports custom field converters', function () {
 
     assert.equal(FormDataConverter.fromForm({code: 'usd'}, customSchema).code, 'USD');
     assert.equal(FormDataConverter.toForm({code: 'USD'}, customSchema).code, 'usd');
+});
+
+
+test('FormDataConverter preserves DECIMAL(20,4) precision', function () {
+    const result = FormDataConverter.fromForm({
+        amount: '9,999,999,999,999,999.9999'
+    }, {
+        amount: Type.DECIMAL
+    });
+
+    assert.equal(result.amount, '9999999999999999.9999');
 });
