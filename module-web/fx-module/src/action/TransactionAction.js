@@ -126,15 +126,19 @@ function configureRowNavigation(mode, key, rows) {
     const currentIndex = TransactionMode.isCreate(mode)
         ? rows.transactions.length
         : key;
-    const lastIndex = rows.transactions.length;
+    const lastIndex = rows.transactions.length - 1;
 
     setNavigationDisabled(
         previousButton,
-        !Number.isInteger(currentIndex) || currentIndex <= 0
+        rows.transactions.length === 0
+            || !Number.isInteger(currentIndex)
+            || currentIndex <= 0
     );
     setNavigationDisabled(
         nextButton,
-        !Number.isInteger(currentIndex) || currentIndex >= lastIndex
+        TransactionMode.isCreate(mode)
+            || !Number.isInteger(currentIndex)
+            || currentIndex >= lastIndex
     );
 }
 
@@ -175,7 +179,9 @@ function bindRowNavigation(action, mode, key, rowsKey, rows, returnTo) {
 }
 
 function navigateToRow(action, targetIndex, rows, rowsKey, returnTo) {
-    if (!Number.isInteger(targetIndex) || targetIndex < 0 || targetIndex > rows.transactions.length) {
+    if (!Number.isInteger(targetIndex)
+        || targetIndex < 0
+        || targetIndex >= rows.transactions.length) {
         return;
     }
 
@@ -183,12 +189,10 @@ function navigateToRow(action, targetIndex, rows, rowsKey, returnTo) {
         return;
     }
 
-    const createMode = targetIndex === rows.transactions.length;
-
     NavigationState.set({
         page: 'transaction',
-        action: createMode ? TransactionMode.CREATE : TransactionMode.EDIT,
-        key: createMode ? null : targetIndex,
+        action: TransactionMode.EDIT,
+        key: targetIndex,
         rowsKey: rowsKey,
         returnTo: returnTo
     });
