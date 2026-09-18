@@ -25,6 +25,9 @@ class Navigator {
             this.handleClick(event, 1);
         };
 
+        this.previousElement.classList.add('navigator-link', 'navigator-previous');
+        this.nextElement.classList.add('navigator-link', 'navigator-next');
+
         this.previousElement.addEventListener('click', this.previousHandler);
         this.nextElement.addEventListener('click', this.nextHandler);
 
@@ -107,6 +110,8 @@ class Navigator {
                 await this.options.onNavigate(targetIndex);
             }
 
+            this.index = targetIndex;
+            this.refresh();
             return true;
         } finally {
             this.navigating = false;
