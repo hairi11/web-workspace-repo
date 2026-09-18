@@ -4,7 +4,7 @@ import FxRows from '../FxRows.js';
 import FxService from '../FxService.js';
 import FxMasterFormAction from './FxMasterFormAction.js';
 
-const { ConfirmDialog, DataTableBuilder, DateUtil, NavigationState, Renderers, Toast } = Common;
+const { DataTableBuilder, DateUtil, Dialog, NavigationState, Renderers, Toast } = Common;
 
 let table = null;
 let formAction = null;
@@ -155,7 +155,7 @@ function openTransaction(mode, index, rowsKey) {
 }
 
 async function removeTransaction(row, rowsKey) {
-    const confirmed = await ConfirmDialog.show({
+    const confirmed = await Dialog.confirm({
         title: 'Remove Transaction',
         message: 'Remove this FX transaction?',
         yesLabel: 'Yes',
