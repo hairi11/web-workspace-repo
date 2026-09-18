@@ -15,8 +15,7 @@ export interface ButtonOptions {
     variant?: 'primary' | 'secondary';
     hidden?: boolean;
     disabled?: boolean;
-    onClick?: (event: Event) => any;
-    onError?: (error: any) => void;
+    onClick?: (event: Event) => void;
 }
 
 export class Button {
