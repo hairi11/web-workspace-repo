@@ -2,7 +2,9 @@ import Common from '@company/common-js-web';
 import TodoService from './TodoService.js';
 import { saveDraft } from './action/todoActionBase.js';
 
-const { ButtonBar, ChoiceInput, FormAction, NavigationState, Validator, Toast } = Common;
+const { ButtonBar, ChoiceInput, FormAction, Logger, NavigationState, Validator, Toast } = Common;
+
+const logger = new Logger('TodoFormAction');
 
 class TodoFormAction extends FormAction {
     constructor(selector, options) {
@@ -131,7 +133,7 @@ class TodoFormAction extends FormAction {
 
     onError(error) {
         Toast.error(error && error.message ? error.message : 'Request failed.');
-        console.error(error);
+        logger.error(error);
     }
 }
 
