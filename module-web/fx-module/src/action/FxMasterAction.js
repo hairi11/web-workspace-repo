@@ -3,6 +3,8 @@ import { MasterMode, TransactionMode } from '../FxConstants.js';
 import FxRows from '../FxRows.js';
 
 const {
+    Button,
+    ButtonBar,
     DataTableBuilder,
     DateUtil,
     Dialog,
@@ -20,10 +22,40 @@ class FxMasterAction {
             ? options.transactions
             : [];
         this.table = null;
+        this.addButton = null;
+        this.buttonBar = null;
     }
 
     build() {
+        const editing = this.mode === MasterMode.EDIT;
+
         this.table = this.buildTable();
+
+        this.addButton = new Button('#addTransactionButton', {
+            variant: Button.Variant.PRIMARY,
+            hidden: !editing,
+            onClick: () => {
+                this.openTransaction(TransactionMode.CREATE, null);
+            }
+        }).build();
+
+        this.buttonBar = new ButtonBar('#masterButtonBar')
+            .primary([
+                {
+                    target: '#saveButton',
+                    hidden: !editing
+                },
+                {
+                    target: '#submitButton',
+                    hidden: !editing
+                }
+            ])
+            .secondary({
+                target: '#backButton',
+                hidden: editing
+            })
+            .build();
+
         return this;
     }
 
@@ -42,26 +74,28 @@ class FxMasterAction {
     }
 
     configure() {
-        const editing = this.mode === MasterMode.EDIT;
         const heading = document.querySelector('h1');
-        const addButton = document.querySelector('#addTransactionButton');
-        const saveButton = document.querySelector('#saveButton');
-        const submitButton = document.querySelector('#submitButton');
-        const backButton = document.querySelector('#backButton');
 
-        if (heading) heading.textContent = editing ? 'Edit FX Master' : 'View FX Master';
-        if (addButton) addButton.hidden = !editing;
-        if (saveButton) saveButton.hidden = !editing;
-        if (submitButton) submitButton.hidden = !editing;
-        if (backButton) backButton.hidden = editing;
+        if (heading) {
+            heading.textContent = this.mode === MasterMode.EDIT
+                ? 'Edit FX Master'
+                : 'View FX Master';
+        }
 
         return this;
     }
 
-    bind() {
-        if (this.mode === MasterMode.EDIT) {
-            this.bindAddTransaction();
+    destroy() {
+        if (this.addButton) {
+            this.addButton.destroy();
+            this.addButton = null;
         }
+
+        if (this.buttonBar) {
+            this.buttonBar.destroy();
+            this.buttonBar = null;
+        }
+
         return this;
     }
 
@@ -107,15 +141,6 @@ class FxMasterAction {
             rowIndex: index,
             recordNo: transaction.recordNo || index + 1
         }));
-    }
-
-    bindAddTransaction() {
-        const button = document.querySelector('#addTransactionButton');
-        if (!button) return;
-
-        button.addEventListener('click', () => {
-            this.openTransaction(TransactionMode.CREATE, null);
-        });
     }
 
     openTransaction(mode, index) {
