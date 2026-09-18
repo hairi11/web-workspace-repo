@@ -92,11 +92,11 @@ function showConfirm(config, level, content, resolve) {
     var actions = createActions();
     var noButton = createButton(
         config.noLabel || 'No',
-        'common-dialog-secondary'
+        'button button-secondary common-dialog-secondary'
     );
     var yesButton = createButton(
         config.yesLabel || 'Yes',
-        'common-dialog-primary common-dialog-primary-' + level
+        'button button-primary common-dialog-primary'
     );
 
     actions.appendChild(noButton);
@@ -127,7 +127,7 @@ function showOk(config, level, content, resolve) {
     var actions = createActions();
     var okButton = createButton(
         config.okLabel || 'OK',
-        'common-dialog-primary common-dialog-primary-' + level
+        'button button-primary common-dialog-primary'
     );
 
     actions.appendChild(okButton);
