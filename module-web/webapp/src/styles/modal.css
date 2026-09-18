@@ -54,77 +54,57 @@
     border-top: 1px solid #ddd;
 }
 
-.common-confirm-message {
-    line-height: 1.5;
-}
-
-.common-confirm-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-}
-
-.common-confirm-yes {
-    border-color: #555;
-    background: #222;
-    color: #fff;
-}
-
-.common-confirm-yes:hover {
-    background: #444;
-}
-
-
-.common-ok-content {
+.common-dialog-content {
     display: flex;
     align-items: flex-start;
     gap: 12px;
 }
 
-.common-ok-icon {
+.common-dialog-icon {
     flex: 0 0 auto;
     margin-top: 2px;
     font-size: 1.4rem;
 }
 
-.common-ok-message {
+.common-dialog-message {
     min-width: 0;
     line-height: 1.5;
 }
 
-.common-ok-info .common-ok-icon {
+.common-dialog-info .common-dialog-icon {
     color: #1d4ed8;
 }
 
-.common-ok-success .common-ok-icon {
+.common-dialog-success .common-dialog-icon {
     color: #15803d;
 }
 
-.common-ok-warning .common-ok-icon {
+.common-dialog-warning .common-dialog-icon {
     color: #a16207;
 }
 
-.common-ok-error .common-ok-icon {
+.common-dialog-error .common-dialog-icon {
     color: #b91c1c;
 }
 
-.common-ok-actions {
+.common-dialog-actions {
     display: flex;
     justify-content: flex-end;
+    gap: 8px;
 }
 
-.common-ok-button-info {
+.common-dialog-primary-info {
     border-color: #1d4ed8;
 }
 
-.common-ok-button-success {
+.common-dialog-primary-success {
     border-color: #15803d;
 }
 
-.common-ok-button-warning {
+.common-dialog-primary-warning {
     border-color: #a16207;
 }
 
-.common-ok-button-error {
+.common-dialog-primary-error {
     border-color: #b91c1c;
 }
