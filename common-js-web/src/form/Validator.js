@@ -21,7 +21,7 @@ class Validator {
 
             var normalized = NumberUtil.normalizeFormatted(value);
 
-            if (!/^-?\d+(\.\d+)?$/.test(normalized)) {
+            if (!/^-?(?:\d+(?:\.\d*)?|\.\d+)$/.test(normalized)) {
                 return config.message;
             }
 
