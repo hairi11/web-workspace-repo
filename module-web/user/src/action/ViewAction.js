@@ -2,7 +2,9 @@ import Common from '@company/common-js-web';
 import UserService from '../UserService.js';
 import { asText, clearDraft, getDraft } from './userActionBase.js';
 
-const { NavigationState, Toast } = Common;
+const { ButtonBar, NavigationState, Toast } = Common;
+
+let buttonBar = null;
 
 function renderUser(user) {
     const container = document.querySelector('#userView');
@@ -54,6 +56,18 @@ function configureLinks(user) {
         ? () => NavigationState.set({ page: 'user-update', id: user.id })
         : null;
     backLink.href = './enquiry.html';
+
+    if (buttonBar) buttonBar.destroy();
+    buttonBar = new ButtonBar('#userViewButtonBar')
+        .primary({
+            target: '#updateLink',
+            hidden: !user.id
+        })
+        .secondary({
+            target: '#backLink',
+            placement: ButtonBar.Placement.END
+        })
+        .build();
 }
 
 export async function initView() {
