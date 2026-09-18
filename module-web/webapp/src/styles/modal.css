@@ -73,3 +73,58 @@
 .common-confirm-yes:hover {
     background: #444;
 }
+
+
+.common-ok-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.common-ok-icon {
+    flex: 0 0 auto;
+    margin-top: 2px;
+    font-size: 1.4rem;
+}
+
+.common-ok-message {
+    min-width: 0;
+    line-height: 1.5;
+}
+
+.common-ok-info .common-ok-icon {
+    color: #1d4ed8;
+}
+
+.common-ok-success .common-ok-icon {
+    color: #15803d;
+}
+
+.common-ok-warning .common-ok-icon {
+    color: #a16207;
+}
+
+.common-ok-error .common-ok-icon {
+    color: #b91c1c;
+}
+
+.common-ok-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.common-ok-button-info {
+    border-color: #1d4ed8;
+}
+
+.common-ok-button-success {
+    border-color: #15803d;
+}
+
+.common-ok-button-warning {
+    border-color: #a16207;
+}
+
+.common-ok-button-error {
+    border-color: #b91c1c;
+}
