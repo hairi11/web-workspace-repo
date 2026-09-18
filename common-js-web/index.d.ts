@@ -213,19 +213,33 @@ export const Renderers: {
 export const SafeDom: any;
 export const SecurityUtil: any;
 export const Repository: any;
-export const ConfirmDialog: any;
-export const OkDialog: {
+export const Dialog: {
     Level: {
         readonly INFO: 'info';
         readonly SUCCESS: 'success';
         readonly WARNING: 'warning';
         readonly ERROR: 'error';
     };
+    Mode: {
+        readonly OK: 'ok';
+        readonly CONFIRM: 'confirm';
+    };
     show(config: string | {
+        mode?: 'ok' | 'confirm';
         level?: 'info' | 'success' | 'warning' | 'error';
         title?: string;
         message?: string;
         okLabel?: string;
+        yesLabel?: string;
+        noLabel?: string;
+        size?: string;
+    }): Promise<boolean>;
+    confirm(config: string | {
+        level?: 'info' | 'success' | 'warning' | 'error';
+        title?: string;
+        message?: string;
+        yesLabel?: string;
+        noLabel?: string;
         size?: string;
     }): Promise<boolean>;
     info(message: string, config?: any): Promise<boolean>;
