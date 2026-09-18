@@ -44,16 +44,24 @@ class FxMasterAction {
                 target: '#submitButton',
                 hidden: !editing
             })
-            .secondary([
-                {
-                    target: '#saveButton',
-                    hidden: !editing
-                },
-                {
-                    target: '#backButton',
-                    hidden: editing
-                }
-            ])
+            .secondary({
+                target: '#backButton',
+                hidden: editing
+            })
+            .secondaryDropdown({
+                trigger: '#masterSecondaryButton',
+                menu: '#masterSecondaryMenu',
+                hidden: !editing,
+                items: [
+                    {
+                        target: '#saveButton'
+                    },
+                    {
+                        target: '#cancelButton',
+                        onClick: () => this.cancel()
+                    }
+                ]
+            })
             .build();
 
         return this;
@@ -141,6 +149,10 @@ class FxMasterAction {
             rowIndex: index,
             recordNo: transaction.recordNo || index + 1
         }));
+    }
+
+    cancel() {
+        window.location.href = './enquiry.html';
     }
 
     openTransaction(mode, index) {
