@@ -110,25 +110,22 @@ class ButtonBar {
     }
 
     buildSecondaryDropdown(configs) {
-        var actionConfig = configs[0];
-        var itemConfigs = configs.slice(1);
-        var actionElement = this.requireElement(actionConfig.target);
-        var itemElements = itemConfigs.map(
+        var itemElements = configs.map(
             (config) => this.requireElement(config.target)
         );
+        var anchorElement = itemElements[0];
         var wrapper = document.createElement('div');
         var trigger = this.createDropdownTrigger();
         var menu = document.createElement('div');
 
-        wrapper.className = 'button-dropdown button-dropdown-split';
+        wrapper.className = 'button-dropdown';
         menu.className = 'button-dropdown-menu';
         menu.id = 'button-dropdown-menu-' + (++dropdownCounter);
         menu.hidden = true;
 
         trigger.setAttribute('aria-controls', menu.id);
 
-        actionElement.parentNode.insertBefore(wrapper, actionElement);
-        wrapper.appendChild(actionElement);
+        anchorElement.parentNode.insertBefore(wrapper, anchorElement);
         wrapper.appendChild(trigger);
         wrapper.appendChild(menu);
 
@@ -138,14 +135,13 @@ class ButtonBar {
 
         this.secondaryGroup = {
             wrapper: wrapper,
-            elements: [actionElement].concat(itemElements)
+            elements: itemElements
         };
 
         this.secondaryDropdownComponent = new ButtonDropdown({
             trigger: trigger,
             menu: menu,
-            action: this.asDropdownConfig(actionConfig, actionElement),
-            items: itemConfigs.map((config, index) => (
+            items: configs.map((config, index) => (
                 this.asDropdownConfig(config, itemElements[index])
             ))
         }).build();
@@ -165,14 +161,18 @@ class ButtonBar {
 
     createDropdownTrigger() {
         var trigger = document.createElement('button');
+        var label = document.createElement('span');
         var icon = document.createElement('span');
 
         trigger.type = 'button';
-        trigger.setAttribute('aria-label', 'More secondary actions');
-        trigger.title = 'More secondary actions';
+        trigger.setAttribute('aria-label', ButtonBar.DEFAULT_DROPDOWN_LABEL);
+        trigger.title = ButtonBar.DEFAULT_DROPDOWN_LABEL;
 
-        icon.textContent = '▾';
+        label.textContent = ButtonBar.DEFAULT_DROPDOWN_LABEL;
+        icon.textContent = '▴';
         icon.setAttribute('aria-hidden', 'true');
+
+        trigger.appendChild(label);
         trigger.appendChild(icon);
 
         return trigger;
@@ -234,6 +234,8 @@ class ButtonBar {
         return target || null;
     }
 }
+
+ButtonBar.DEFAULT_DROPDOWN_LABEL = 'More actions';
 
 ButtonBar.Placement = Object.freeze({
     END: 'end'
