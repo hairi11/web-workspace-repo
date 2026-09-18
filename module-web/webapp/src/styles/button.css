@@ -54,10 +54,11 @@ a.button.is-disabled {
 
 .button-dropdown-menu {
     position: absolute;
-    top: calc(100% + 6px);
     right: 0;
+    bottom: calc(100% + 6px);
     z-index: 20;
-    min-width: 160px;
+    width: 100%;
+    min-width: 100%;
     padding: 6px;
     border: 1px solid #ddd;
     border-radius: 6px;
@@ -90,11 +91,17 @@ a.button.is-disabled {
 }
 
 .button-dropdown-split > .button:first-child {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.button-dropdown-split > .button:first-child {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
 }
 
 .button-dropdown-split > .button:nth-child(2) {
+    flex: 0 0 34px;
     margin-left: -1px;
     padding-inline: 8px;
     border-top-left-radius: 0;
