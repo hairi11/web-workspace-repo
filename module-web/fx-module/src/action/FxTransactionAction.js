@@ -18,9 +18,7 @@ class FxTransactionAction {
     build() {
         const viewMode = TransactionMode.isView(this.mode);
         const count = this.rows ? this.rows.transactions.length : 0;
-        const index = this.rows
-            ? (TransactionMode.isCreate(this.mode) ? count : this.key)
-            : 0;
+        const index = this.getNavigationIndex(count);
 
         this.buttonBar = new ButtonBar('#transactionButtonBar')
             .navigator({
@@ -48,6 +46,14 @@ class FxTransactionAction {
             .build();
 
         return this;
+    }
+
+    getNavigationIndex(count) {
+        if (!this.rows) return 0;
+
+        return TransactionMode.isCreate(this.mode)
+            ? count
+            : this.key;
     }
 
     configure() {
