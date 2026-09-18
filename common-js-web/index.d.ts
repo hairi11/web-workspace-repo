@@ -27,6 +27,7 @@ export class ChoiceInput {
         readonly RADIO: 'radio';
         readonly SELECT: 'select';
     };
+    static resolveMode(optionCount: number, threshold?: number): 'radio' | 'select';
     constructor(target: string | HTMLSelectElement, options?: ChoiceInputOptions);
     build(): this;
     destroy(): this;
