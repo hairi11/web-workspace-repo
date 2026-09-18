@@ -93,18 +93,3 @@
     gap: 8px;
 }
 
-.common-dialog-primary-info {
-    border-color: #1d4ed8;
-}
-
-.common-dialog-primary-success {
-    border-color: #15803d;
-}
-
-.common-dialog-primary-warning {
-    border-color: #a16207;
-}
-
-.common-dialog-primary-error {
-    border-color: #b91c1c;
-}
