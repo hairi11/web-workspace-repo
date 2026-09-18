@@ -5,6 +5,7 @@ import FxService from '../FxService.js';
 
 const {
     ChoiceInput,
+    CurrencyInput,
     DatePicker,
     DateUtil,
     FormAction,
@@ -24,6 +25,7 @@ class FxTransactionForm extends FormAction {
         this.options = options || {};
         this.references = null;
         this.datePicker = null;
+        this.amountInput = null;
         this.choices = {};
     }
 
@@ -47,6 +49,9 @@ class FxTransactionForm extends FormAction {
 
     onBuild() {
         this.datePicker = new DatePicker('#fxDate').build();
+        this.amountInput = new CurrencyInput('#fxAmount', {
+            decimalScale: 4
+        }).build();
 
         this.choices.fxCategory = this.buildChoice('#fxCategory', this.references.category);
         this.choices.fxCode = this.buildChoice('#fxCode', this.references.code);
@@ -211,6 +216,11 @@ class FxTransactionForm extends FormAction {
                 return;
             }
 
+            if (name === 'fxAmount' && this.amountInput) {
+                this.amountInput.setValue(value, false);
+                return;
+            }
+
             field.value = value;
         });
 
@@ -265,8 +275,10 @@ class FxTransactionForm extends FormAction {
 
     destroyControls() {
         if (this.datePicker) this.datePicker.destroy();
+        if (this.amountInput) this.amountInput.destroy();
         Object.values(this.choices).forEach((choice) => choice.destroy());
         this.datePicker = null;
+        this.amountInput = null;
         this.choices = {};
     }
 
