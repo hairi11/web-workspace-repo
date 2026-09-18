@@ -1,4 +1,5 @@
 .button-bar {
+    --button-bar-action-width: 140px;
     display: flex;
     justify-content: flex-end;
     align-items: center;
@@ -14,4 +15,17 @@
     align-items: center;
     gap: 12px;
     margin-right: auto;
+}
+
+
+.button-bar > .button,
+.button-bar > .button-dropdown {
+    width: var(--button-bar-action-width);
+    box-sizing: border-box;
+}
+
+.button-bar > .button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
 }
