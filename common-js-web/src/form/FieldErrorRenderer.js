@@ -63,8 +63,9 @@ class FieldErrorRenderer {
     }
 
     _messageTarget(input, visibleInput) {
+        var choiceGroup = input.closest('.choice-input-radio-group');
         var datePickerControl = input.closest('.date-picker-control');
-        return datePickerControl || visibleInput;
+        return choiceGroup || datePickerControl || visibleInput;
     }
 
     _scrollTo(input) {
