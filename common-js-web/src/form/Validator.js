@@ -1,3 +1,5 @@
+const NumberUtil = require('../util/NumberUtil');
+
 class Validator {
     static required(message) {
         return function (value) {
@@ -14,7 +16,9 @@ class Validator {
     static decimal(message) {
         return function (value) {
             if (value === null || value === undefined || String(value).trim() === '') return null;
-            return Number.isFinite(Number(value)) ? null : (message || 'Please enter a valid decimal value.');
+            return NumberUtil.parseFormatted(value) !== null
+                ? null
+                : (message || 'Please enter a valid decimal value.');
         };
     }
     static minLength(length, message) {
