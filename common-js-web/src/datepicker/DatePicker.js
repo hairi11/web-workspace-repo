@@ -2,7 +2,7 @@ const DEFAULT_OPTIONS = {
     allowInput: true,
     dateFormat: 'Y-m-d',
     altInput: true,
-    altFormat: 'd-M-Y',
+    altFormat: 'd/m/Y',
     position: 'auto'
 };
 
@@ -15,6 +15,7 @@ class DatePicker {
         this.control = null;
         this.toggleButton = null;
         this.clearButton = null;
+        this.altInputHandler = null;
         this.changeHandler = () => this.syncClearButton();
     }
 
@@ -41,6 +42,7 @@ class DatePicker {
 
         this.buildControls();
         this.instance = window.flatpickr(this.element, this.options);
+        this.bindDateMask();
         this.syncClearButton();
         return this;
     }
@@ -120,7 +122,27 @@ class DatePicker {
         return this;
     }
 
+    bindDateMask() {
+        if (!this.instance || !this.instance.altInput) return;
+
+        var altInput = this.instance.altInput;
+
+        altInput.inputMode = 'numeric';
+        altInput.maxLength = 10;
+        altInput.placeholder = 'dd/mm/yyyy';
+
+        this.altInputHandler = () => {
+            altInput.value = DatePicker.maskDateInput(altInput.value);
+        };
+
+        altInput.addEventListener('input', this.altInputHandler);
+    }
+
     destroy() {
+        if (this.instance && this.instance.altInput && this.altInputHandler) {
+            this.instance.altInput.removeEventListener('input', this.altInputHandler);
+        }
+
         if (this.element) {
             this.element.removeEventListener('change', this.changeHandler);
         }
@@ -139,6 +161,7 @@ class DatePicker {
         this.control = null;
         this.toggleButton = null;
         this.clearButton = null;
+        this.altInputHandler = null;
         return this;
     }
 
@@ -163,6 +186,17 @@ class DatePicker {
         return this.instance;
     }
 }
+
+DatePicker.maskDateInput = function (value) {
+    var digits = String(value || '').replace(/\D/g, '').slice(0, 8);
+    var parts = [];
+
+    if (digits.length > 0) parts.push(digits.slice(0, 2));
+    if (digits.length > 2) parts.push(digits.slice(2, 4));
+    if (digits.length > 4) parts.push(digits.slice(4, 8));
+
+    return parts.join('/');
+};
 
 DatePicker.DEFAULT_OPTIONS = DEFAULT_OPTIONS;
 
