@@ -99,3 +99,7 @@
     padding: 9px 16px;
 }
 
+.common-dialog-actions:has(.button + .button) .button {
+    flex: 0 0 120px;
+}
+
