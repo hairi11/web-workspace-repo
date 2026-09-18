@@ -94,6 +94,8 @@ class Dialog {
                     content: content,
                     footer: actions,
                     size: config.size || 'sm',
+                    closable: config.closable,
+                    escapeClose: config.escapeClose,
                     onClose: function (reason) {
                         resolve(reason === 'yes');
                     }
@@ -122,6 +124,8 @@ class Dialog {
                 content: content,
                 footer: actions,
                 size: config.size || 'sm',
+                closable: config.closable,
+                escapeClose: config.escapeClose,
                 onClose: function (reason) {
                     resolve(reason === 'ok');
                 }
