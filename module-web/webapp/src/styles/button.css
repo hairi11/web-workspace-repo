@@ -79,9 +79,12 @@ a.button.is-disabled {
     width: 100%;
     min-height: 34px;
     padding: 8px 10px;
+    appearance: none;
+    -webkit-appearance: none;
     border: 0;
     border-radius: 4px;
     background: transparent;
+    box-shadow: none;
     color: #222;
     font: inherit;
     text-align: left;
