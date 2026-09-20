@@ -13,7 +13,8 @@
     "eventemitter3": "^5.0.1",
     "loglevel": "^1.9.2",
     "lru-cache": "^11.1.0",
-    "unistore": "^3.5.2"
+    "unistore": "^3.5.2",
+    "bootstrap": "^5.3.3"
   },
   "license": "MIT",
   "type": "commonjs"
