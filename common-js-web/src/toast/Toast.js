@@ -1,88 +1,67 @@
-const TYPE_CLASS = Object.freeze({
+const TYPE_CLASS = {
     success: 'text-bg-success',
     error: 'text-bg-danger',
     info: 'text-bg-primary'
-});
+};
 
-function getBootstrapToast() {
+function BootstrapToast() {
     return require('bootstrap/js/dist/toast');
 }
 
-function getContainer() {
-    var container = document.querySelector('[data-common-toast-container]');
+function container() {
+    var element = document.querySelector('[data-common-toast-container]');
 
-    if (container) return container;
+    if (!element) {
+        element = document.createElement('div');
+        element.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+        element.dataset.commonToastContainer = '';
+        document.body.appendChild(element);
+    }
 
-    container = document.createElement('div');
-    container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
-    container.setAttribute('data-common-toast-container', '');
-    document.body.appendChild(container);
-
-    return container;
+    return element;
 }
 
 class Toast {
     static show(message, type, duration) {
         type = TYPE_CLASS[type] ? type : 'info';
-        duration = duration === undefined
-            ? 3000
-            : Math.max(0, Number(duration) || 0);
+        duration = duration === undefined ? 3000 : Math.max(0, Number(duration) || 0);
 
         var element = document.createElement('div');
         var row = document.createElement('div');
         var body = document.createElement('div');
-        var closeButton = document.createElement('button');
+        var close = document.createElement('button');
 
         element.className = 'toast align-items-center border-0 ' + TYPE_CLASS[type];
         element.setAttribute('role', 'alert');
-        element.setAttribute('aria-live', 'assertive');
-        element.setAttribute('aria-atomic', 'true');
-
         row.className = 'd-flex';
         body.className = 'toast-body';
-        body.textContent = message === null || message === undefined
-            ? ''
-            : String(message);
+        body.textContent = message == null ? '' : String(message);
+        close.type = 'button';
+        close.className = 'btn-close btn-close-white me-2 m-auto';
+        close.dataset.bsDismiss = 'toast';
+        close.setAttribute('aria-label', 'Close');
 
-        closeButton.type = 'button';
-        closeButton.className = 'btn-close btn-close-white me-2 m-auto';
-        closeButton.setAttribute('data-bs-dismiss', 'toast');
-        closeButton.setAttribute('aria-label', 'Close');
-
-        row.appendChild(body);
-        row.appendChild(closeButton);
+        row.append(body, close);
         element.appendChild(row);
-        getContainer().appendChild(element);
+        container().appendChild(element);
 
-        var BootstrapToast = getBootstrapToast();
-        var instance = new BootstrapToast(element, {
+        var instance = new (BootstrapToast())(element, {
             autohide: duration > 0,
-            delay: duration > 0 ? duration : 3000
+            delay: duration || 3000
         });
 
         element.addEventListener('hidden.bs.toast', function () {
             instance.dispose();
-
-            if (element.parentNode) {
-                element.parentNode.removeChild(element);
-            }
+            element.remove();
         }, {once: true});
 
         instance.show();
         return element;
     }
 
-    static success(message, duration) {
-        return Toast.show(message, 'success', duration);
-    }
-
-    static error(message, duration) {
-        return Toast.show(message, 'error', duration);
-    }
-
-    static info(message, duration) {
-        return Toast.show(message, 'info', duration);
-    }
+    static success(message, duration) { return Toast.show(message, 'success', duration); }
+    static error(message, duration) { return Toast.show(message, 'error', duration); }
+    static info(message, duration) { return Toast.show(message, 'info', duration); }
 }
 
 module.exports = Toast;
