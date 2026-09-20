@@ -39,7 +39,17 @@ class ButtonBar {
             throw new Error('ButtonBar element not found.');
         }
 
-        this.element.classList.add('button-bar');
+        this.element.classList.add(
+            'button-bar',
+            'd-flex',
+            'justify-content-end',
+            'align-items-center',
+            'flex-wrap',
+            'gap-2',
+            'mt-4',
+            'pt-3',
+            'border-top'
+        );
 
         this.buttons = this.buildButtons(this.primaryConfigs);
         this.buildSecondaryControls();
@@ -118,10 +128,11 @@ class ButtonBar {
         var trigger = this.createDropdownTrigger();
         var menu = document.createElement('div');
 
-        wrapper.className = 'button-dropdown';
-        menu.className = 'button-dropdown-menu';
+        wrapper.className = 'dropup';
+        wrapper.style.minWidth = '140px';
+        menu.className = 'dropdown-menu w-100';
         menu.id = 'button-dropdown-menu-' + (++dropdownCounter);
-        menu.hidden = true;
+        menu.hidden = false;
 
         trigger.setAttribute('aria-controls', menu.id);
 
@@ -154,26 +165,23 @@ class ButtonBar {
     }
 
     buildButtons(configs) {
-        return configs.map(
-            (config) => new Button(config.target, config.options).build()
-        );
+        return configs.map(function (config) {
+            var button = new Button(config.target, config.options).build();
+
+            if (button.element) {
+                button.element.style.minWidth = '140px';
+            }
+
+            return button;
+        });
     }
 
     createDropdownTrigger() {
         var trigger = document.createElement('button');
-        var label = document.createElement('span');
-        var icon = document.createElement('span');
-
         trigger.type = 'button';
+        trigger.textContent = ButtonBar.DEFAULT_DROPDOWN_LABEL;
         trigger.setAttribute('aria-label', ButtonBar.DEFAULT_DROPDOWN_LABEL);
         trigger.title = ButtonBar.DEFAULT_DROPDOWN_LABEL;
-
-        label.textContent = ButtonBar.DEFAULT_DROPDOWN_LABEL;
-        icon.textContent = '▴';
-        icon.setAttribute('aria-hidden', 'true');
-
-        trigger.appendChild(label);
-        trigger.appendChild(icon);
 
         return trigger;
     }
