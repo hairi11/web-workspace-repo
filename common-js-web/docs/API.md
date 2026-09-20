@@ -1,97 +1,106 @@
-# Common JS v7 API
+# Common JS v8 API
 
-## FormAction
+## UI wrappers
 
-`FormAction` is a Template Method base class. Create a child class per form/use-case and override only the methods whose default behavior must change.
+### Button
+Bootstrap-backed button wrapper.
 
-### Required override
+### ButtonBar
+Composes primary/secondary actions. When more than two actions are visible and multiple secondary actions exist, secondaries are grouped into a Bootstrap dropup.
 
-- `getUrl()` — returns the request URL.
+### ButtonDropdown
+Thin Bootstrap Dropdown wrapper.
 
-### Default template methods
+### Modal
+Thin Bootstrap Modal wrapper.
 
-- `getMethod()` — defaults to `POST`.
-- `getValidationRules()` — defaults to `{}`.
-- `getConfirmation()` — defaults to `null`.
-- `getConfirmationHandler()` — defaults to `ConfirmDialog.show`.
-- `buildRequestData(formValues)` — defaults to all serialized form values.
-- `getRequestOptions()` — defaults to `{}`.
-- `getErrorRenderer()` — defaults to `FieldErrorRenderer`.
-- `shouldTrackDirty()` — defaults to `false`.
-- `shouldResetOnSuccess()` — defaults to `false`.
-- `shouldDisableWhileSubmitting()` — defaults to `true`.
+### Dialog
+Promise-based `confirm`, `info`, `success`, `warning`, and `error` facade.
 
-### Lifecycle hooks
+### Toast
+Bootstrap Toast facade.
 
-- `beforeValidate(formValues, form)`
-- `afterValidate(validation, formValues, form)`
-- `beforeConfirm(formValues, form)`
-- `afterConfirm(confirmed, formValues, form)`
-- `beforeSubmit(context)` — return `false` to cancel submission.
-- `onSuccess(data, context, response)`
-- `onError(error, context)`
-- `onComplete({context, error, result})`
-- `onValidationError(errors, formValues, form)`
-- `onDirtyChange(dirty, formState)`
-- `onBuild(form)`
-- `onDestroy(form)`
-- `transformResponse(data, response, context)`
-- `mapServerErrors(error, context)`
+## Forms
 
-### Public runtime methods
+### FormAction
+
+Main lifecycle:
+
+```text
+serializeForm
+validateForm
+buildRequestData
+beforeSubmit
+sendRequest
+onSuccess / onError
+```
+
+Public methods:
 
 - `build()`
 - `destroy()`
-- `execute()`
+- `execute(submitter?)`
 - `reset()`
 - `isDirty()`
 - `serializeForm()`
-- `validateForm(formValues)`
-- `confirmSubmission(formValues)`
-- `createContext(formValues)`
+- `validateForm(values)`
+- `showValidationErrors(errors)`
+- `clearValidationErrors()`
+- `setSubmitting(value)`
+
+Override points:
+
+- `getValidationRules()`
+- `buildRequestData(values)`
+- `shouldTrackDirty()`
+- `beforeSubmit(context)`
 - `sendRequest(context)`
+- `onBuild(form)`
+- `onDestroy(form)`
+- `onSuccess(data, context, response)`
+- `onError(error, context)`
 
-### Example
+### Validator
 
-```js
-const {FormAction, Validator} = require('../src');
+Includes required, email, pattern, length, custom and exact decimal precision/scale validation.
 
-class SearchFormAction extends FormAction {
-    getMethod() {
-        return 'GET';
-    }
+### FormDataConverter
 
-    getUrl() {
-        return '/api/users';
-    }
+`DECIMAL` values are normalized strings to preserve database precision.
 
-    getValidationRules() {
-        return {
-            keyword: Validator.required()
-        };
-    }
+## Inputs
 
-    buildRequestData(form) {
-        return {
-            keyword: form.keyword,
-            status: form.status
-        };
-    }
+### ChoiceInput
+- up to 5 options → Bootstrap radios
+- more than 5 → Select2
 
-    onSuccess(data) {
-        console.log(data);
-    }
-}
+### CurrencyInput
+Exact decimal masking with precision/scale limits.
 
-new SearchFormAction('#searchForm').build();
-```
-
-For GET forms, the value returned by `buildRequestData()` is sent as query parameters. For POST forms, it is sent as the request body.
-
-## Ajax
-
-Supports GET and POST, global defaults, interceptors, timeout, retry, cache, deduplication, cancellation, and normalized responses/errors.
+### DatePicker
+Flatpickr wrapper with `dd/mm/yyyy` visible input mask.
 
 ## DataTableBuilder
 
-Supports AJAX data, server-side mode, columns, renderers, menu actions, external search, filters, refresh, search and destroy.
+Supported configuration:
+
+- `data(rows)`
+- `option(name, value)`
+- `serverPage(loader, config)`
+- `column(data, title, config?)`
+- `renderer(data, title, renderer, config?)`
+- `menuAction()`
+- `addAction(action)`
+- `searchInput(selector)`
+
+Runtime:
+
+- `build()`
+- `refresh(resetPaging?)`
+- `replaceData(rows, resetPaging?)`
+- `search(value)`
+- `destroy()`
+
+## HTTP
+
+`Ajax` remains the project HTTP wrapper with GET/POST, interceptors, cancellation, retry, cache, dedupe and security guards.
