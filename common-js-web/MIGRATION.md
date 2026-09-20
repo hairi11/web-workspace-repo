@@ -1,79 +1,114 @@
-# Migration to v7 Template FormAction
+# Migration to common-js-web v8
 
-The main v7 form API uses the Template Method Pattern instead of fluent chaining.
+v8 keeps the project wrappers but removes generic framework behavior that the workspace does not use.
 
-Old style:
+## Bootstrap UI
 
-```js
-new FormAction('#userForm')
-    .validate(rules)
-    .post('/api/users')
-    .data(buildData)
-    .onSuccess(handleSuccess)
-    .build();
+The wrappers now use Bootstrap 5 internally.
+
+Legacy custom classes such as:
+
+```text
+button-primary
+button-secondary
+button-dropdown-menu
+common-modal-*
+common-toast
 ```
 
-New style:
+are no longer part of the UI contract.
+
+Use the wrappers as before:
 
 ```js
-class UserFormAction extends FormAction {
-    getUrl() {
-        return '/api/users';
-    }
+new Button('#saveButton', {
+    variant: Button.Variant.PRIMARY
+}).build();
 
-    getValidationRules() {
-        return rules;
-    }
-
-    buildRequestData(formValues) {
-        return buildData(formValues);
-    }
-
-    onSuccess(data) {
-        handleSuccess(data);
-    }
-}
-
-new UserFormAction('#userForm').build();
-```
-
-Mapping from the old builder API:
-
-- `.post(url)` -> default `getMethod()` + override `getUrl()`
-- `.get(url)` -> override `getMethod()` to `GET` + `getUrl()`
-- `.validate(rules)` -> `getValidationRules()`
-- `.confirm(config)` -> `getConfirmation()`
-- `.useConfirmation(handler)` -> `getConfirmationHandler()`
-- `.data(resolver)` / `.query(resolver)` -> `buildRequestData()`
-- `.requestOptions(config)` -> `getRequestOptions()`
-- `.dirtyTracking()` -> `shouldTrackDirty()`
-- `.resetOnSuccess()` -> `shouldResetOnSuccess()`
-- `.disableWhileSubmitting(false)` -> `shouldDisableWhileSubmitting()`
-- `.mapServerErrors(mapper)` -> `mapServerErrors()`
-- `.transformResponse(handler)` -> `transformResponse()`
-- `.onDirtyChange(handler)` -> `onDirtyChange()`
-- `.onValidationError(handler)` -> `onValidationError()`
-- `.beforeSubmit(handler)` -> `beforeSubmit()`
-- `.onSuccess(handler)` -> `onSuccess()`
-- `.onError(handler)` -> `onError()`
-- `.onComplete(handler)` -> `onComplete()`
-
-Methods that are not overridden automatically use the base-class defaults.
-
-## v7.0 -> v7.1 security notes
-
-`Modal.open({content: '<b>Hello</b>'})` now displays the string as text. If the HTML is fully trusted and intentionally authored by your application, opt in explicitly with `trustedHtml: true`. Prefer passing a DOM `Node` instead.
-
-Cross-origin requests no longer send sensitive headers by default and `credentials: 'include'` is rejected unless `allowCrossOriginCredentials: true` is explicitly configured. This may require an explicit opt-in for trusted third-party APIs.
-
-For same-origin POST CSRF protection, configure a token provider:
-
-```js
-Ajax.configure({
-    csrfTokenProvider: function () {
-        return window.appCsrfToken;
-    }
+await Dialog.confirm({
+    title: 'Delete',
+    message: 'Delete this record?'
 });
+
+Toast.success('Saved.');
 ```
 
-Client-side validation and file checks are convenience and defense-in-depth only. Repeat all authorization, validation, CSRF, file, and permission checks on the server.
+Static buttons and links should use Bootstrap classes directly.
+
+## FormAction
+
+Removed v7 generic lifecycle APIs:
+
+```text
+getMethod
+getUrl
+getConfirmation
+getConfirmationHandler
+getRequestOptions
+getErrorRenderer
+shouldResetOnSuccess
+shouldDisableWhileSubmitting
+beforeValidate
+afterValidate
+beforeConfirm
+afterConfirm
+onDirtyChange
+onValidationError
+transformResponse
+mapServerErrors
+onComplete
+createContext
+confirmSubmission
+```
+
+v8 child actions normally override only:
+
+```text
+getValidationRules
+buildRequestData
+shouldTrackDirty
+beforeSubmit
+sendRequest
+onBuild
+onDestroy
+onSuccess
+onError
+```
+
+## DataTableBuilder
+
+Removed unused generic APIs:
+
+```text
+ajax
+optionsConfig
+serverSide
+filter
+selectable
+addBulkAction
+selectedData
+runBulkAction
+inline action mode
+```
+
+Use `serverPage()` for server-backed tables and `data()` for local tables.
+
+## DatePicker
+
+The custom clear/calendar-button shell was removed. Flatpickr now owns opening/closing directly and the visible field uses Bootstrap `form-control`.
+
+The wrapper methods remain:
+
+```text
+build
+setDate
+clear
+open
+close
+destroy
+getInstance
+```
+
+## Decimal values
+
+`FormDataConverter.Types.DECIMAL` returns normalized decimal strings, not JavaScript numbers. This prevents precision loss for large database decimals.
