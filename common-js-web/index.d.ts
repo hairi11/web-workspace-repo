@@ -53,6 +53,7 @@ export class CurrencyInput {
     static countSignificant(value: any): number;
     static findCaret(formatted: string, significantCount: number): number;
     static isWithinLimit(value: any, options?: CurrencyInputOptions): boolean;
+    static maxLength(options?: CurrencyInputOptions): number;
     constructor(target: string | HTMLInputElement, options?: CurrencyInputOptions);
     build(): this;
     destroy(): this;
