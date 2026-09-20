@@ -121,7 +121,13 @@ class ButtonBar {
         wrapper.appendChild(menu);
         elements.forEach((element) => menu.appendChild(element));
 
-        this.group = {wrapper: wrapper, elements: elements};
+        this.group = {
+            wrapper: wrapper,
+            elements: elements,
+            classes: elements.map(function (element) {
+                return element.className;
+            })
+        };
         this.dropdown = new ButtonDropdown({
             trigger: trigger,
             menu: menu,
@@ -152,7 +158,8 @@ class ButtonBar {
 
         var wrapper = this.group.wrapper;
         if (wrapper.parentNode) {
-            this.group.elements.forEach((element) => {
+            this.group.elements.forEach((element, index) => {
+                element.className = this.group.classes[index];
                 wrapper.parentNode.insertBefore(element, wrapper);
             });
             wrapper.remove();
