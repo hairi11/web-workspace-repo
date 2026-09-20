@@ -83,7 +83,7 @@ The wrapper intentionally exposes only the DataTable behavior currently used by 
 - `search()`
 - `destroy()`
 
-Context actions use Bootstrap dropdown presentation.
+Row actions use a visible Bootstrap dropdown column.
 
 ## Decimal safety
 
