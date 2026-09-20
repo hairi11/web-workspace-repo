@@ -3,75 +3,61 @@ class Navigator {
         this.options = options || {};
         this.previousElement = null;
         this.nextElement = null;
-        this.previousHandler = null;
-        this.nextHandler = null;
+        this.bindings = [];
         this.index = Number.isInteger(this.options.index) ? this.options.index : 0;
-        this.count = this.normalizeCount(this.options.count);
+        this.count = Navigator.count(this.options.count);
         this.navigating = false;
     }
 
     build() {
-        this.previousElement = this.resolveElement(this.options.previous);
-        this.nextElement = this.resolveElement(this.options.next);
+        this.previousElement = this.resolve(this.options.previous);
+        this.nextElement = this.resolve(this.options.next);
 
         if (!this.previousElement || !this.nextElement) {
             throw new Error('Navigator previous and next elements are required.');
         }
 
-        this.previousHandler = (event) => {
-            this.handleClick(event, -1);
-        };
-        this.nextHandler = (event) => {
-            this.handleClick(event, 1);
-        };
-
-        this.applyClasses(this.previousElement, 'navigator-previous');
-        this.applyClasses(this.nextElement, 'navigator-next');
-
-        this.previousElement.addEventListener('click', this.previousHandler);
-        this.nextElement.addEventListener('click', this.nextHandler);
-
+        this.prepare(this.previousElement, 'navigator-previous', -1);
+        this.prepare(this.nextElement, 'navigator-next', 1);
         this.setHidden(this.options.hidden === true);
-        this.refresh();
+        return this.refresh();
+    }
 
-        return this;
+    prepare(element, className, offset) {
+        element.classList.remove('navigator-link', 'is-disabled');
+        element.classList.add('btn', 'btn-link', 'text-decoration-none', className);
+
+        var handler = (event) => {
+            event.preventDefault();
+            if (element.getAttribute('aria-disabled') !== 'true') {
+                this.navigate(this.index + offset);
+            }
+        };
+
+        element.addEventListener('click', handler);
+        this.bindings.push({element: element, handler: handler});
     }
 
     destroy() {
-        if (this.previousElement && this.previousHandler) {
-            this.previousElement.removeEventListener('click', this.previousHandler);
-        }
-
-        if (this.nextElement && this.nextHandler) {
-            this.nextElement.removeEventListener('click', this.nextHandler);
-        }
-
-        this.previousHandler = null;
-        this.nextHandler = null;
+        this.bindings.forEach(function (binding) {
+            binding.element.removeEventListener('click', binding.handler);
+        });
+        this.bindings = [];
         this.previousElement = null;
         this.nextElement = null;
         return this;
     }
 
     update(index, count) {
-        if (Number.isInteger(index)) {
-            this.index = index;
-        }
-
-        if (count !== undefined) {
-            this.count = this.normalizeCount(count);
-        }
-
-        this.refresh();
-        return this;
+        if (Number.isInteger(index)) this.index = index;
+        if (count !== undefined) this.count = Navigator.count(count);
+        return this.refresh();
     }
 
     setHidden(hidden) {
         var value = Boolean(hidden);
-
         if (this.previousElement) this.previousElement.hidden = value;
         if (this.nextElement) this.nextElement.hidden = value;
-
         return this;
     }
 
@@ -82,61 +68,48 @@ class Navigator {
     }
 
     hasPrevious() {
-        return this.count > 0
-            && Number.isInteger(this.index)
-            && this.index > 0;
+        return this.count > 0 && this.index > 0;
     }
 
     hasNext() {
-        return this.count > 0
-            && Number.isInteger(this.index)
-            && this.index < this.count - 1;
+        return this.count > 0 && this.index < this.count - 1;
     }
 
-    async navigate(targetIndex) {
-        if (!this.isValidTarget(targetIndex) || this.navigating) {
+    async navigate(index) {
+        if (
+            this.navigating
+            || !Number.isInteger(index)
+            || index < 0
+            || index >= this.count
+        ) {
             return false;
         }
 
         this.navigating = true;
 
         try {
-            if (typeof this.options.beforeNavigate === 'function') {
-                var proceed = await this.options.beforeNavigate(targetIndex);
-                if (proceed === false) return false;
+            if (
+                typeof this.options.beforeNavigate === 'function'
+                && await this.options.beforeNavigate(index) === false
+            ) {
+                return false;
             }
 
             if (typeof this.options.onNavigate === 'function') {
-                await this.options.onNavigate(targetIndex);
+                await this.options.onNavigate(index);
             }
 
-            this.index = targetIndex;
+            this.index = index;
             this.refresh();
             return true;
         } catch (error) {
             if (typeof this.options.onError === 'function') {
                 this.options.onError(error);
             }
-
             return false;
         } finally {
             this.navigating = false;
         }
-    }
-
-    handleClick(event, offset) {
-        event.preventDefault();
-
-        var element = offset < 0 ? this.previousElement : this.nextElement;
-        if (!element || element.getAttribute('aria-disabled') === 'true') return;
-
-        this.navigate(this.index + offset);
-    }
-
-    isValidTarget(index) {
-        return Number.isInteger(index)
-            && index >= 0
-            && index < this.count;
     }
 
     setDisabled(element, disabled) {
@@ -148,21 +121,14 @@ class Navigator {
         element.tabIndex = value ? -1 : 0;
     }
 
-    applyClasses(element, directionClass) {
-        element.classList.remove('navigator-link', 'is-disabled');
-        element.classList.add('btn', 'btn-link', 'text-decoration-none', directionClass);
+    resolve(target) {
+        return typeof target === 'string'
+            ? document.querySelector(target)
+            : target || null;
     }
 
-    resolveElement(target) {
-        if (typeof target === 'string') {
-            return document.querySelector(target);
-        }
-
-        return target || null;
-    }
-
-    normalizeCount(count) {
-        var value = Number(count);
+    static count(value) {
+        value = Number(value);
         return Number.isInteger(value) && value >= 0 ? value : 0;
     }
 }
