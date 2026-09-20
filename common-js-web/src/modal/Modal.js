@@ -1,69 +1,55 @@
 const SafeDom = require('../util/SafeDom');
 
-var modalCounter = 0;
+let modalId = 0;
 
-function getBootstrapModal() {
+function BootstrapModal() {
     return require('bootstrap/js/dist/modal');
 }
 
-function dialogSizeClass(size) {
-    if (size === 'sm') return 'modal-sm';
-    if (size === 'lg') return 'modal-lg';
-    if (size === 'xl') return 'modal-xl';
-    return '';
+function node(tag, className) {
+    var element = document.createElement(tag);
+    if (className) element.className = className;
+    return element;
 }
 
 class Modal {
     static open(config) {
         config = config || {};
 
-        var root = document.createElement('div');
-        var dialog = document.createElement('div');
-        var content = document.createElement('div');
-        var header = document.createElement('div');
-        var title = document.createElement('h5');
-        var closeButton = document.createElement('button');
-        var body = document.createElement('div');
+        var root = node('div', 'modal fade');
+        var dialog = node('div', 'modal-dialog modal-dialog-centered');
+        var content = node('div', 'modal-content');
+        var header = node('div', 'modal-header');
+        var title = node('h5', 'modal-title');
+        var close = node('button', 'btn-close');
+        var body = node('div', 'modal-body');
+        var sizeClass = {
+            sm: 'modal-sm',
+            lg: 'modal-lg',
+            xl: 'modal-xl'
+        }[config.size];
 
-        root.className = 'modal fade';
         root.tabIndex = -1;
-        root.setAttribute('aria-hidden', 'true');
-
-        dialog.className = 'modal-dialog modal-dialog-centered';
-        var sizeClass = dialogSizeClass(config.size || 'md');
         if (sizeClass) dialog.classList.add(sizeClass);
 
-        content.className = 'modal-content';
-        header.className = 'modal-header';
-        body.className = 'modal-body';
-
-        title.className = 'modal-title';
+        title.id = 'common-modal-title-' + (++modalId);
         title.textContent = config.title || '';
-        title.id = 'common-modal-title-' + (++modalCounter);
         root.setAttribute('aria-labelledby', title.id);
 
-        closeButton.type = 'button';
-        closeButton.className = 'btn-close';
-        closeButton.setAttribute('aria-label', 'Close');
-
-        if (config.closable === false) {
-            closeButton.hidden = true;
-        } else {
-            closeButton.setAttribute('data-bs-dismiss', 'modal');
-        }
+        close.type = 'button';
+        close.setAttribute('aria-label', 'Close');
+        close.hidden = config.closable === false;
+        if (!close.hidden) close.dataset.bsDismiss = 'modal';
 
         SafeDom.appendContent(body, config.content, {
             trustedHtml: config.trustedHtml === true
         });
 
-        header.appendChild(title);
-        header.appendChild(closeButton);
-        content.appendChild(header);
-        content.appendChild(body);
+        header.append(title, close);
+        content.append(header, body);
 
         if (config.footer !== null && config.footer !== undefined) {
-            var footer = document.createElement('div');
-            footer.className = 'modal-footer';
+            var footer = node('div', 'modal-footer');
             SafeDom.appendContent(footer, config.footer, {
                 trustedHtml: config.trustedHtml === true
             });
@@ -74,10 +60,8 @@ class Modal {
         root.appendChild(dialog);
         document.body.appendChild(root);
 
-        var BootstrapModal = getBootstrapModal();
-        var instance = new BootstrapModal(root, {
+        var instance = new (BootstrapModal())(root, {
             backdrop: 'static',
-            focus: true,
             keyboard: config.escapeClose !== false
         });
         var reason = 'close';
@@ -87,26 +71,18 @@ class Modal {
             element: root,
             modal: root,
             instance: instance,
-            close: function (closeReason) {
+            close: function (value) {
                 if (closed) return;
-                reason = closeReason || 'close';
+                reason = value || 'close';
                 instance.hide();
             }
         };
 
-        closeButton.addEventListener('click', function () {
-            reason = 'close';
-        });
-
         root.addEventListener('hidden.bs.modal', function () {
             if (closed) return;
             closed = true;
-
             instance.dispose();
-
-            if (root.parentNode) {
-                root.parentNode.removeChild(root);
-            }
+            root.remove();
 
             if (typeof config.onClose === 'function') {
                 config.onClose(reason, api);
