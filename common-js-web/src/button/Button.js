@@ -80,6 +80,7 @@ class Button {
             'button',
             'button-primary',
             'button-secondary',
+            'dropdown-item',
             'btn-primary',
             'btn-outline-secondary'
         );
