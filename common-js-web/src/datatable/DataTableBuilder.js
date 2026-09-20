@@ -41,6 +41,7 @@ class DataTableBuilder {
         this.actionTitle = 'Actions';
         this.table = null;
         this.searchSelector = null;
+        this.actionHeader = null;
     }
 
     data(rows) {
@@ -173,6 +174,7 @@ class DataTableBuilder {
         if (this.actions.length) {
             loadBootstrapDropdown();
             this.appendActionColumn();
+            this.ensureActionHeader();
         }
 
         this.table = window.jQuery(this.selector).DataTable(this.options);
@@ -189,6 +191,17 @@ class DataTableBuilder {
             searchable: false,
             render: () => this.renderActions()
         });
+    }
+
+    ensureActionHeader() {
+        var table = document.querySelector(this.selector);
+        var row = table && table.querySelector('thead tr');
+
+        if (!row || row.children.length >= this.options.columns.length) return;
+
+        this.actionHeader = document.createElement('th');
+        this.actionHeader.textContent = this.actionTitle;
+        row.appendChild(this.actionHeader);
     }
 
     renderActions() {
@@ -280,6 +293,11 @@ class DataTableBuilder {
         if (this.table) {
             this.table.destroy();
             this.table = null;
+        }
+
+        if (this.actionHeader) {
+            this.actionHeader.remove();
+            this.actionHeader = null;
         }
 
         return this;
