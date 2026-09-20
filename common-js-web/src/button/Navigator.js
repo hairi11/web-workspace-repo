@@ -25,8 +25,8 @@ class Navigator {
             this.handleClick(event, 1);
         };
 
-        this.previousElement.classList.add('navigator-link', 'navigator-previous');
-        this.nextElement.classList.add('navigator-link', 'navigator-next');
+        this.applyClasses(this.previousElement, 'navigator-previous');
+        this.applyClasses(this.nextElement, 'navigator-next');
 
         this.previousElement.addEventListener('click', this.previousHandler);
         this.nextElement.addEventListener('click', this.nextHandler);
@@ -143,9 +143,14 @@ class Navigator {
         if (!element) return;
 
         var value = Boolean(disabled);
-        element.classList.toggle('is-disabled', value);
+        element.classList.toggle('disabled', value);
         element.setAttribute('aria-disabled', String(value));
         element.tabIndex = value ? -1 : 0;
+    }
+
+    applyClasses(element, directionClass) {
+        element.classList.remove('navigator-link', 'is-disabled');
+        element.classList.add('btn', 'btn-link', 'text-decoration-none', directionClass);
     }
 
     resolveElement(target) {
