@@ -1,7 +1,7 @@
 {
   "name": "@company/common-js-web",
-  "version": "7.1.0",
-  "description": "Framework-agnostic CommonJS utility library for Ajax, forms, DataTables and reusable UI helpers.",
+  "version": "8.0.0",
+  "description": "Bootstrap-backed CommonJS wrapper library for HTTP, forms, DataTables and reusable UI helpers.",
   "main": "src/index.js",
   "types": "index.d.ts",
   "scripts": {
