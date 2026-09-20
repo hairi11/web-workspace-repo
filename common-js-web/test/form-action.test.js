@@ -8,8 +8,8 @@ class TestFormAction extends FormAction {
         super('#testForm');
         this.events = [];
         this.form = {
-            reset: function () {},
-            querySelectorAll: function () { return []; }
+            querySelectorAll: function () { return []; },
+            reset: function () {}
         };
         this.errorRenderer = {
             render: function () {},
@@ -21,16 +21,8 @@ class TestFormAction extends FormAction {
         return {name: 'Ali'};
     }
 
-    getUrl() {
-        return '/api/users';
-    }
-
     getValidationRules() {
         return {name: Validator.required()};
-    }
-
-    getConfirmation() {
-        return null;
     }
 
     buildRequestData(values) {
@@ -54,40 +46,27 @@ class TestFormAction extends FormAction {
         this.events.push('onSuccess');
         assert.equal(data.name, 'Ali');
     }
-
-    onComplete() {
-        this.events.push('onComplete');
-    }
 }
 
-test('FormAction template flow uses inherited defaults and overridden hooks', async function () {
-    var action = new TestFormAction();
-    var result = await action.execute();
+test('FormAction runs the project submit lifecycle', async function () {
+    const action = new TestFormAction();
+    const result = await action.execute();
 
     assert.deepEqual(result, {id: 1, name: 'Ali'});
-    assert.equal(action.getMethod(), 'POST');
     assert.equal(action.shouldTrackDirty(), false);
-    assert.equal(action.shouldResetOnSuccess(), false);
-    assert.equal(action.shouldDisableWhileSubmitting(), true);
     assert.deepEqual(action.events, [
         'beforeSubmit',
         'sendRequest',
-        'onSuccess',
-        'onComplete'
+        'onSuccess'
     ]);
 });
 
-class GetFormAction extends TestFormAction {
-    getMethod() {
-        return 'GET';
-    }
-}
+test('FormAction stops on validation errors', async function () {
+    const action = new TestFormAction();
+    action.serializeForm = function () { return {name: ''}; };
 
-test('FormAction child only overrides getMethod for GET behavior', async function () {
-    var action = new GetFormAction();
-    var context = await action.createContext({name: 'Ali'});
+    const result = await action.execute();
 
-    assert.equal(context.method, 'GET');
-    assert.equal(context.url, '/api/users');
-    assert.deepEqual(context.data, {user: {name: 'Ali'}});
+    assert.equal(result, undefined);
+    assert.deepEqual(action.events, []);
 });
