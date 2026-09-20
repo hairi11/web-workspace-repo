@@ -1,5 +1,4 @@
 const Modal = require('../../modal/Modal');
-const SecurityUtil = require('../../util/SecurityUtil');
 
 const LEVELS = Object.freeze({
     INFO: 'info',
@@ -16,19 +15,23 @@ const MODES = Object.freeze({
 const LEVEL_CONFIG = Object.freeze({
     info: {
         title: 'Information',
-        icon: 'fa fa-info-circle'
+        icon: 'fa fa-info-circle',
+        textClass: 'text-primary'
     },
     success: {
         title: 'Success',
-        icon: 'fa fa-check-circle'
+        icon: 'fa fa-check-circle',
+        textClass: 'text-success'
     },
     warning: {
         title: 'Warning',
-        icon: 'fa fa-exclamation-triangle'
+        icon: 'fa fa-exclamation-triangle',
+        textClass: 'text-warning'
     },
     error: {
         title: 'Error',
-        icon: 'fa fa-times-circle'
+        icon: 'fa fa-times-circle',
+        textClass: 'text-danger'
     }
 });
 
@@ -39,22 +42,21 @@ function normalizeConfig(config) {
 }
 
 function normalizeLevel(level) {
-    var value = SecurityUtil.sanitizeClassList(level || LEVELS.INFO)
-        .split(' ')[0] || LEVELS.INFO;
-
-    return LEVEL_CONFIG[value] ? value : LEVELS.INFO;
+    return LEVEL_CONFIG[level] ? level : LEVELS.INFO;
 }
 
 function createContent(level, messageText) {
     var content = document.createElement('div');
-    content.className = 'common-dialog-content common-dialog-' + level;
-
     var icon = document.createElement('i');
-    icon.className = 'common-dialog-icon ' + LEVEL_CONFIG[level].icon;
+    var message = document.createElement('div');
+
+    content.className = 'd-flex align-items-start gap-3';
+    icon.className = LEVEL_CONFIG[level].icon
+        + ' fs-4 '
+        + LEVEL_CONFIG[level].textClass;
     icon.setAttribute('aria-hidden', 'true');
 
-    var message = document.createElement('div');
-    message.className = 'common-dialog-message';
+    message.className = 'flex-grow-1';
     message.textContent = messageText || '';
 
     content.appendChild(icon);
@@ -70,9 +72,15 @@ function createButton(label, className) {
     return button;
 }
 
-function createActions() {
+function createActions(paired) {
     var actions = document.createElement('div');
-    actions.className = 'common-dialog-actions';
+
+    actions.className = 'd-flex gap-2 ms-auto';
+
+    if (paired) {
+        actions.style.minWidth = '248px';
+    }
+
     return actions;
 }
 
@@ -88,15 +96,15 @@ function openModal(config, title, content, actions, onClose) {
     });
 }
 
-function showConfirm(config, level, content, resolve) {
-    var actions = createActions();
+function showConfirm(config, content, resolve) {
+    var actions = createActions(true);
     var noButton = createButton(
         config.noLabel || 'No',
-        'button button-secondary common-dialog-secondary'
+        'btn btn-outline-secondary flex-fill'
     );
     var yesButton = createButton(
         config.yesLabel || 'Yes',
-        'button button-primary common-dialog-primary'
+        'btn btn-primary flex-fill'
     );
 
     actions.appendChild(noButton);
@@ -124,10 +132,10 @@ function showConfirm(config, level, content, resolve) {
 }
 
 function showOk(config, level, content, resolve) {
-    var actions = createActions();
+    var actions = createActions(false);
     var okButton = createButton(
         config.okLabel || 'OK',
-        'button button-primary common-dialog-primary'
+        'btn btn-primary px-4'
     );
 
     actions.appendChild(okButton);
@@ -161,7 +169,7 @@ class Dialog {
 
         return new Promise(function (resolve) {
             if (mode === MODES.CONFIRM) {
-                showConfirm(config, level, content, resolve);
+                showConfirm(config, content, resolve);
                 return;
             }
 
