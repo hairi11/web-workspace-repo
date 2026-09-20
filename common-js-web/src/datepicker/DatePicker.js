@@ -3,6 +3,7 @@ const DEFAULT_OPTIONS = {
     dateFormat: 'Y-m-d',
     altInput: true,
     altFormat: 'd/m/Y',
+    altInputClass: 'form-control',
     position: 'auto'
 };
 
@@ -10,13 +11,9 @@ class DatePicker {
     constructor(selector, options) {
         this.selector = selector;
         this.options = Object.assign({}, DEFAULT_OPTIONS, options || {});
-        this.instance = null;
         this.element = null;
-        this.control = null;
-        this.toggleButton = null;
-        this.clearButton = null;
-        this.altInputHandler = null;
-        this.changeHandler = () => this.syncClearButton();
+        this.instance = null;
+        this.maskHandler = null;
     }
 
     option(name, value) {
@@ -25,7 +22,7 @@ class DatePicker {
     }
 
     optionsConfig(config) {
-        this.options = Object.assign(this.options, config || {});
+        Object.assign(this.options, config || {});
         return this;
     }
 
@@ -40,146 +37,62 @@ class DatePicker {
 
         if (!this.element) return this;
 
-        this.buildControls();
+        this.element.classList.add('form-control');
         this.instance = window.flatpickr(this.element, this.options);
-        this.bindDateMask();
-        this.syncClearButton();
+        this.bindMask();
         return this;
     }
 
-    buildControls() {
-        const parent = this.element.parentNode;
-        if (!parent) return;
+    bindMask() {
+        var input = this.instance && this.instance.altInput;
+        if (!input) return;
 
-        this.control = document.createElement('div');
-        this.control.className = 'date-picker-control';
+        input.inputMode = 'numeric';
+        input.maxLength = 10;
+        input.placeholder = 'dd/mm/yyyy';
 
-        parent.insertBefore(this.control, this.element);
-        this.control.appendChild(this.element);
+        this.maskHandler = function () {
+            input.value = DatePicker.maskDateInput(input.value);
+        };
 
-        this.clearButton = this.createButton(
-            'date-picker-clear',
-            'Clear date',
-            '<i class="fa fa-times" aria-hidden="true"></i>'
-        );
-        this.clearButton.hidden = true;
-        this.clearButton.addEventListener('click', () => {
-            if (this.isDisabled()) return;
-            this.clear();
-        });
-
-        this.toggleButton = this.createButton(
-            'date-picker-toggle',
-            'Open calendar',
-            '<i class="fa fa-calendar" aria-hidden="true"></i>'
-        );
-        this.toggleButton.addEventListener('click', () => {
-            if (this.isDisabled()) return;
-            this.open();
-        });
-
-        this.control.appendChild(this.clearButton);
-        this.control.appendChild(this.toggleButton);
-        this.element.addEventListener('change', this.changeHandler);
-    }
-
-    createButton(className, label, html) {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'date-picker-button ' + className;
-        button.setAttribute('aria-label', label);
-        button.innerHTML = html;
-        return button;
+        input.addEventListener('input', this.maskHandler);
     }
 
     setDate(value, triggerChange) {
-        if (this.instance && typeof this.instance.setDate === 'function') {
+        if (this.instance) {
             this.instance.setDate(value, triggerChange === true);
-            this.syncClearButton();
         }
         return this;
     }
 
     clear() {
-        if (this.instance && typeof this.instance.clear === 'function') {
-            this.instance.clear();
-            this.syncClearButton();
-        }
+        if (this.instance) this.instance.clear();
         return this;
     }
 
     open() {
-        if (this.instance && typeof this.instance.open === 'function') {
-            this.instance.open();
-        }
+        if (this.instance) this.instance.open();
         return this;
     }
 
     close() {
-        if (this.instance && typeof this.instance.close === 'function') {
-            this.instance.close();
-        }
+        if (this.instance) this.instance.close();
         return this;
-    }
-
-    bindDateMask() {
-        if (!this.instance || !this.instance.altInput) return;
-
-        var altInput = this.instance.altInput;
-
-        altInput.inputMode = 'numeric';
-        altInput.maxLength = 10;
-        altInput.placeholder = 'dd/mm/yyyy';
-
-        this.altInputHandler = () => {
-            altInput.value = DatePicker.maskDateInput(altInput.value);
-        };
-
-        altInput.addEventListener('input', this.altInputHandler);
     }
 
     destroy() {
-        if (this.instance && this.instance.altInput && this.altInputHandler) {
-            this.instance.altInput.removeEventListener('input', this.altInputHandler);
+        var input = this.instance && this.instance.altInput;
+
+        if (input && this.maskHandler) {
+            input.removeEventListener('input', this.maskHandler);
         }
 
-        if (this.element) {
-            this.element.removeEventListener('change', this.changeHandler);
-        }
+        if (this.instance) this.instance.destroy();
 
-        if (this.instance && typeof this.instance.destroy === 'function') {
-            this.instance.destroy();
-        }
-
-        if (this.control && this.element && this.control.parentNode) {
-            this.control.parentNode.insertBefore(this.element, this.control);
-            this.control.remove();
-        }
-
-        this.instance = null;
         this.element = null;
-        this.control = null;
-        this.toggleButton = null;
-        this.clearButton = null;
-        this.altInputHandler = null;
+        this.instance = null;
+        this.maskHandler = null;
         return this;
-    }
-
-    syncClearButton() {
-        if (!this.clearButton) return;
-
-        const hasValue = this.instance
-            ? Array.isArray(this.instance.selectedDates) && this.instance.selectedDates.length > 0
-            : Boolean(this.element && this.element.value);
-
-        this.clearButton.hidden = !hasValue;
-    }
-
-    isDisabled() {
-        return Boolean(
-            (this.element && this.element.disabled)
-            || (this.instance && this.instance.altInput && this.instance.altInput.disabled)
-        );
     }
 
     getInstance() {
@@ -191,7 +104,7 @@ DatePicker.maskDateInput = function (value) {
     var digits = String(value || '').replace(/\D/g, '').slice(0, 8);
     var parts = [];
 
-    if (digits.length > 0) parts.push(digits.slice(0, 2));
+    if (digits.length) parts.push(digits.slice(0, 2));
     if (digits.length > 2) parts.push(digits.slice(2, 4));
     if (digits.length > 4) parts.push(digits.slice(4, 8));
 
