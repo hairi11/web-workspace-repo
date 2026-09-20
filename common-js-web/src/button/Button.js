@@ -25,7 +25,6 @@ class Button {
         }
 
         this.bindClick();
-
         return this;
     }
 
@@ -62,31 +61,34 @@ class Button {
             this.element.disabled = value;
         }
 
-        this.element.classList.toggle('is-disabled', value);
+        this.element.classList.toggle('disabled', value);
         this.element.setAttribute('aria-disabled', String(value));
-        this.element.tabIndex = value ? -1 : 0;
+
+        if (!('disabled' in this.element)) {
+            this.element.tabIndex = value ? -1 : 0;
+        }
 
         return this;
     }
 
-    resolveElement() {
-        if (typeof this.target === 'string') {
-            return document.querySelector(this.target);
-        }
-
-        return this.target || null;
-    }
-
     applyVariant() {
-        if (!this.element) return;
+        if (!this.element) return this;
 
-        var variant = this.options.variant === Button.Variant.PRIMARY
-            ? Button.Variant.PRIMARY
-            : Button.Variant.SECONDARY;
+        var primary = this.options.variant === Button.Variant.PRIMARY;
 
-        this.element.classList.add('button');
-        this.element.classList.toggle('button-primary', variant === Button.Variant.PRIMARY);
-        this.element.classList.toggle('button-secondary', variant === Button.Variant.SECONDARY);
+        this.element.classList.remove(
+            'button',
+            'button-primary',
+            'button-secondary',
+            'btn-primary',
+            'btn-outline-secondary'
+        );
+        this.element.classList.add(
+            'btn',
+            primary ? 'btn-primary' : 'btn-outline-secondary'
+        );
+
+        return this;
     }
 
     bindClick() {
@@ -104,6 +106,13 @@ class Button {
         this.element.addEventListener('click', this.clickHandler);
     }
 
+    resolveElement() {
+        if (typeof this.target === 'string') {
+            return document.querySelector(this.target);
+        }
+
+        return this.target || null;
+    }
 }
 
 Button.Variant = Object.freeze({
